@@ -19,9 +19,10 @@ Base prefix: `/api/v1`. Default port `4000` (`PORT`). Helmet + CORS + a global
    which calls `@ox/db` `withScope`. That opens a transaction and sets the
    Postgres GUCs `ox.user_id / ox.role / ox.floor_id`. The **RLS policies are the
    row boundary** — they filter every row. We never hand-filter scoped rows. The
-   operator-parity stores with no DB table yet (leads, automations, shifts,
-   agreements) enforce the equivalent floor scope in-service so cross-tenant rows
-   never leak.
+   operator- and consumer-parity tables (leads, automations, shifts, agreements,
+   notifications, wishlist, credits, packs, …) are Prisma-backed and run through
+   the same `ScopeRunner`, with explicit floor/user `where` clauses as defense in
+   depth so cross-tenant rows never leak.
 
 > Connect Postgres as a **non-superuser, non-BYPASSRLS** role in prod or the
 > policies in `db/prisma/migrations/rls/policies.sql` will not apply.
@@ -81,12 +82,14 @@ Auth (`@Public`): `POST /auth/otp/start`, `POST /auth/otp/verify`, `POST /auth/s
 | Module | Routes | Caps |
 |---|---|---|
 | **me** | `GET /me`, `/me/progress`, `/me/recovery`, `/me/prs`, `/me/orders`, `/me/credential` | `self.view` |
+| **me** (consumer parity) | `GET /me/notifications`, `POST /me/notifications/:id/read`, `POST /me/notifications/read-all`; `GET/POST /me/body`; `GET /me/wishlist`, `POST /me/wishlist`, `DELETE /me/wishlist/:productId`; `GET /me/addresses`, `POST /me/addresses`, `PATCH/DELETE /me/addresses/:id`; `GET /me/credits`; `GET /me/waivers`; `GET /me/health`, `POST /me/health/connect`, `DELETE /me/health/:provider`; `GET/POST /me/guest-passes`; `GET/PUT /me/onboarding` | `self.view` / `shop.buy` |
 | **tenant** | `GET /tenant/brand` (resolves `X-OX-Brand`, default OX copper) | public |
 | **floors** | `GET /floors`, `GET /floors/:id` | public |
 | **training** | `GET /exercises` (public, `q/muscle/equipment`), `POST /workouts/generate`, `POST /workouts`, `POST /workouts/:id/sets`, `POST /workouts/:id/finish` | `workout.log` |
 | **classes** | `GET /classes`, `POST /classes`, `PATCH/DELETE /classes/:id`, `POST /classes/:id/book`, `POST /bookings/:id/cancel`, `GET /classes/:id/roster`, `POST /classes/:id/checkin` | `class.manage` / `class.book` / `roster.view` / `checkin.scan` |
 | **events** | `GET /events`, `GET /events/:id` (public), `POST /events`, `POST /events/:id/rsvp`, `POST /tickets/:id/checkin` | `class.manage` / `raid.join` / `checkin.scan` |
-| **commerce** | `GET /products` (public, level-gated drops), `GET /cart`, `POST /cart/items`, `DELETE /cart/items/:id`, `POST /checkout` | `shop.buy` |
+| **commerce** | `GET /products` (public, level-gated drops), `GET /cart`, `POST /cart/items`, `DELETE /cart/items/:id`, `POST /checkout` (optional `promoCode`), `POST /cart/promo` | `shop.buy` |
+| **store** (consumer parity) | `GET /products/:id/reviews` (public), `POST /products/:id/reviews`; `GET /packs` (public), `POST /packs/:id/buy`; `POST /giftcards`, `POST /giftcards/redeem`; `GET /waivers`, `POST /waivers/:id/sign` | public / `self.view` / `shop.buy` |
 | **floors** (writes) | `PUT /floors/:id`, `PUT /floors/:id/equipment` | `floor.manage` / `equipment.manage` |
 | **classes** (series) | `POST /classes/:id/occurrences?count=&persist=` (recurRule expander) | `class.manage` |
 | **ops** | `GET /members`, `GET /members/:id`, `GET /clients`, `GET /payments`, `POST /payments/:id/retry`, `GET /memberships`, `POST /memberships`, `PATCH /memberships/:id`, `GET /reports/:name` | `members.view` / `clients.view` / `revenue.view` |
@@ -113,10 +116,14 @@ Lead pipeline, automation builder (with a `fire(floor, trigger)` runner invoked 
 signup + booking), POS desk sales (real `Payment` rows; cash settles paid, card
 mints a PaymentIntent), staff scheduling, commission/payroll (computed from the
 live `Payment` ledger, CSV export), recurring class builder (`occurrences`), and
-contracts/e-sign. Concepts already in the schema (POS→`Payment`, recurrence→
-`Class`, lead-convert→`User`) persist for real; concepts with no live table (Lead,
-Automation, Shift, Agreement, Signature) use floor-scoped in-memory stores with the
-same method surface, ready to port to Prisma when those tables land.
+contracts/e-sign. All of these now persist for real: Lead/LeadActivity,
+Automation/AutomationRun, Shift, and Agreement/Signature are Prisma-backed and
+RLS-scoped via `ScopeRunner` (host=floor, coach=own, admin=all), with explicit
+floor/user `where` clauses so tenants never leak. The automation `fire(floor,
+trigger)` runner records an `AutomationRun` per matched rule. Consumer-parity
+tables (notifications, body metrics, wishlist, reviews, addresses, credit ledger,
+packs, gift cards, promo codes, waivers, health connections, guest passes,
+onboarding) are likewise persisted, scoped by `userId = session.userId`.
 
 ## OpenAPI
 

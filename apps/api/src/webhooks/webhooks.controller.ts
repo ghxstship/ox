@@ -3,9 +3,10 @@
 //   - Signature: when STRIPE_WEBHOOK_SECRET is set we verify with
 //     stripe.webhooks.constructEvent(rawBody, sig, secret). Missing/invalid
 //     signature → rejected. With no secret (dev) we parse the body directly.
-//   - Idempotency: by event id. We keep an in-memory Set of processed ids.
-//     PRODUCTION needs a durable store (a WebhookEvent table / Redis) so dedupe
-//     survives restarts and is shared across instances.
+//   - Idempotency: by event id, persisted to the `WebhookEvent` table. We upsert
+//     the event on arrival; if it already carries a `processedAt` we skip. After
+//     a handler succeeds we stamp `processedAt` so dedupe survives restarts and is
+//     shared across instances. (Trusted server context — no RLS scope.)
 //   - Handling: branch on the lifecycle events and apply the real DB mutations
 //     from 05-state-machines via Prisma (webhooks are trusted server context, so
 //     they legitimately write without an RLS scope — no user is on the request).
@@ -23,8 +24,6 @@ import type { OxRequest } from "../common/session";
 @Controller("webhooks")
 export class WebhooksController {
   private readonly log = new Logger("StripeWebhook");
-  // In-memory idempotency. PRODUCTION: swap for a durable store (table/Redis).
-  private readonly seen = new Set<string>();
 
   constructor(
     private readonly config: ConfigService,
@@ -61,22 +60,29 @@ export class WebhooksController {
     }
 
     const id = event.id ?? "evt_unknown";
-    if (this.seen.has(id)) {
+    // Durable idempotency by event id. Upsert the row on arrival; if it already
+    // has a processedAt, this is a replay — skip. The row is kept either way so a
+    // failed handler (which throws below) re-processes on Stripe's retry.
+    const record = await prisma.webhookEvent.upsert({
+      where: { id },
+      create: { id, type: event.type },
+      update: {},
+    });
+    if (record.processedAt) {
       this.log.log(`Duplicate event ${id} ignored.`);
       return { received: true, duplicate: true };
     }
-    this.seen.add(id);
 
     try {
       await this.handle(event);
     } catch (e) {
-      // A failed handler should 500 so Stripe retries — but we de-duped above, so
-      // drop the id to allow the retry to re-process.
-      this.seen.delete(id);
+      // A failed handler should 500 so Stripe retries. We left processedAt null,
+      // so the retry re-processes cleanly.
       this.log.error(`Handler failed for ${id} (${event.type}): ${(e as Error).message}`);
       throw e;
     }
 
+    await prisma.webhookEvent.update({ where: { id }, data: { processedAt: new Date() } });
     this.log.log(`Stripe event ${id} (${event.type}) processed.`);
     return { received: true, id };
   }

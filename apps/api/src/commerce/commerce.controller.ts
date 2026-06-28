@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Req } from "@nestjs/common";
 import { Capability, CurrentSession, Public } from "../common/decorators";
 import type { OxRequest, Session } from "../common/session";
-import { AddCartItemDto } from "./commerce.dto";
+import { AddCartItemDto, CheckoutDto } from "./commerce.dto";
 import { CommerceService } from "./commerce.service";
 
 @Controller()
@@ -35,7 +35,7 @@ export class CommerceController {
 
   @Post("checkout")
   @Capability("shop.buy")
-  checkout(@CurrentSession() session: Session) {
-    return this.commerce.checkout(session);
+  checkout(@CurrentSession() session: Session, @Body() dto: CheckoutDto) {
+    return this.commerce.checkout(session, dto.promoCode);
   }
 }

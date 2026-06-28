@@ -451,3 +451,325 @@ model Quest {
 
   @@index([userId])
 }
+
+// ════════════════════════════════════════════════════════════════════
+// Parity tables (operator + consumer). Added 2026-06-28 for full
+// end-to-end functionality. Scalar FKs only (navigation omitted to keep the
+// hand-maintained schema localized); the live DB holds the real FKs + RLS.
+// ════════════════════════════════════════════════════════════════════
+
+enum LeadStage {
+  lead
+  tour
+  trial
+  member
+  lost
+}
+
+enum AutomationTrigger {
+  signup
+  booking
+  missed_class
+  membership_lapsed
+}
+
+enum ShiftKind {
+  class
+  floor
+  open
+}
+
+enum NotificationKind {
+  system
+  coach
+  social
+  commerce
+  booking
+  quest
+}
+
+enum HealthProvider {
+  apple_health
+  google_fit
+  garmin
+  whoop
+  fitbit
+}
+
+enum DiscountKind {
+  percent
+  fixed
+}
+
+enum CreditReason {
+  purchase
+  booking
+  refund
+  gift
+  adjustment
+  referral
+}
+
+model Lead {
+  id         String    @id @default(cuid())
+  floorId    String
+  name       String
+  contact    String
+  source     String    @default("walk_in")
+  stage      LeadStage @default(lead)
+  notes      String?
+  valueCents Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([floorId])
+}
+
+model LeadActivity {
+  id      String   @id @default(cuid())
+  leadId  String
+  floorId String
+  kind    String
+  note    String   @default("")
+  at      DateTime @default(now())
+
+  @@index([leadId])
+}
+
+model Automation {
+  id         String            @id @default(cuid())
+  floorId    String
+  name       String?
+  trigger    AutomationTrigger
+  action     String
+  delayHours Int               @default(0)
+  enabled    Boolean           @default(true)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@index([floorId])
+}
+
+model AutomationRun {
+  id           String   @id @default(cuid())
+  automationId String
+  floorId      String
+  at           DateTime @default(now())
+  result       String   @default("")
+
+  @@index([automationId])
+}
+
+model Shift {
+  id             String    @id @default(cuid())
+  floorId        String
+  staffId        String
+  startsAt       DateTime
+  endsAt         DateTime
+  kind           ShiftKind @default(floor)
+  coverRequested Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  @@index([floorId])
+  @@index([staffId])
+}
+
+model Agreement {
+  id        String   @id @default(cuid())
+  floorId   String
+  title     String
+  body      String
+  version   Int      @default(1)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([floorId])
+}
+
+model Signature {
+  id          String   @id @default(cuid())
+  agreementId String
+  floorId     String
+  userId      String
+  dataUrl     String
+  signedAt    DateTime @default(now())
+
+  @@index([agreementId])
+}
+
+model WebhookEvent {
+  id          String    @id
+  type        String
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  kind      NotificationKind @default(system)
+  title     String
+  body      String           @default("")
+  href      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+}
+
+model BodyMetric {
+  id         String   @id @default(cuid())
+  userId     String
+  at         DateTime @default(now())
+  weightLb   Float?
+  bodyFatPct Float?
+  restingHr  Int?
+  notes      String?
+
+  @@index([userId])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model ProductReview {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String
+  rating    Int
+  title     String?
+  body      String   @default("")
+  createdAt DateTime @default(now())
+
+  @@unique([productId, userId])
+  @@index([productId])
+}
+
+model ShippingAddress {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  line1     String
+  line2     String?
+  city      String
+  region    String
+  postal    String
+  country   String   @default("US")
+  phone     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model CreditLedger {
+  id           String       @id @default(cuid())
+  userId       String
+  delta        Int
+  balanceAfter Int
+  reason       CreditReason @default(adjustment)
+  note         String?
+  at           DateTime     @default(now())
+
+  @@index([userId])
+}
+
+model Pack {
+  id         String   @id @default(cuid())
+  floorId    String?
+  name       String
+  credits    Int
+  priceCents Int
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model UserPack {
+  id               String    @id @default(cuid())
+  userId           String
+  packId           String
+  creditsRemaining Int
+  purchasedAt      DateTime  @default(now())
+  expiresAt        DateTime?
+
+  @@index([userId])
+}
+
+model GiftCard {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  balanceCents  Int
+  initialCents  Int
+  purchaserId   String?
+  recipientEmail String?
+  redeemedById  String?
+  createdAt     DateTime @default(now())
+}
+
+model PromoCode {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  kind           DiscountKind @default(percent)
+  value          Int
+  active         Boolean      @default(true)
+  maxRedemptions Int?
+  timesRedeemed  Int          @default(0)
+  expiresAt      DateTime?
+  createdAt      DateTime     @default(now())
+}
+
+model Waiver {
+  id        String   @id @default(cuid())
+  floorId   String?
+  title     String
+  body      String
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+}
+
+model WaiverSignature {
+  id       String   @id @default(cuid())
+  waiverId String
+  userId   String
+  signedAt DateTime @default(now())
+
+  @@unique([waiverId, userId])
+  @@index([userId])
+}
+
+model HealthConnection {
+  id          String         @id @default(cuid())
+  userId      String
+  provider    HealthProvider
+  status      String         @default("connected")
+  connectedAt DateTime       @default(now())
+
+  @@unique([userId, provider])
+}
+
+model GuestPass {
+  id        String    @id @default(cuid())
+  userId    String
+  code      String    @unique
+  guestName String?
+  usedAt    DateTime?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model OnboardingState {
+  userId    String   @id
+  step      Int      @default(0)
+  completed Boolean  @default(false)
+  data      Json     @default("{}")
+  updatedAt DateTime @default(now())
+}

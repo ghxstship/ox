@@ -18,6 +18,165 @@ export type Database = {
   }
   public: {
     Tables: {
+      Agreement: {
+        Row: {
+          archived: boolean
+          body: string
+          createdAt: string
+          floorId: string
+          id: string
+          title: string
+          version: number
+        }
+        Insert: {
+          archived?: boolean
+          body: string
+          createdAt?: string
+          floorId: string
+          id?: string
+          title: string
+          version?: number
+        }
+        Update: {
+          archived?: boolean
+          body?: string
+          createdAt?: string
+          floorId?: string
+          id?: string
+          title?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Agreement_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Automation: {
+        Row: {
+          action: string
+          createdAt: string
+          delayHours: number
+          enabled: boolean
+          floorId: string
+          id: string
+          name: string | null
+          trigger: Database["public"]["Enums"]["AutomationTrigger"]
+          updatedAt: string
+        }
+        Insert: {
+          action: string
+          createdAt?: string
+          delayHours?: number
+          enabled?: boolean
+          floorId: string
+          id?: string
+          name?: string | null
+          trigger: Database["public"]["Enums"]["AutomationTrigger"]
+          updatedAt?: string
+        }
+        Update: {
+          action?: string
+          createdAt?: string
+          delayHours?: number
+          enabled?: boolean
+          floorId?: string
+          id?: string
+          name?: string | null
+          trigger?: Database["public"]["Enums"]["AutomationTrigger"]
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Automation_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      AutomationRun: {
+        Row: {
+          at: string
+          automationId: string
+          floorId: string
+          id: string
+          result: string
+        }
+        Insert: {
+          at?: string
+          automationId: string
+          floorId: string
+          id?: string
+          result?: string
+        }
+        Update: {
+          at?: string
+          automationId?: string
+          floorId?: string
+          id?: string
+          result?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "AutomationRun_automationId_fkey"
+            columns: ["automationId"]
+            isOneToOne: false
+            referencedRelation: "Automation"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "AutomationRun_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      BodyMetric: {
+        Row: {
+          at: string
+          bodyFatPct: number | null
+          id: string
+          notes: string | null
+          restingHr: number | null
+          userId: string
+          weightLb: number | null
+        }
+        Insert: {
+          at?: string
+          bodyFatPct?: number | null
+          id?: string
+          notes?: string | null
+          restingHr?: number | null
+          userId: string
+          weightLb?: number | null
+        }
+        Update: {
+          at?: string
+          bodyFatPct?: number | null
+          id?: string
+          notes?: string | null
+          restingHr?: number | null
+          userId?: string
+          weightLb?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "BodyMetric_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Booking: {
         Row: {
           classId: string
@@ -348,6 +507,44 @@ export type Database = {
           },
         ]
       }
+      CreditLedger: {
+        Row: {
+          at: string
+          balanceAfter: number
+          delta: number
+          id: string
+          note: string | null
+          reason: Database["public"]["Enums"]["CreditReason"]
+          userId: string
+        }
+        Insert: {
+          at?: string
+          balanceAfter: number
+          delta: number
+          id?: string
+          note?: string | null
+          reason?: Database["public"]["Enums"]["CreditReason"]
+          userId: string
+        }
+        Update: {
+          at?: string
+          balanceAfter?: number
+          delta?: number
+          id?: string
+          note?: string | null
+          reason?: Database["public"]["Enums"]["CreditReason"]
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "CreditLedger_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       DirectMessage: {
         Row: {
           body: string
@@ -637,6 +834,124 @@ export type Database = {
           },
         ]
       }
+      GiftCard: {
+        Row: {
+          balanceCents: number
+          code: string
+          createdAt: string
+          id: string
+          initialCents: number
+          purchaserId: string | null
+          recipientEmail: string | null
+          redeemedById: string | null
+        }
+        Insert: {
+          balanceCents: number
+          code: string
+          createdAt?: string
+          id?: string
+          initialCents: number
+          purchaserId?: string | null
+          recipientEmail?: string | null
+          redeemedById?: string | null
+        }
+        Update: {
+          balanceCents?: number
+          code?: string
+          createdAt?: string
+          id?: string
+          initialCents?: number
+          purchaserId?: string | null
+          recipientEmail?: string | null
+          redeemedById?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "GiftCard_purchaserId_fkey"
+            columns: ["purchaserId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "GiftCard_redeemedById_fkey"
+            columns: ["redeemedById"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      GuestPass: {
+        Row: {
+          code: string
+          createdAt: string
+          expiresAt: string | null
+          guestName: string | null
+          id: string
+          usedAt: string | null
+          userId: string
+        }
+        Insert: {
+          code: string
+          createdAt?: string
+          expiresAt?: string | null
+          guestName?: string | null
+          id?: string
+          usedAt?: string | null
+          userId: string
+        }
+        Update: {
+          code?: string
+          createdAt?: string
+          expiresAt?: string | null
+          guestName?: string | null
+          id?: string
+          usedAt?: string | null
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "GuestPass_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      HealthConnection: {
+        Row: {
+          connectedAt: string
+          id: string
+          provider: Database["public"]["Enums"]["HealthProvider"]
+          status: string
+          userId: string
+        }
+        Insert: {
+          connectedAt?: string
+          id?: string
+          provider: Database["public"]["Enums"]["HealthProvider"]
+          status?: string
+          userId: string
+        }
+        Update: {
+          connectedAt?: string
+          id?: string
+          provider?: Database["public"]["Enums"]["HealthProvider"]
+          status?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "HealthConnection_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Herd: {
         Row: {
           createdAt: string
@@ -669,6 +984,95 @@ export type Database = {
             columns: ["userId"]
             isOneToOne: false
             referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Lead: {
+        Row: {
+          contact: string
+          createdAt: string
+          floorId: string
+          id: string
+          name: string
+          notes: string | null
+          source: string
+          stage: Database["public"]["Enums"]["LeadStage"]
+          updatedAt: string
+          valueCents: number
+        }
+        Insert: {
+          contact: string
+          createdAt?: string
+          floorId: string
+          id?: string
+          name: string
+          notes?: string | null
+          source?: string
+          stage?: Database["public"]["Enums"]["LeadStage"]
+          updatedAt?: string
+          valueCents?: number
+        }
+        Update: {
+          contact?: string
+          createdAt?: string
+          floorId?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          source?: string
+          stage?: Database["public"]["Enums"]["LeadStage"]
+          updatedAt?: string
+          valueCents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Lead_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      LeadActivity: {
+        Row: {
+          at: string
+          floorId: string
+          id: string
+          kind: string
+          leadId: string
+          note: string
+        }
+        Insert: {
+          at?: string
+          floorId: string
+          id?: string
+          kind: string
+          leadId: string
+          note?: string
+        }
+        Update: {
+          at?: string
+          floorId?: string
+          id?: string
+          kind?: string
+          leadId?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "LeadActivity_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "LeadActivity_leadId_fkey"
+            columns: ["leadId"]
+            isOneToOne: false
+            referencedRelation: "Lead"
             referencedColumns: ["id"]
           },
         ]
@@ -804,6 +1208,79 @@ export type Database = {
           },
         ]
       }
+      Notification: {
+        Row: {
+          body: string
+          createdAt: string
+          href: string | null
+          id: string
+          kind: Database["public"]["Enums"]["NotificationKind"]
+          read: boolean
+          title: string
+          userId: string
+        }
+        Insert: {
+          body?: string
+          createdAt?: string
+          href?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["NotificationKind"]
+          read?: boolean
+          title: string
+          userId: string
+        }
+        Update: {
+          body?: string
+          createdAt?: string
+          href?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["NotificationKind"]
+          read?: boolean
+          title?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Notification_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      OnboardingState: {
+        Row: {
+          completed: boolean
+          data: Json
+          step: number
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          completed?: boolean
+          data?: Json
+          step?: number
+          updatedAt?: string
+          userId: string
+        }
+        Update: {
+          completed?: boolean
+          data?: Json
+          step?: number
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "OnboardingState_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: true
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Order: {
         Row: {
           createdAt: string
@@ -889,6 +1366,44 @@ export type Database = {
             columns: ["productId"]
             isOneToOne: false
             referencedRelation: "Product"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Pack: {
+        Row: {
+          active: boolean
+          createdAt: string
+          credits: number
+          floorId: string | null
+          id: string
+          name: string
+          priceCents: number
+        }
+        Insert: {
+          active?: boolean
+          createdAt?: string
+          credits: number
+          floorId?: string | null
+          id?: string
+          name: string
+          priceCents: number
+        }
+        Update: {
+          active?: boolean
+          createdAt?: string
+          credits?: number
+          floorId?: string | null
+          id?: string
+          name?: string
+          priceCents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Pack_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
             referencedColumns: ["id"]
           },
         ]
@@ -1216,6 +1731,51 @@ export type Database = {
           },
         ]
       }
+      ProductReview: {
+        Row: {
+          body: string
+          createdAt: string
+          id: string
+          productId: string
+          rating: number
+          title: string | null
+          userId: string
+        }
+        Insert: {
+          body?: string
+          createdAt?: string
+          id?: string
+          productId: string
+          rating: number
+          title?: string | null
+          userId: string
+        }
+        Update: {
+          body?: string
+          createdAt?: string
+          id?: string
+          productId?: string
+          rating?: number
+          title?: string | null
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ProductReview_productId_fkey"
+            columns: ["productId"]
+            isOneToOne: false
+            referencedRelation: "Product"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ProductReview_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ProductSize: {
         Row: {
           id: string
@@ -1391,6 +1951,42 @@ export type Database = {
           },
         ]
       }
+      PromoCode: {
+        Row: {
+          active: boolean
+          code: string
+          createdAt: string
+          expiresAt: string | null
+          id: string
+          kind: Database["public"]["Enums"]["DiscountKind"]
+          maxRedemptions: number | null
+          timesRedeemed: number
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          createdAt?: string
+          expiresAt?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["DiscountKind"]
+          maxRedemptions?: number | null
+          timesRedeemed?: number
+          value: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          createdAt?: string
+          expiresAt?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["DiscountKind"]
+          maxRedemptions?: number | null
+          timesRedeemed?: number
+          value?: number
+        }
+        Relationships: []
+      }
       Quest: {
         Row: {
           createdAt: string
@@ -1511,6 +2107,156 @@ export type Database = {
             columns: ["sessionId"]
             isOneToOne: false
             referencedRelation: "WorkoutSession"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Shift: {
+        Row: {
+          coverRequested: boolean
+          createdAt: string
+          endsAt: string
+          floorId: string
+          id: string
+          kind: Database["public"]["Enums"]["ShiftKind"]
+          staffId: string
+          startsAt: string
+        }
+        Insert: {
+          coverRequested?: boolean
+          createdAt?: string
+          endsAt: string
+          floorId: string
+          id?: string
+          kind?: Database["public"]["Enums"]["ShiftKind"]
+          staffId: string
+          startsAt: string
+        }
+        Update: {
+          coverRequested?: boolean
+          createdAt?: string
+          endsAt?: string
+          floorId?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["ShiftKind"]
+          staffId?: string
+          startsAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Shift_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Shift_staffId_fkey"
+            columns: ["staffId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ShippingAddress: {
+        Row: {
+          city: string
+          country: string
+          createdAt: string
+          id: string
+          isDefault: boolean
+          line1: string
+          line2: string | null
+          name: string
+          phone: string | null
+          postal: string
+          region: string
+          userId: string
+        }
+        Insert: {
+          city: string
+          country?: string
+          createdAt?: string
+          id?: string
+          isDefault?: boolean
+          line1: string
+          line2?: string | null
+          name: string
+          phone?: string | null
+          postal: string
+          region: string
+          userId: string
+        }
+        Update: {
+          city?: string
+          country?: string
+          createdAt?: string
+          id?: string
+          isDefault?: boolean
+          line1?: string
+          line2?: string | null
+          name?: string
+          phone?: string | null
+          postal?: string
+          region?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ShippingAddress_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Signature: {
+        Row: {
+          agreementId: string
+          dataUrl: string
+          floorId: string
+          id: string
+          signedAt: string
+          userId: string
+        }
+        Insert: {
+          agreementId: string
+          dataUrl: string
+          floorId: string
+          id?: string
+          signedAt?: string
+          userId: string
+        }
+        Update: {
+          agreementId?: string
+          dataUrl?: string
+          floorId?: string
+          id?: string
+          signedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Signature_agreementId_fkey"
+            columns: ["agreementId"]
+            isOneToOne: false
+            referencedRelation: "Agreement"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Signature_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Signature_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
             referencedColumns: ["id"]
           },
         ]
@@ -1836,6 +2582,48 @@ export type Database = {
           },
         ]
       }
+      UserPack: {
+        Row: {
+          creditsRemaining: number
+          expiresAt: string | null
+          id: string
+          packId: string
+          purchasedAt: string
+          userId: string
+        }
+        Insert: {
+          creditsRemaining: number
+          expiresAt?: string | null
+          id?: string
+          packId: string
+          purchasedAt?: string
+          userId: string
+        }
+        Update: {
+          creditsRemaining?: number
+          expiresAt?: string | null
+          id?: string
+          packId?: string
+          purchasedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "UserPack_packId_fkey"
+            columns: ["packId"]
+            isOneToOne: false
+            referencedRelation: "Pack"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "UserPack_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       UserSpecies: {
         Row: {
           caughtAt: string
@@ -1865,6 +2653,134 @@ export type Database = {
           },
           {
             foreignKeyName: "UserSpecies_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Waiver: {
+        Row: {
+          body: string
+          createdAt: string
+          floorId: string | null
+          id: string
+          title: string
+          version: number
+        }
+        Insert: {
+          body: string
+          createdAt?: string
+          floorId?: string | null
+          id?: string
+          title: string
+          version?: number
+        }
+        Update: {
+          body?: string
+          createdAt?: string
+          floorId?: string | null
+          id?: string
+          title?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Waiver_floorId_fkey"
+            columns: ["floorId"]
+            isOneToOne: false
+            referencedRelation: "Floor"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      WaiverSignature: {
+        Row: {
+          id: string
+          signedAt: string
+          userId: string
+          waiverId: string
+        }
+        Insert: {
+          id?: string
+          signedAt?: string
+          userId: string
+          waiverId: string
+        }
+        Update: {
+          id?: string
+          signedAt?: string
+          userId?: string
+          waiverId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "WaiverSignature_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "WaiverSignature_waiverId_fkey"
+            columns: ["waiverId"]
+            isOneToOne: false
+            referencedRelation: "Waiver"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      WebhookEvent: {
+        Row: {
+          id: string
+          processedAt: string | null
+          receivedAt: string
+          type: string
+        }
+        Insert: {
+          id: string
+          processedAt?: string | null
+          receivedAt?: string
+          type: string
+        }
+        Update: {
+          id?: string
+          processedAt?: string | null
+          receivedAt?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      WishlistItem: {
+        Row: {
+          createdAt: string
+          id: string
+          productId: string
+          userId: string
+        }
+        Insert: {
+          createdAt?: string
+          id?: string
+          productId: string
+          userId: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          productId?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "WishlistItem_productId_fkey"
+            columns: ["productId"]
+            isOneToOne: false
+            referencedRelation: "Product"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "WishlistItem_userId_fkey"
             columns: ["userId"]
             isOneToOne: false
             referencedRelation: "User"
@@ -1947,6 +2863,11 @@ export type Database = {
       is_operator: { Args: never; Returns: boolean }
     }
     Enums: {
+      AutomationTrigger:
+        | "signup"
+        | "booking"
+        | "missed_class"
+        | "membership_lapsed"
       BookingState:
         | "booked"
         | "waitlist"
@@ -1955,6 +2876,14 @@ export type Database = {
         | "no_show"
         | "cancelled"
       ClassLoad: "open" | "fill" | "full"
+      CreditReason:
+        | "purchase"
+        | "booking"
+        | "refund"
+        | "gift"
+        | "adjustment"
+        | "referral"
+      DiscountKind: "percent" | "fixed"
       Equipment:
         | "barbell"
         | "dumbbell"
@@ -1964,6 +2893,13 @@ export type Database = {
         | "band"
         | "bodyweight"
         | "trx"
+      HealthProvider:
+        | "apple_health"
+        | "google_fit"
+        | "garmin"
+        | "whoop"
+        | "fitbit"
+      LeadStage: "lead" | "tour" | "trial" | "member" | "lost"
       MembershipStatus: "active" | "paused" | "cancelled" | "past_due"
       Muscle:
         | "push"
@@ -1975,10 +2911,18 @@ export type Database = {
         | "back"
         | "chest"
         | "glutes"
+      NotificationKind:
+        | "system"
+        | "coach"
+        | "social"
+        | "commerce"
+        | "booking"
+        | "quest"
       OrderState: "cart" | "placed" | "paid" | "fulfilled" | "cancelled"
       PayState: "pending" | "paid" | "failed" | "refunded"
       Role: "member" | "coach" | "host" | "admin"
       Scenery: "oceanfront" | "rooftop" | "industrial" | "sunrise" | "forest"
+      ShiftKind: "class" | "floor" | "open"
       TicketState: "reserved" | "paid" | "checked_in" | "refunded"
       Tier: "compass" | "sound" | "distant" | "founder"
     }
@@ -2108,6 +3052,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      AutomationTrigger: [
+        "signup",
+        "booking",
+        "missed_class",
+        "membership_lapsed",
+      ],
       BookingState: [
         "booked",
         "waitlist",
@@ -2117,6 +3067,15 @@ export const Constants = {
         "cancelled",
       ],
       ClassLoad: ["open", "fill", "full"],
+      CreditReason: [
+        "purchase",
+        "booking",
+        "refund",
+        "gift",
+        "adjustment",
+        "referral",
+      ],
+      DiscountKind: ["percent", "fixed"],
       Equipment: [
         "barbell",
         "dumbbell",
@@ -2127,6 +3086,14 @@ export const Constants = {
         "bodyweight",
         "trx",
       ],
+      HealthProvider: [
+        "apple_health",
+        "google_fit",
+        "garmin",
+        "whoop",
+        "fitbit",
+      ],
+      LeadStage: ["lead", "tour", "trial", "member", "lost"],
       MembershipStatus: ["active", "paused", "cancelled", "past_due"],
       Muscle: [
         "push",
@@ -2139,13 +3106,21 @@ export const Constants = {
         "chest",
         "glutes",
       ],
+      NotificationKind: [
+        "system",
+        "coach",
+        "social",
+        "commerce",
+        "booking",
+        "quest",
+      ],
       OrderState: ["cart", "placed", "paid", "fulfilled", "cancelled"],
       PayState: ["pending", "paid", "failed", "refunded"],
       Role: ["member", "coach", "host", "admin"],
       Scenery: ["oceanfront", "rooftop", "industrial", "sunrise", "forest"],
+      ShiftKind: ["class", "floor", "open"],
       TicketState: ["reserved", "paid", "checked_in", "refunded"],
       Tier: ["compass", "sound", "distant", "founder"],
     },
   },
 } as const
-

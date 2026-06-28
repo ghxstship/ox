@@ -9,6 +9,7 @@ import { BillingModule } from "./billing/billing.module";
 import { ClassesModule } from "./classes/classes.module";
 import { CommerceModule } from "./commerce/commerce.module";
 import { CommonModule } from "./common/common.module";
+import { ConsumerModule } from "./consumer/consumer.module";
 import { ErrorFilter } from "./common/error.filter";
 import { EventsModule } from "./events/events.module";
 import { FloorsModule } from "./floors/floors.module";
@@ -35,6 +36,7 @@ import { WebhooksModule } from "./webhooks/webhooks.module";
     ClassesModule,
     EventsModule,
     CommerceModule,
+    ConsumerModule,
     OpsModule,
     AdminModule,
     WebhooksModule,

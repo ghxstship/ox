@@ -5,6 +5,7 @@ import { prisma, Prisma } from "@ox/db";
 import type { Session } from "@ox/rbac";
 import { BillingService } from "../billing/billing.service";
 import { ScopeRunner } from "../common/scope.runner";
+import { StoreService } from "../consumer/store.service";
 import type { AddCartItemDto } from "./commerce.dto";
 
 @Injectable()
@@ -67,8 +68,12 @@ export class CommerceService {
     });
   }
 
-  /** Place the cart: total it, mint a PaymentIntent, move to `placed`, write Payment(pending). */
-  checkout(session: Session) {
+  /**
+   * Place the cart: total it, apply an optional promo code, mint a PaymentIntent,
+   * move to `placed`, write Payment(pending). A valid promo increments its
+   * timesRedeemed only on this successful checkout.
+   */
+  checkout(session: Session, promoCode?: string) {
     return this.scope.run(session, async (tx) => {
       const cart = await tx.order.findFirst({
         where: { userId: session.userId, state: "cart" },
@@ -77,7 +82,15 @@ export class CommerceService {
       if (!cart || cart.items.length === 0) {
         throw new NotFoundException({ code: "not_found", message: "Cart is empty." });
       }
-      const total = cart.items.reduce((s, i) => s + i.priceCents * i.qty, 0);
+      const subtotal = cart.items.reduce((s, i) => s + i.priceCents * i.qty, 0);
+      let total = subtotal;
+      let discountCents = 0;
+      if (promoCode) {
+        const promo = await StoreService.validatePromo(tx, promoCode);
+        discountCents = StoreService.computeDiscount(promo, subtotal);
+        total = Math.max(0, subtotal - discountCents);
+        await tx.promoCode.update({ where: { id: promo.id }, data: { timesRedeemed: { increment: 1 } } });
+      }
       const pi = await this.billing.createPaymentIntent(total, "Shop");
 
       const order = await tx.order.update({
@@ -95,7 +108,13 @@ export class CommerceService {
           stripePiId: pi.id,
         },
       });
-      return { order, payment: { id: payment.id, clientSecret: pi.clientSecret, mock: pi.mock } };
+      return {
+        order,
+        subtotalCents: subtotal,
+        discountCents,
+        totalCents: total,
+        payment: { id: payment.id, clientSecret: pi.clientSecret, mock: pi.mock },
+      };
     });
   }
 

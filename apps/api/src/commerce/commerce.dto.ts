@@ -5,3 +5,8 @@ export class AddCartItemDto {
   @IsString() size!: string;
   @IsInt() @Min(1) @IsOptional() qty?: number;
 }
+
+export class CheckoutDto {
+  /** Optional promo code applied to the order total at checkout. */
+  @IsString() @IsOptional() promoCode?: string;
+}
