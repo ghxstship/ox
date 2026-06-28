@@ -1,0 +1,167 @@
+/* OX web — app-level CSS. The DS owns the design language (@ox/ds/styles.css);
+   this file only adds page-shell glue (skip link, focus rings, reduced motion,
+   logical-property layout) on top of the DS tokens. No hand-rolled colors —
+   everything references --ox-* tokens. */
+
+:root {
+  color-scheme: light;
+  /* Geist loads under its own var (the `geist` package); alias the DS body-type
+     token to it so --ox-font-sans resolves to Geist. */
+  --ox-font-sans: var(--font-geist-sans, "Geist", system-ui, -apple-system, sans-serif);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ox-paper, #f4f1ec);
+  color: var(--ox-ink, #1b1714);
+  font-family: var(--ox-font-sans, system-ui, sans-serif);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Skip-to-content — visible only on focus, square + ruled, one-accent. */
+.ox-skip {
+  position: fixed;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  z-index: 1000;
+  transform: translateY(-200%);
+  padding: 10px 16px;
+  background: var(--ox-ink, #1b1714);
+  color: var(--ox-paper, #f4f1ec);
+  border: 1px solid var(--ox-oxide, #b5552e);
+  border-radius: 0;
+  font-family: var(--ox-font-mono, monospace);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.12s ease;
+}
+.ox-skip:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--ox-oxide, #b5552e);
+  outline-offset: 2px;
+}
+
+/* Never remove focus outlines — strengthen them. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--ox-oxide, #b5552e);
+  outline-offset: 2px;
+}
+
+/* 44px min touch targets for interactive chrome. */
+.ox-hit {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Logical-property page wrappers so RTL mirrors automatically. */
+.ox-page {
+  inline-size: 100%;
+  max-inline-size: 1100px;
+  margin-inline: auto;
+  padding-inline: 20px;
+  padding-block: 24px 80px;
+}
+
+.ox-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ox-row-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.ox-section-label {
+  font-family: var(--ox-font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ox-stone, #8a8178);
+  margin-block: 8px 4px;
+}
+
+.ox-grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+/* Consumer bottom tab bar — square, ruled, one-accent active state. */
+.ox-tabbar {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 50;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border-block-start: 1px solid var(--ox-line, #d9d2c7);
+  background: var(--ox-paper, #f4f1ec);
+}
+.ox-tabbar a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-block-size: 56px;
+  padding-block: 8px;
+  text-decoration: none;
+  color: var(--ox-stone, #8a8178);
+  font-family: var(--ox-font-mono, monospace);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ox-tabbar a[aria-current="page"] {
+  color: var(--ox-oxide, #b5552e);
+  border-block-start: 2px solid var(--ox-oxide, #b5552e);
+}
+
+/* App top chrome (consumer). */
+.ox-appbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-inline: 20px;
+  padding-block: 12px;
+  border-block-end: 1px solid var(--ox-line, #d9d2c7);
+  background: var(--ox-paper, #f4f1ec);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 40;
+}
+
+.ox-demo-note {
+  font-family: var(--ox-font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ox-stone, #8a8178);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

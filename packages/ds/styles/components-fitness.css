@@ -1,0 +1,283 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — components-fitness.css
+ * Styling for the components/fitness group. Square, ruled, copper accent.
+ * Reads the fitness tokens (tokens/fitness.css). No new hues.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Level badge ─────────────────────────────────────────────────────── */
+.ox-lvl { display: inline-flex; align-items: center; gap: 8px; }
+.ox-lvl__b { font-family: var(--ox-font-mono); font-weight: 800; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-level-text); background: var(--ox-level); padding: 5px 9px; }
+.ox-lvl--ink .ox-lvl__b { background: var(--ox-ink); color: var(--ox-oxide-bright); }
+.ox-lvl__r { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-stone); }
+
+/* ── XP bar ──────────────────────────────────────────────────────────── */
+.ox-xpbar__track { height: 6px; background: var(--ox-xp-track); }
+.ox-xpbar--compact .ox-xpbar__track { height: 4px; }
+.ox-xpbar__fill { display: block; height: 100%; background: var(--ox-xp); transition: width var(--ox-dur) var(--ox-ease); }
+.ox-xpbar__meta { display: flex; justify-content: space-between; font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-stone); margin-top: 6px; }
+
+/* ── Streak ──────────────────────────────────────────────────────────── */
+.ox-streak { display: inline-flex; align-items: baseline; gap: 5px; font-family: var(--ox-font-mono); color: var(--ox-stone-soft); }
+.ox-streak.is-active { color: var(--ox-streak); }
+.ox-streak__f { font-size: 11px; }
+.ox-streak__n { font-family: var(--ox-font-serif); font-size: 22px; line-height: 1; color: var(--ox-ink); }
+.ox-streak__l { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* ── Quest row ───────────────────────────────────────────────────────── */
+.ox-quest { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid var(--ox-line); border-bottom: none; }
+.ox-quest:last-child { border-bottom: 1px solid var(--ox-line); }
+.ox-quest__ic { width: 34px; height: 34px; flex-shrink: 0; border: 1px solid var(--ox-ink); display: grid; place-items: center; font-family: var(--ox-font-mono); font-weight: 800; font-size: 12px; }
+.ox-quest.is-done .ox-quest__ic { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+.ox-quest.is-locked { opacity: 0.5; }
+.ox-quest.is-locked .ox-quest__ic { border-color: var(--ox-quest-locked); color: var(--ox-quest-locked); }
+.ox-quest__main { flex: 1; }
+.ox-quest__name { font-family: var(--ox-font-serif); font-size: 18px; line-height: 1; }
+.ox-quest__sub { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin-top: 5px; }
+.ox-quest__v { font-family: var(--ox-font-mono); font-size: 13px; font-weight: 500; color: var(--ox-ink); white-space: nowrap; }
+.ox-quest__v em { font-style: normal; color: var(--ox-oxide); }
+
+/* ── Challenge hero ──────────────────────────────────────────────────── */
+.ox-chero { position: relative; overflow: hidden; background: var(--ox-ink); color: var(--ox-paper); padding: 24px 22px 22px; }
+.ox-chero__bg { position: absolute; inset: 0; background: radial-gradient(circle at 80% 16%, var(--ox-oxide) 0%, #4a2818 26%, var(--ox-ink) 64%); opacity: 0.9; }
+.ox-chero__in { position: relative; }
+.ox-chero__k { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ox-oxide-bright); }
+.ox-chero__t { font-family: var(--ox-font-serif); font-size: 48px; line-height: 0.86; letter-spacing: -0.02em; margin: 12px 0 0; }
+.ox-chero__t em { font-style: italic; color: var(--ox-oxide-bright); }
+.ox-chero__sub { font-family: var(--ox-font-serif); font-style: italic; font-size: 15px; line-height: 1.35; color: rgba(236,231,218,0.82); margin: 14px 0 0; max-width: 32ch; }
+.ox-chero__row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.ox-chero__pill { font-family: var(--ox-font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 10px; border: 1px solid rgba(236,231,218,0.4); color: var(--ox-paper); }
+.ox-chero__pill.on { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+
+/* ── Species badge / collection ──────────────────────────────────────── */
+.ox-species { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.ox-species__slot { position: relative; width: 56px; height: 56px; border: 1px solid var(--ox-badge-empty); display: grid; place-items: center; font-size: 22px; color: var(--ox-stone-soft); }
+.ox-species.is-earned .ox-species__slot { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+.ox-species__n { position: absolute; bottom: 2px; right: 4px; font-family: var(--ox-font-mono); font-size: 8px; font-weight: 700; }
+.ox-species__l { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-stone); text-align: center; }
+
+/* ── Medal ───────────────────────────────────────────────────────────── */
+.ox-medal { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--ox-line); opacity: 0.5; }
+.ox-medal.is-earned { opacity: 1; }
+.ox-medal__m { width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--ox-ink); display: grid; place-items: center; font-size: 18px; }
+.ox-medal.is-earned .ox-medal__m { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+.ox-medal__t { font-family: var(--ox-font-serif); font-size: 18px; }
+.ox-medal__d { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin-top: 3px; }
+
+/* ── Exercise card ───────────────────────────────────────────────────── */
+.ox-ex { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid var(--ox-line); border-bottom: none; transition: var(--ox-transition-colors); }
+.ox-ex:last-child { border-bottom: 1px solid var(--ox-line); }
+.ox-ex:hover { background: var(--ox-salt); }
+.ox-ex__n { font-family: var(--ox-font-mono); font-weight: 700; font-size: 11px; color: var(--ox-stone); width: 18px; }
+.ox-ex__main { flex: 1; }
+.ox-ex__name { font-family: var(--ox-font-serif); font-size: 19px; line-height: 1; }
+.ox-ex__eq { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin-top: 5px; }
+.ox-ex__mu { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-oxide-deep); margin-top: 3px; }
+.ox-ex__find { font-family: var(--ox-font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-oxide); white-space: nowrap; }
+
+/* ── Floor match ─────────────────────────────────────────────────────── */
+.ox-floor { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--ox-line); border-bottom: none; }
+.ox-floor:last-child { border-bottom: 1px solid var(--ox-line); }
+.ox-floor__d { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; color: var(--ox-ink); width: 44px; }
+.ox-floor__m { flex: 1; }
+.ox-floor__n { font-family: var(--ox-font-sans); font-weight: 600; font-size: 14px; }
+.ox-floor__sc { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ox-stone); margin-top: 3px; }
+.ox-floor__sc b { color: var(--ox-oxide-deep); font-weight: 700; }
+.ox-floor__x { font-family: var(--ox-font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-paper); background: var(--ox-oxide); padding: 4px 7px; white-space: nowrap; }
+
+/* ── Scenery picker ──────────────────────────────────────────────────── */
+.ox-scenery { border: 1px solid var(--ox-line); background: var(--ox-salt); padding: 16px; }
+.ox-scenery__t { font-family: var(--ox-font-serif); font-size: 21px; line-height: 1; }
+.ox-scenery__t em { font-style: italic; color: var(--ox-oxide); }
+.ox-scenery__s { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin: 7px 0 14px; }
+.ox-scenery__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.ox-env { font-family: var(--ox-font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 11px; border: 1px solid var(--ox-rule); background: var(--ox-paper); color: var(--ox-ink); cursor: pointer; transition: var(--ox-transition-colors); }
+.ox-env:hover { border-color: var(--ox-ink); }
+.ox-env.on { background: var(--ox-ink); border-color: var(--ox-ink); color: var(--ox-paper); }
+
+/* ── Set row ─────────────────────────────────────────────────────────── */
+.ox-set { display: flex; align-items: center; gap: 14px; padding: 11px 14px; border: 1px solid var(--ox-line); border-bottom: none; }
+.ox-set:last-child { border-bottom: 1px solid var(--ox-line); }
+.ox-set.is-done { background: var(--ox-salt); }
+.ox-set__n { font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; color: var(--ox-stone); width: 20px; }
+.ox-set__wr { flex: 1; font-family: var(--ox-font-mono); font-size: 13px; }
+.ox-set__wr em { font-style: normal; font-weight: 700; color: var(--ox-ink); }
+.ox-set__rpe { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-oxide-deep); }
+.ox-set__chk { width: 28px; height: 28px; border: 1px solid var(--ox-ink); background: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 13px; cursor: pointer; }
+.ox-set.is-done .ox-set__chk { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+
+/* ── Metric ring ─────────────────────────────────────────────────────── */
+.ox-ring-wrap { display: flex; align-items: center; gap: 20px; }
+.ox-ring { position: relative; flex-shrink: 0; }
+.ox-ring__c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ox-ring__n { font-family: var(--ox-font-serif); font-size: 40px; line-height: 1; }
+.ox-ring__l { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); margin-top: 4px; }
+.ox-ring-meta > div { margin-bottom: 14px; }
+.ox-ring-meta .k { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-ring-meta .v { font-family: var(--ox-font-serif); font-size: 22px; }
+
+/* ── Zone bar ────────────────────────────────────────────────────────── */
+.ox-zones { display: grid; gap: 10px; }
+.ox-zrow { display: grid; grid-template-columns: 70px 1fr 48px; align-items: center; gap: 14px; }
+.ox-zlab { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-ink); }
+.ox-ztrack { height: 14px; background: var(--ox-paper-warm); }
+.ox-zfill { display: block; height: 100%; }
+.ox-zval { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-stone); text-align: right; }
+
+/* ── Recovery map ────────────────────────────────────────────────────── */
+.ox-recovery { display: grid; gap: 1px; background: var(--ox-line); border: 1px solid var(--ox-line); }
+.ox-recovery__r { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--ox-paper); }
+.ox-recovery__dot { width: 14px; height: 14px; flex-shrink: 0; }
+.ox-recovery__n { flex: 1; font-family: var(--ox-font-sans); font-size: 14px; }
+.ox-recovery__s { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-stone); }
+
+/* ── Rest timer ──────────────────────────────────────────────────────── */
+.ox-rest { border: 1px solid var(--ox-ink); padding: 14px 16px; }
+.ox-rest__top { display: flex; align-items: baseline; gap: 14px; margin-bottom: 10px; }
+.ox-rest__l { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-rest__t { font-family: var(--ox-font-serif); font-size: 28px; line-height: 1; flex: 1; }
+.ox-rest__skip { background: none; border: none; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-oxide); cursor: pointer; }
+.ox-rest__track { height: 4px; background: var(--ox-paper-warm); }
+.ox-rest__fill { display: block; height: 100%; background: var(--ox-oxide); transition: width 1s linear; }
+@media (prefers-reduced-motion: reduce) { .ox-rest__fill { transition: none; } }
+
+/* ── Exercise player · follow-along ──────────────────────────────────────── */
+.ox-player { border: 1px solid var(--ox-ink); background: var(--ox-paper); }
+.ox-player__stage { position: relative; aspect-ratio: 4 / 3; background: var(--ox-ink); color: var(--ox-paper); display: grid; place-items: center; overflow: hidden; }
+.ox-player__stage > img, .ox-player__stage > video, .ox-player__stage > image-slot { width: 100%; height: 100%; object-fit: cover; }
+.ox-player__ph { font-family: var(--ox-font-mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-player__timer { position: absolute; top: 12px; right: 12px; font-family: var(--ox-font-serif); font-size: 30px; line-height: 1; color: var(--ox-paper); background: rgba(11,11,10,0.5); padding: 4px 10px; }
+.ox-player.is-rest .ox-player__timer { color: var(--ox-oxide); }
+.ox-player__bar { display: flex; align-items: baseline; gap: 10px; padding: 13px 16px 4px; }
+.ox-player__set { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-oxide); }
+.ox-player__name { font-family: var(--ox-font-serif); font-size: 22px; flex: 1; }
+.ox-player__target { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-stone); }
+.ox-player__cue { padding: 0 16px 12px; font-family: var(--ox-font-sans); font-size: 13px; color: var(--ox-stone); }
+.ox-player__ctrls { display: grid; grid-template-columns: 48px 1fr 48px; border-top: 1px solid var(--ox-line); }
+.ox-player__nav { background: none; border: none; border-right: 1px solid var(--ox-line); padding: 14px 0; font-size: 16px; cursor: pointer; color: var(--ox-ink); }
+.ox-player__ctrls .ox-player__nav:last-child { border-right: none; border-left: 1px solid var(--ox-line); }
+.ox-player__log { background: var(--ox-oxide); color: var(--ox-ink); border: none; font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+
+/* ── Filter bar ──────────────────────────────────────────────────────────── */
+.ox-filters { display: grid; gap: 10px; }
+.ox-filters__row { display: flex; align-items: center; gap: 10px; }
+.ox-filters__lab { flex-shrink: 0; width: 76px; font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-filters__chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.ox-filters__chips::-webkit-scrollbar { display: none; }
+.ox-fchip { flex-shrink: 0; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--ox-line); background: var(--ox-paper); color: var(--ox-ink); cursor: pointer; white-space: nowrap; }
+.ox-fchip:hover { border-color: var(--ox-ink); }
+.ox-fchip.on { background: var(--ox-ink); border-color: var(--ox-ink); color: var(--ox-paper); }
+
+/* ── PR / PB chip ────────────────────────────────────────────────────────── */
+.ox-pr { display: flex; align-items: stretch; border: 1px solid var(--ox-line); background: var(--ox-paper); min-width: 0; }
+.ox-pr.is-fresh { border-color: var(--ox-oxide); }
+.ox-pr__mark { flex-shrink: 0; width: 44px; display: grid; place-items: center; color: var(--ox-stone); background: var(--ox-salt); border-right: 1px solid var(--ox-line); }
+.ox-pr.is-fresh .ox-pr__mark { color: var(--ox-ink); background: var(--ox-oxide); border-right-color: var(--ox-oxide); }
+.ox-pr__body { flex: 1; min-width: 0; padding: 9px 12px 10px; display: grid; gap: 5px; }
+.ox-pr__top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.ox-pr__kind { font-family: var(--ox-font-mono); font-size: 8.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-stone); white-space: nowrap; }
+.ox-pr.is-fresh .ox-pr__kind { color: var(--ox-oxide); }
+.ox-pr__lift { font-family: var(--ox-font-serif); font-size: 14px; line-height: 1; color: var(--ox-text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ox-pr__val { display: flex; align-items: baseline; gap: 4px; }
+.ox-pr__val em { font-family: var(--ox-font-serif); font-style: normal; font-size: 30px; line-height: 0.9; color: var(--ox-text); }
+.ox-pr__unit { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-text-muted); }
+.ox-pr__delta { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; color: var(--ox-oxide); }
+.ox-pr__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid var(--ox-line); padding-top: 6px; margin-top: 1px; }
+.ox-pr__prev { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-text-muted); white-space: nowrap; }
+.ox-pr__spark { color: var(--ox-oxide); display: block; flex-shrink: 0; }
+
+/* ── Tribe board ─────────────────────────────────────────────────────── */
+.ox-board { display: grid; }
+.ox-trow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--ox-line); }
+.ox-trow__r { font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; width: 22px; color: var(--ox-stone); }
+.ox-trow.me .ox-trow__r { color: var(--ox-oxide); }
+.ox-trow__av { width: 28px; height: 28px; border-radius: 999px; background: var(--ox-oxide); color: var(--ox-ink); display: grid; place-items: center; font-family: var(--ox-font-mono); font-weight: 800; font-size: 11px; flex-shrink: 0; }
+.ox-trow__n { flex: 1; font-family: var(--ox-font-sans); font-size: 14px; }
+.ox-trow.me .ox-trow__n { font-weight: 600; }
+.ox-trow__xp { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-ink); }
+
+/* ── Class row ───────────────────────────────────────────────────────── */
+.ox-class { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 1px solid var(--ox-line); border-bottom: none; }
+.ox-class:last-child { border-bottom: 1px solid var(--ox-line); }
+.ox-class__time { font-family: var(--ox-font-mono); font-size: 12px; font-weight: 700; width: 64px; }
+.ox-class__main { flex: 1; }
+.ox-class__title { font-family: var(--ox-font-serif); font-size: 18px; line-height: 1; }
+.ox-class__meta { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin-top: 5px; }
+.ox-class__cta { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 12px; border: 1px solid var(--ox-ink); background: var(--ox-paper); color: var(--ox-ink); cursor: pointer; transition: var(--ox-transition-colors); }
+.ox-class__cta:hover { background: var(--ox-ink); color: var(--ox-paper); }
+.ox-class.is-booked .ox-class__cta { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); cursor: default; }
+.ox-class.is-full .ox-class__cta { color: var(--ox-stone); }
+
+/* ── Booking card — premium ticket stub (Dice / TIXR register) ───────── */
+.ox-booking { border: 1px solid var(--ox-ink); background: var(--ox-bg); }
+.ox-booking__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--ox-line); }
+.ox-booking__status { display: inline-flex; align-items: center; gap: 8px; font-family: var(--ox-font-mono); font-size: 9.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text); white-space: nowrap; }
+.ox-booking__mark { width: 6px; height: 6px; flex-shrink: 0; background: var(--ox-oxide); display: inline-block; }
+.ox-booking__code { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.14em; color: var(--ox-text-muted); white-space: nowrap; }
+.ox-booking__title { font-family: var(--ox-font-serif); font-size: 27px; line-height: 0.98; letter-spacing: -0.01em; color: var(--ox-text); padding: 15px 16px 0; text-wrap: balance; }
+.ox-booking__rail { display: flex; flex-direction: column; gap: 11px; padding: 14px 16px 16px; }
+.ox-booking__line { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.ox-booking__line > svg { color: var(--ox-oxide); flex-shrink: 0; }
+.ox-booking__when { font-family: var(--ox-font-mono); font-size: 12.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ox-text); white-space: nowrap; }
+.ox-booking__place { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.2; }
+.ox-booking__venue { font-family: var(--ox-font-serif); font-size: 18px; color: var(--ox-text); }
+.ox-booking__loc { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-text-muted); }
+.ox-booking__loc::before { content: "\00B7"; color: var(--ox-stone); margin: 0 7px; font-size: 12px; }
+
+/* ── Coach card ──────────────────────────────────────────────────────── */
+.ox-coach { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--ox-line); }
+.ox-coach__av { width: 44px; height: 44px; border-radius: 999px; background: var(--ox-oxide); color: var(--ox-ink); display: grid; place-items: center; font-family: var(--ox-font-mono); font-weight: 800; font-size: 16px; flex-shrink: 0; }
+.ox-coach__main { flex: 1; }
+.ox-coach__n { font-family: var(--ox-font-serif); font-size: 19px; line-height: 1; }
+.ox-coach__sp { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-oxide-deep); margin-top: 5px; }
+.ox-coach__meta { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin-top: 3px; }
+.ox-coach__cta { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-oxide); }
+
+/* ── Event card ──────────────────────────────────────────────────────── */
+.ox-event { border: 1px solid var(--ox-line); padding: 16px 18px; }
+.ox-event--soft { border-color: var(--ox-oxide); }
+.ox-event__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ox-event__day { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-event__tag { font-family: var(--ox-font-mono); font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-oxide-deep); border: 1px solid var(--ox-oxide); padding: 3px 7px; }
+.ox-event__title { font-family: var(--ox-font-serif); font-size: 24px; line-height: 0.95; }
+.ox-event__title em { font-style: italic; color: var(--ox-oxide); }
+.ox-event__foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+.ox-event__host { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-event__cta { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 12px; border: 1px solid var(--ox-ink); background: var(--ox-paper); cursor: pointer; transition: var(--ox-transition-colors); }
+.ox-event__cta:hover { background: var(--ox-ink); color: var(--ox-paper); }
+
+/* ── Raid card ───────────────────────────────────────────────────────── */
+.ox-raid { border: 1px solid var(--ox-ink); padding: 16px 18px; }
+.ox-raid__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ox-raid__k { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-raid__xp { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-paper); background: var(--ox-oxide); padding: 4px 8px; }
+.ox-raid__title { font-family: var(--ox-font-serif); font-size: 24px; line-height: 0.95; }
+.ox-raid__meta { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-stone); margin-top: 6px; }
+.ox-raid__foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+.ox-raid__cap { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-ink); }
+.ox-raid__cap em { font-style: normal; color: var(--ox-oxide); font-weight: 700; }
+.ox-raid__cta { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 14px; border: 1px solid var(--ox-ink); background: var(--ox-ink); color: var(--ox-paper); cursor: pointer; }
+.ox-raid__cta:disabled { background: var(--ox-paper); color: var(--ox-stone); cursor: default; }
+
+/* ── Check-in ────────────────────────────────────────────────────────── */
+.ox-checkin { text-align: center; padding: 24px; }
+.ox-checkin__qr { width: 140px; height: 140px; margin: 0 auto 18px; background: var(--ox-salt); border: 1px solid var(--ox-ink); display: grid; place-items: center; font-family: var(--ox-font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-stone); }
+.ox-checkin__floor { font-family: var(--ox-font-serif); font-size: 26px; }
+.ox-checkin__xp { font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-oxide); margin-top: 10px; }
+
+/* ── Herd that · reaction / co-sign stamp ────────────────────────────────
+   "Herd that" (heard that) — the OX like/cheer. Square, ruled, copper on tap. */
+.ox-herd { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--ox-line); background: var(--ox-paper); color: var(--ox-ink); padding: 7px 11px; cursor: pointer; font-family: var(--ox-font-mono); transition: background var(--ox-dur-1, 120ms) ease, border-color var(--ox-dur-1, 120ms) ease, color var(--ox-dur-1, 120ms) ease; }
+.ox-herd:hover { border-color: var(--ox-ink); }
+.ox-herd.is-sm { padding: 5px 9px; gap: 6px; }
+.ox-herd__mark { font-weight: 800; font-size: 11px; letter-spacing: -0.04em; line-height: 1; border: 1px solid currentColor; padding: 2px 3px; }
+.ox-herd.is-sm .ox-herd__mark { font-size: 9px; }
+.ox-herd__label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.ox-herd.is-sm .ox-herd__label { font-size: 9px; }
+.ox-herd__count { font-size: 11px; font-weight: 700; color: var(--ox-stone); }
+.ox-herd__avs { display: inline-flex; }
+.ox-herd__av { width: 16px; height: 16px; margin-left: -5px; border-radius: 999px; background: var(--ox-stone); color: var(--ox-paper); display: grid; place-items: center; font-size: 8px; font-weight: 800; border: 1px solid var(--ox-paper); }
+.ox-herd__av:first-child { margin-left: 0; }
+.ox-herd.is-on { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+.ox-herd.is-on .ox-herd__count { color: var(--ox-ink); }
+.ox-herd.is-on .ox-herd__av { background: var(--ox-ink); border-color: var(--ox-oxide); }
+@media (prefers-reduced-motion: reduce) { .ox-herd { transition: none; } }

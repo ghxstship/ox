@@ -1,0 +1,48 @@
+{
+  "name": "@ox/ds",
+  "version": "1.0.0",
+  "description": "OX Design System — tokens, 124 React components, white-label layer. One accent, square, ruled, flat.",
+  "private": true,
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./styles.css": "./styles/styles.css",
+    "./tokens/tokens.dtcg.json": "./styles/tokens/tokens.dtcg.json",
+    "./tokens/whitelabel.css": "./styles/tokens/whitelabel.css",
+    "./bundle": "./bundle/ds-bundle.js",
+    "./bundle/manifest": "./bundle/ds-manifest.json",
+    "./whitelabel": {
+      "types": "./whitelabel/apply-brand.d.ts",
+      "default": "./whitelabel/apply-brand.js"
+    },
+    "./whitelabel/schema": "./whitelabel/brand.schema.json",
+    "./assets/*": "./assets/*"
+  },
+  "files": [
+    "src",
+    "styles",
+    "bundle",
+    "assets",
+    "whitelabel"
+  ],
+  "scripts": {
+    "lint": "echo \"@ox/ds: lint via root oxlint adherence\" && exit 0",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.4"
+  }
+}

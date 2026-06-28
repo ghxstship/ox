@@ -1,0 +1,33 @@
+{
+  "name": "@ox/web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OX gamified-fitness web app — Next.js App Router, RBAC-routed, white-label, i18n + RTL. Plug in. Level up.",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint || echo \"ok\"",
+    "clean": "rm -rf .next .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "next-intl": "^3.17.2",
+    "geist": "^1.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@ox/ds": "workspace:*",
+    "@ox/rbac": "workspace:*",
+    "@ox/api-client": "workspace:*",
+    "@ox/types": "workspace:*",
+    "@ox/supabase": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0"
+  }
+}

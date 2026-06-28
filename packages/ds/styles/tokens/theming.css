@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/theming.css   (v4 · multi-axis runtime theming)
+ * Generalizes v3's tier scope classes into root DATA-ATTRIBUTES that
+ * kit.js persists to localStorage. Five axes, all reading the same
+ * primitives from colors.css:
+ *
+ *   data-ox-product   member | operate | admin   (the suite — one
+ *                     mark, one accent STEP per app, all within copper)
+ *   data-ox-mode      light | dark               (paired ramps)
+ *   data-ox-density   cozy | compact             (~30% tighter)
+ *   data-ox-accent    soft | default | vivid      (color-mix tune)
+ *   data-ox-type      editorial | signage         (swaps the type system)
+ *
+ * RULE (carried from the brand): Oxide is the only chromatic accent.
+ * The three suite apps are NOT given new hues — they take a tonal STEP
+ * of the copper family (bright / default / deep) so they read as one
+ * family, distinct by step + app-tile + monogram, never by a new color.
+ *
+ * THEME-SWITCH RULE: never transition a token-backed `background` across
+ * a theme change (recolor instantly; animate filter/opacity only).
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Accent split (distinct fills vs text vs tint), tuned per mode ─
+     --ox-accent      → fills, bars, dots
+     --ox-accent-text → text + links (deepened in light for AA)
+     --ox-accent-weak → tint washes */
+  --ox-accent-text: var(--ox-oxide-deep);
+  --ox-accent-weak: var(--ox-oxide-tint);
+
+  /* ─── Role-based casing (author sentence-case; apply case via token) ─ */
+  --ox-case-eyebrow:   uppercase;  /* @kind other */
+  --ox-case-label:     uppercase;  /* @kind other */
+  --ox-case-button:    uppercase;  /* @kind other */
+  --ox-case-tablehead: uppercase;  /* @kind other */
+  --ox-case-body:      none;       /* @kind other */
+  --ox-display-case:   none;      /* @kind other */
+
+  /* ─── Elevation (3-step; dark leans on borders, not blur) ─────────── */
+  --ox-elev-rest:    none;
+  --ox-elev-hover:   0 1px 0 var(--ox-rule);
+  --ox-elev-overlay: 0 12px 28px rgba(11,11,10,0.18);
+
+  /* ─── Motion (one ease family, a short duration scale) ─────────────
+     OX motion is near-zero: value/opacity only, no parallax or loops.
+     Durations stay short; theme recolors are instant. */
+  --ox-dur-instant: 0ms;    /* @kind other */ /* theme/value swaps that should not animate */
+  --ox-dur-fast:    120ms;  /* @kind other */ /* overlay opacity, hover value flips */
+  --ox-dur:         160ms;  /* @kind other */ /* default control transition */
+  --ox-dur-slow:    240ms;  /* sheet slide, the longest OX allows */
+  --ox-ease:        cubic-bezier(0.2, 0, 0, 1);  /* @kind other */ /* standard */
+  --ox-ease-out:    cubic-bezier(0, 0, 0, 1);    /* @kind other */ /* entrances (decelerate) */
+  --ox-ease-in:     cubic-bezier(0.4, 0, 1, 1);  /* @kind other */ /* exits (accelerate) */
+  /* Presets */
+  --ox-transition:        all var(--ox-dur) var(--ox-ease);  /* @kind other */
+  --ox-transition-fast:   all var(--ox-dur-fast) var(--ox-ease);  /* @kind other */
+  --ox-transition-colors: color var(--ox-dur-fast) var(--ox-ease), background-color var(--ox-dur-fast) var(--ox-ease), border-color var(--ox-dur-fast) var(--ox-ease);  /* @kind other */
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * AXIS · PRODUCT (suite) — one accent STEP per app, all copper
+ * ═══════════════════════════════════════════════════════════════════ */
+[data-ox-product="member"]  { --ox-accent: var(--ox-oxide);        --ox-accent-text: var(--ox-oxide-deep);   --ox-app-code: "MBR"; /* @kind other */ }
+[data-ox-product="operate"] { --ox-accent: var(--ox-oxide-deep);   --ox-accent-text: var(--ox-oxide-deep);   --ox-app-code: "OPS"; /* @kind other */ }
+[data-ox-product="admin"]   { --ox-accent: var(--ox-oxide-bright); --ox-accent-text: var(--ox-oxide-deep);   --ox-app-code: "ADM"; /* @kind other */ }
+
+/* ═══════════════════════════════════════════════════════════════════
+ * AXIS · MODE — three canonical values:
+ *   light  (default)  · paired ramps from colors.css
+ *   dark              · surfaces+text paired, accent brightened for AA
+ *   auto / system     · follows the OS via prefers-color-scheme
+ *
+ * `color-scheme` is set so native controls (scrollbars, form widgets,
+ * date pickers) match the active mode. The dark token block is shared
+ * by explicit `dark` AND `auto` (under a dark OS) via a selector list,
+ * so there is one source of truth for the dark ramp.
+ * ═══════════════════════════════════════════════════════════════════ */
+:root,
+[data-ox-mode="light"] { color-scheme: light; }
+
+/* The dark ramp — applied for explicit dark, and for auto under a dark OS. */
+[data-ox-mode="dark"] {
+  color-scheme: dark;
+  --ox-bg:         var(--ox-ink);
+  --ox-bg-raised:  #15140F;
+  --ox-bg-inverse: var(--ox-paper);
+  --ox-text:        var(--ox-paper);
+  --ox-text-muted:  var(--ox-stone-soft);
+  --ox-text-inverse: var(--ox-ink);
+  --ox-line:        var(--ox-rule-reverse);
+  --ox-accent:      var(--ox-oxide-bright);
+  --ox-accent-text: var(--ox-oxide-bright);   /* brightened for AA on Ink */
+  --ox-accent-weak: rgba(201,97,47,0.16);
+  --ox-elev-hover:  0 0 0 1px var(--ox-rule-reverse);
+  --ox-elev-overlay: 0 16px 40px rgba(0,0,0,0.55);
+  background: var(--ox-bg);
+  color: var(--ox-text);
+}
+/* dark + per-app accent text stays bright */
+[data-ox-mode="dark"][data-ox-product="operate"] { --ox-accent: var(--ox-oxide); }
+
+/* AXIS · MODE = auto / system — adopt the OS preference. `auto` and
+   `system` are accepted aliases. Light OS → inherit the light default. */
+[data-ox-mode="auto"], [data-ox-mode="system"] { color-scheme: light dark; }
+@media (prefers-color-scheme: dark) {
+  [data-ox-mode="auto"], [data-ox-mode="system"] {
+    color-scheme: dark;
+    --ox-bg:         var(--ox-ink);
+    --ox-bg-raised:  #15140F;
+    --ox-bg-inverse: var(--ox-paper);
+    --ox-text:        var(--ox-paper);
+    --ox-text-muted:  var(--ox-stone-soft);
+    --ox-text-inverse: var(--ox-ink);
+    --ox-line:        var(--ox-rule-reverse);
+    --ox-accent:      var(--ox-oxide-bright);
+    --ox-accent-text: var(--ox-oxide-bright);
+    --ox-accent-weak: rgba(201,97,47,0.16);
+    --ox-elev-hover:  0 0 0 1px var(--ox-rule-reverse);
+    --ox-elev-overlay: 0 16px 40px rgba(0,0,0,0.55);
+    background: var(--ox-bg);
+    color: var(--ox-text);
+  }
+  [data-ox-mode="auto"][data-ox-product="operate"],
+  [data-ox-mode="system"][data-ox-product="operate"] { --ox-accent: var(--ox-oxide); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * AXIS · ACCENT INTENSITY — tune the accent via color-mix
+ * ═══════════════════════════════════════════════════════════════════ */
+[data-ox-accent="soft"]  { --ox-accent: color-mix(in oklch, var(--ox-oxide) 78%, var(--ox-stone)); }
+[data-ox-accent="vivid"] { --ox-accent: color-mix(in oklch, var(--ox-oxide) 88%, #FF7A33); }
+
+/* ═══════════════════════════════════════════════════════════════════
+ * AXIS · DENSITY — ~30% tighter control/row/card sizing
+ * ═══════════════════════════════════════════════════════════════════ */
+:root { --ox-row-h: 52px; --ox-control-h: 44px; --ox-cell-pad: 16px 18px; --ox-card-pad: 28px; }
+[data-ox-density="compact"] {
+  --ox-row-h: 38px; --ox-control-h: 34px; --ox-cell-pad: 9px 12px; --ox-card-pad: 18px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * AXIS · TYPE — swap the whole type system. editorial (default) uses
+ * DM Serif Display for display; signage swaps display to the mono so
+ * wayfinding reads at distance. Re-skins page content AND doc chrome.
+ * ═══════════════════════════════════════════════════════════════════ */
+[data-ox-type="signage"] {
+  --ox-font-serif: var(--ox-font-mono);  /* display becomes the mono — wayfinding register */
+  --ox-display-case: uppercase;  /* @kind other */
+  --ox-track-display: 0.02em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * BACKWARD COMPAT — the v3 tier scope classes still work and now also
+ * set the matching product/mode context where it makes sense.
+ * (definitions live in colors.css; this file only layers axes on top)
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* Honor reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  :root { --ox-dur: 0ms; /* @kind other */ --ox-dur-slow: 0ms; /* @kind other */ --ox-dur-fast: 0ms; /* @kind other */ }
+}

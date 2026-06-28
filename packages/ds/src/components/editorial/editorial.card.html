@@ -1,0 +1,34 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Editorial · Prose, Pullquote, Figure" subtitle="The journal block — article header, prose, pullquote, read-more" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  .wrap { padding: 30px 34px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXArticleHeader, OXProse, OXPullquote, OXReadMore } = window.OXDesignSystem_7d2a2e;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <>
+      <OXArticleHeader kicker="Field notes · No. 03"
+        title={<>The room is the <em>proof.</em></>}
+        byline={["Andrés Beltrán","Founder 003","March · MMXXVI"]} />
+      <OXProse style={{marginTop:24}}>
+        <p>We started the listening room because the city did not have one. Not a club — a room where the <em>sound system</em> is the reason you came, and the people are the reason you stay.</p>
+        <OXPullquote>We are not building a venue. We are building a <b>standard.</b></OXPullquote>
+        <p><OXReadMore href="#">Read the full dispatch</OXReadMore></p>
+      </OXProse>
+    </>
+  );
+</script>
+</body>
+</html>

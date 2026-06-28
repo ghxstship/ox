@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="240" viewBox="0 0 150 240">
+  <g transform="rotate(90 75 120)">
+    <text x="75" y="160" text-anchor="middle" font-family="JetBrains Mono, monospace" font-weight="800" font-size="150" letter-spacing="-6" fill="#0B0B0A">OX</text>
+  </g>
+</svg>

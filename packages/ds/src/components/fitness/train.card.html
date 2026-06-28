@@ -1,0 +1,102 @@
+<!-- @dsCard group="Fitness" viewport="700x720" name="Train & Safari · Exercise, Floor, Scenery, Player, Filters, PRs" subtitle="Discovery, floor match, scenery picker, set logging, effort ring, zones, recovery, follow-along player, filter bar, PR chips" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  .wrap { padding: 24px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 26px 36px; align-items: start; }
+  .stack { display: grid; gap: 18px; }
+  .h { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); }
+  .span { grid-column: 1 / -1; border-top: 1px solid var(--ox-line); padding-top: 22px; display: grid; grid-template-columns: 300px 1fr; gap: 36px; align-items: start; }
+  .prrow { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXExerciseCard, OXFloorMatch, OXSceneryPicker, OXSetRow, OXMetricRing, OXZoneBar, OXRecoveryMap, OXExercisePlayer, OXFilterBar, OXPRChip } = window.OXDesignSystem_7d2a2e;
+  function Demo() {
+    const [scenery, setScenery] = React.useState("Oceanfront");
+    const [filters, setFilters] = React.useState({ Type: "Strength", Equipment: "Barbell" });
+    return (
+      <>
+        <div className="stack">
+          <div>
+            <div className="h" style={{marginBottom:8}}>— Today's moves</div>
+            <OXExerciseCard index="01" name="Hip thrust" equipment="Barbell · bench · pad" floors={5} />
+            <OXExerciseCard index="02" name="Sled push" equipment="Sled · turf ≥ 15m" floors={2} />
+          </div>
+          <div>
+            <div className="h" style={{marginBottom:8}}>— Hip thrust · where to train it</div>
+            <OXFloorMatch distance="0.4mi" name="Iron District — Wynwood" has="Has the rig" scenery="industrial floor" xp={250} />
+            <OXFloorMatch distance="1.1mi" name="Salt House — Edgewater" has="Has the rig" scenery="oceanfront deck" xp={250} />
+            <OXFloorMatch distance="2.0mi" name="The Annex" has="Has the rig" isHome />
+          </div>
+          <OXSceneryPicker title={<>Same move. <em>New horizon.</em></>} sub="Pick the room by the view"
+            value={scenery} onChange={setScenery}
+            options={["Oceanfront","Rooftop","Industrial","Sunrise","Forest"]} />
+        </div>
+        <div className="stack">
+          <div>
+            <div className="h" style={{marginBottom:8}}>— Set log · Hip thrust</div>
+            <OXSetRow index={1} weight={185} reps={10} rpe={7} done />
+            <OXSetRow index={2} weight={205} reps={8} rpe={8} done />
+            <OXSetRow index={3} weight={205} reps={8} />
+          </div>
+          <OXMetricRing value={87} label="Effort" metrics={[{label:"Avg HR",value:154},{label:"Duration",value:"48:12"}]} />
+          <div>
+            <div className="h" style={{marginBottom:10}}>— Time in zone</div>
+            <OXZoneBar zones={[
+              {label:"Z5 max",value:8,zone:5,display:"3:50"},
+              {label:"Z4 hard",value:26,zone:4,display:"12:30"},
+              {label:"Z3 tempo",value:34,zone:3,display:"16:20"},
+              {label:"Z2 base",value:22,zone:2,display:"10:40"},
+              {label:"Z1 easy",value:10,zone:1,display:"4:52"},
+            ]} />
+          </div>
+          <div>
+            <div className="h" style={{marginBottom:10}}>— Recovery</div>
+            <OXRecoveryMap regions={[
+              {name:"Glutes",state:"spent"},{name:"Hamstrings",state:"worked"},
+              {name:"Quads",state:"light"},{name:"Upper back",state:"fresh"},
+            ]} />
+          </div>
+        </div>
+        <div className="span">
+          <div>
+            <div className="h" style={{marginBottom:8}}>— Follow-along player</div>
+            <OXExercisePlayer name="Hip thrust" setIndex={3} setTotal={4} target="8 × 205lb · RPE 8"
+              timer="0:42" cue="Drive through the heels, ribs down, pause at the top." />
+          </div>
+          <div>
+            <div className="h" style={{marginBottom:8}}>— Discovery filter</div>
+            <OXFilterBar
+              value={filters}
+              onChange={(k,o)=>setFilters(f=>({...f,[k]:o}))}
+              groups={[
+                {key:"Type",label:"Type",options:["Strength","Hybrid","Endurance","Mobility"]},
+                {key:"Duration",label:"Time",options:["15m","30m","45m","60m+"]},
+                {key:"Equipment",label:"Gear",options:["Barbell","Dumbbell","Sled","Bodyweight","Machine"]},
+                {key:"Muscle",label:"Target",options:["Glutes","Legs","Back","Push","Core"]},
+              ]} />
+            <div className="h" style={{margin:"20px 0 8px"}}>— Personal records</div>
+            <div className="prrow">
+              <OXPRChip lift="Back squat" value={315} delta={10} history={[275,285,295,295,305,315]} fresh />
+              <OXPRChip lift="Bench" value={205} history={[185,190,195,200,205]} />
+              <OXPRChip lift="Deadlift" value={405} delta={15} history={[365,375,385,390,405]} fresh />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

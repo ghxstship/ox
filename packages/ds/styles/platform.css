@@ -1,0 +1,108 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — platform.css   (v4 · SaaS organisms)
+ * App shell, multi-view system, command palette, slide-over, and the
+ * multi-app suite chrome. Reads the token layer; re-skins per app via
+ * data-ox-product. Organisms compose the .oxp-* atoms in product-theme.css.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── APP SHELL — sidebar + topbar + content ────────────────────────── */
+.oxa { display: grid; grid-template-columns: 224px 1fr; height: 100%; background: var(--ox-bg); color: var(--ox-text); font-family: var(--ox-font-sans); }
+.oxa__side { border-right: 1px solid var(--ox-line); display: flex; flex-direction: column; background: var(--ox-bg); }
+.oxa__brand { padding: 18px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--ox-line); }
+.oxa__brand .ox-flag { font-size: 22px; color: var(--ox-text); }
+.oxa__appcode { font-family: var(--ox-font-mono); font-size: 8px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ox-accent-text); border: 1px solid var(--ox-accent); padding: 2px 5px; }
+.oxa__nav { padding: 10px 0; flex: 1; overflow: hidden; }
+.oxa__navgroup { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ox-text-muted); padding: 14px 18px 6px; }
+.oxa__navitem { display: flex; align-items: center; gap: 10px; padding: 8px 18px; font-size: 13px; color: var(--ox-text); text-decoration: none; border-left: 2px solid transparent; }
+.oxa__navitem:hover { background: var(--ox-bg-raised); }
+.oxa__navitem.is-active { border-left-color: var(--ox-accent); color: var(--ox-accent-text); background: var(--ox-accent-weak); }
+.oxa__navitem .oxp-badge { margin-left: auto; }
+.oxa__topbar { display: flex; align-items: center; gap: 16px; padding: 0 20px; height: 56px; border-bottom: 1px solid var(--ox-line); }
+.oxa__topbar .grow { flex: 1; }
+.oxa__main { display: flex; flex-direction: column; min-width: 0; }
+.oxa__content { padding: 24px; overflow: hidden; min-width: 0; }
+
+/* App switcher (suite) — recolors via data-ox-product on a parent */
+.oxa__switch { display: flex; gap: 6px; }
+.oxa__switch a { width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid var(--ox-line); font-family: var(--ox-font-mono); font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: var(--ox-text-muted); text-decoration: none; }
+.oxa__switch a.is-active { border-color: var(--ox-accent); color: var(--ox-accent-text); background: var(--ox-accent-weak); }
+
+/* ⌘K command palette */
+.oxa__cmdk { border: 1px solid var(--ox-line); background: var(--ox-bg); box-shadow: var(--ox-elev-overlay); width: 100%; max-width: 520px; }
+.oxa__cmdk input { width: 100%; border: none; border-bottom: 1px solid var(--ox-line); padding: 16px; font-family: var(--ox-font-sans); font-size: 16px; background: transparent; color: var(--ox-text); outline: none; }
+.oxa__cmdk__row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; border-bottom: 1px solid var(--ox-rule-soft); }
+.oxa__cmdk__row .oxp-kbd { margin-left: auto; }
+
+/* ─── DATA TABLE (product grade) ────────────────────────────────────── */
+.oxa-table { width: 100%; border-collapse: collapse; font-family: var(--ox-font-sans); }
+.oxa-table th { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: var(--ox-case-tablehead); color: var(--ox-text-muted); text-align: left; padding: var(--ox-cell-pad); border-bottom: 1px solid var(--ox-text); font-weight: 400; white-space: nowrap; }
+.oxa-table td { padding: var(--ox-cell-pad); border-bottom: 1px solid var(--ox-rule); font-size: 13px; color: var(--ox-text); height: var(--ox-row-h); }
+.oxa-table tr:hover td { background: var(--ox-bg-raised); }
+.oxa-table .num { text-align: right; font-family: var(--ox-font-mono); }
+
+/* ─── MULTI-VIEW SYSTEM (one dataset, many views) ───────────────────── */
+.oxa-viewbar { display: flex; align-items: center; gap: 4px; padding: 8px 0; border-bottom: 1px solid var(--ox-line); flex-wrap: wrap; }
+.oxa-viewbar__v { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 6px 11px; color: var(--ox-text-muted); text-decoration: none; border: 1px solid transparent; cursor: pointer; }
+.oxa-viewbar__v.is-active { color: var(--ox-text); border-color: var(--ox-line); background: var(--ox-bg-raised); }
+.oxa-viewbar .sep { width: 1px; height: 18px; background: var(--ox-line); margin: 0 6px; }
+.oxa-viewbar__tool { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-text-muted); padding: 6px 10px; cursor: pointer; }
+
+/* Board (kanban) */
+.oxa-board { display: grid; grid-auto-flow: column; grid-auto-columns: 240px; gap: 14px; overflow: hidden; }
+.oxa-board__col { border: 1px solid var(--ox-line); background: var(--ox-bg); display: flex; flex-direction: column; }
+.oxa-board__colhead { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--ox-line); font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); }
+.oxa-card { border: 1px solid var(--ox-line); background: var(--ox-bg-raised); padding: 12px; margin: 8px; display: grid; gap: 8px; }
+.oxa-card__t { font-family: var(--ox-font-sans); font-size: 13px; font-weight: 500; color: var(--ox-text); }
+.oxa-card__m { display: flex; align-items: center; gap: 8px; }
+
+/* Timeline / Gantt with baseline */
+.oxa-gantt { display: grid; gap: 6px; }
+.oxa-gantt__row { display: grid; grid-template-columns: 130px 1fr; gap: 12px; align-items: center; }
+.oxa-gantt__lbl { font-family: var(--ox-font-sans); font-size: 12px; color: var(--ox-text); }
+.oxa-gantt__track { position: relative; height: 22px; background: var(--ox-bg-raised); border: 1px solid var(--ox-rule); }
+.oxa-gantt__bar { position: absolute; top: 4px; height: 14px; background: var(--ox-accent); }
+.oxa-gantt__baseline { position: absolute; bottom: 1px; height: 2px; background: var(--ox-text-muted); opacity: 0.6; }
+
+/* Record detail slide-over */
+.oxa-slideover { width: 380px; height: 100%; border-left: 1px solid var(--ox-line); background: var(--ox-bg); display: flex; flex-direction: column; box-shadow: var(--ox-elev-overlay); }
+.oxa-slideover__head { padding: 18px 20px; border-bottom: 1px solid var(--ox-line); display: flex; justify-content: space-between; align-items: flex-start; }
+.oxa-slideover__body { padding: 20px; overflow: hidden; flex: 1; }
+.oxa-kv { display: grid; grid-template-columns: 110px 1fr; gap: 10px 16px; }
+.oxa-kv dt { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); }
+.oxa-kv dd { margin: 0; font-size: 13px; color: var(--ox-text); }
+
+/* Co-pilot / AI panel */
+.oxa-copilot { border: 1px solid var(--ox-accent); background: var(--ox-accent-weak); padding: 16px; display: grid; gap: 12px; }
+.oxa-copilot__head { display: flex; align-items: center; gap: 8px; font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-accent-text); }
+.oxa-copilot__msg { font-family: var(--ox-font-sans); font-size: 13px; line-height: 1.5; color: var(--ox-text); }
+
+/* Widget / dashboard tile */
+.oxa-widget { border: 1px solid var(--ox-line); background: var(--ox-bg); padding: 18px; display: grid; gap: 12px; }
+.oxa-widget__head { display: flex; justify-content: space-between; align-items: baseline; }
+.oxa-widget__title { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); }
+
+/* Bars mini-chart (reuses brand bars) */
+.oxa-bars { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+.oxa-bars span { flex: 1; background: var(--ox-accent); }
+.oxa-bars span.dim { background: var(--ox-line); }
+
+/* ─── RESPONSIVE — app shell collapses to a top strip on small viewports ─ */
+@media (max-width: 860px) {
+  .oxa { grid-template-columns: 1fr; height: auto; min-height: 100%; }
+  .oxa__side { border-right: 0; border-bottom: 1px solid var(--ox-line); }
+  .oxa__brand { border-bottom: 0; }
+  .oxa__nav { display: flex; overflow-x: auto; padding: 4px 8px; -webkit-overflow-scrolling: touch; }
+  .oxa__nav::-webkit-scrollbar { height: 0; }
+  .oxa__navgroup { display: none; }
+  .oxa__navitem { white-space: nowrap; border-left: 0; border-bottom: 2px solid transparent; padding: 10px 12px; }
+  .oxa__navitem.is-active { border-left: 0; border-bottom-color: var(--ox-accent); background: transparent; }
+  .oxa__navitem .oxp-badge { display: none; }
+  .oxa__content { padding: 16px; }
+  .oxa-slideover { width: 100%; }
+  .oxa-gantt__row { grid-template-columns: 88px 1fr; }
+  .oxa-kv { grid-template-columns: 96px 1fr; }
+}
+/* Data tables scroll horizontally rather than overflow the frame */
+@media (max-width: 720px) {
+  .oxa-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+}

@@ -1,0 +1,90 @@
+<!-- @dsCard group="Game" viewport="1200x980" name="Game — explore, collect, compete" subtitle="World map · species dex · capture moment · pride standings" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); font-family: var(--ox-font-sans); color: var(--ox-ink); }
+  .wrap { padding: 28px 32px; display: grid; gap: 26px; max-width: 1120px; }
+  .two { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: start; }
+  .dex { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .h { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); margin-bottom: 12px; }
+  .capwrap { position: relative; min-height: 460px; border: 1px solid var(--ox-line); overflow: hidden; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="two">
+    <div>
+      <div class="h">OX Map · explore floors, raids, wild WODs & drops</div>
+      <div id="map"></div>
+    </div>
+    <div>
+      <div class="h">Pride standings · team meta</div>
+      <div id="teams"></div>
+    </div>
+  </div>
+  <div>
+    <div class="h">Species dex · collected by training (rarity by corner ticks, never color)</div>
+    <div class="dex" id="dex"></div>
+  </div>
+  <div>
+    <div class="h">Capture moment · fires when a target move summons a new species</div>
+    <div class="capwrap" id="capwrap"></div>
+  </div>
+  <div class="two">
+    <div>
+      <div class="h">Live event · map-wide, time-boxed (GO-Fest-style)</div>
+      <div id="live"></div>
+    </div>
+    <div>
+      <div class="h">Floor control · territory held by a pride</div>
+      <div id="fctl" style="display:grid; gap:14px"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script type="text/babel" data-presets="react">
+  const { OXWorldMap, OXSpeciesCard, OXCaptureMoment, OXTeamBar, OXLiveEvent, OXFloorControl } = window.OXDesignSystem_7d2a2e;
+  const nodes = [
+    { id: "a", type: "floor", label: "Salt House", sub: "Iron · 0.4 mi", x: 0.30, y: 0.34 },
+    { id: "b", type: "floor", label: "The Forge", sub: "Strength · 0.9 mi", x: 0.62, y: 0.52 },
+    { id: "c", type: "raid", label: "Sunrise Raid", sub: "LIVE · 48 in herd", x: 0.74, y: 0.26, live: true },
+    { id: "d", type: "wild", label: "Wild WOD", sub: "Apex Shark nearby", x: 0.40, y: 0.74, live: true },
+    { id: "e", type: "drop", label: "Gear Drop", sub: "LV.10 · today", x: 0.56, y: 0.82 },
+  ];
+  ReactDOM.createRoot(document.getElementById("map")).render(
+    <OXWorldMap nodes={nodes} you={{ x: 0.5, y: 0.5 }} activeId="c" height={360} />
+  );
+  ReactDOM.createRoot(document.getElementById("teams")).render(
+    <OXTeamBar myTeam="tm_reef" teams={[
+      { id: "tm_reef", name: "North Reef", glyph: "◐", score: 184200 },
+      { id: "tm_coast", name: "Iron Coast", glyph: "◑", score: 176900 },
+      { id: "tm_range", name: "Salt Range", glyph: "◒", score: 168400 },
+    ]} />
+  );
+  ReactDOM.createRoot(document.getElementById("dex")).render(<>
+    <OXSpeciesCard name="Reef Ox" glyph="⏂" tier="common" region="Oceanfront" earned />
+    <OXSpeciesCard name="Iron Stag" glyph="⍱" tier="rare" region="The Forge" earned />
+    <OXSpeciesCard name="Apex Shark" glyph="⍖" tier="epic" region="Deepwater" />
+    <OXSpeciesCard name="Phoenix Ram" glyph="♷" tier="legendary" region="Volcano" />
+  </>);
+  ReactDOM.createRoot(document.getElementById("capwrap")).render(
+    <OXCaptureMoment name="Apex Shark" glyph="⍖" tier="epic" region="Deepwater" lore="Never stops moving. Appears at max effort, never below." xp={120} />
+  );
+  ReactDOM.createRoot(document.getElementById("live")).render(
+    <OXLiveEvent title="Salt Fest · Sunrise Wave" kicker="Season 01 · live event" live endsIn={92} multiplier={2} going={312} floor="Salt House — South Beach"
+      featured={["⍖", "⍓", "⍤"]} bonuses={["2× XP on every move", "Rare species spawn map-wide", "Raids count double for your pride"]}
+      waves={[{ t: "6:30", name: "Sunrise HYROX Raid", sub: "zone 4–5", live: true }, { t: "7:30", name: "Apex Shark hour", sub: "Max-effort spawns" }]} />
+  );
+  ReactDOM.createRoot(document.getElementById("fctl")).render(<>
+    <OXFloorControl name="Salt House" heldName="North Reef" held="mine" defense={72} onClaim={() => {}} />
+    <OXFloorControl name="The Forge" heldName="Iron Coast" held="rival" defense={58} onClaim={() => {}} />
+  </>);
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!-- @dsCard group="Components" viewport="700x360" name="App · Credential & Feed Post" subtitle="The membership credential (NFT + physical) and a social post" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  .wrap { padding: 28px 32px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 34px; align-items: start; }
+  .creds { display: grid; gap: 18px; }
+  .postcol { background: var(--ox-salt); border: 1px solid var(--ox-rule); }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXCredential, OXPost } = window.OXDesignSystem_7d2a2e;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <>
+      <div className="creds">
+        <OXCredential material="digital" memberNumber="014" verified
+          fields={[
+            {label:"Member", value:<em>Mariana Cruz</em>},
+            {label:"Tier", value:"Founder"},
+            {label:"Since", value:"2024"},
+          ]}
+          strip="ox.club/token/014 · 0x91…2f" />
+        <OXCredential material="physical" memberNumber="014"
+          fields={[
+            {label:"Member", value:<em>Mariana Cruz</em>},
+            {label:"Pillar", value:"Music"},
+          ]}
+          strip="Beyond the scene." />
+      </div>
+      <div className="postcol">
+        <OXPost author="Mariana" handle="@mariana · Founder 014" time="2H"
+          body="Cold plunge at 6, then the build night ran til 2. Beyond the scene."
+          media liked likes={28} comments={4} />
+        <OXPost author="Devon" handle="@dvn · Compass 132" time="5H"
+          body="Trailhead set for Saturday. Three seats left at the truck." likes={11} comments={2} />
+      </div>
+    </>
+  );
+</script>
+</body>
+</html>

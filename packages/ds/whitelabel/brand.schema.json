@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ox.fit/schema/brand.schema.json",
+  "title": "OX White-label Brand Config",
+  "description": "A tenant brand for the OX design system. Feed to OXBrand.apply() or mirror as a [data-ox-brand] scope in tokens/whitelabel.css. White-label changes the one accent, grounds, type, and mark — it never changes the structure (square, flat, ruled, one accent).",
+  "type": "object",
+  "required": ["slug", "name", "accent"],
+  "additionalProperties": false,
+  "properties": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "URL-safe tenant id; also written to data-ox-brand."
+    },
+    "name": {
+      "type": "string",
+      "description": "Display brand name (the wordmark string). The mark is type."
+    },
+    "mark": {
+      "type": "string",
+      "description": "Override the wordmark string if it differs from name (e.g. an abbreviation)."
+    },
+    "accent": {
+      "type": "string",
+      "pattern": "^#([0-9a-fA-F]{6})$",
+      "description": "The ONE chromatic accent. A tenant gets exactly one — used the OX way (≤10% of any surface)."
+    },
+    "accentDeep": {
+      "type": "string",
+      "pattern": "^#([0-9a-fA-F]{6})$",
+      "description": "Hover/press step (~12% darker). Derived from accent if omitted."
+    },
+    "accentBright": {
+      "type": "string",
+      "pattern": "^#([0-9a-fA-F]{6})$",
+      "description": "Accent on dark ground. Derived from accent if omitted."
+    },
+    "ground":  { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "Page ground. Keep warm/near-mono; never pure #FFF." },
+    "raised":  { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "Card/modal ground." },
+    "deep":    { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "Section ground." },
+    "ink":     { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "Type/structural/dark ground; never pure #000." },
+    "inkSoft": { "type": "string", "pattern": "^#([0-9a-fA-F]{6})$", "description": "Large body blocks / soft ink." },
+    "fontDisplay": { "type": "string", "description": "CSS font-family stack for display/editorial." },
+    "fontBody":    { "type": "string", "description": "CSS font-family stack for body/UI." },
+    "fontMono":    { "type": "string", "description": "CSS font-family stack for labels + the mark." },
+    "mode": {
+      "type": "string",
+      "enum": ["light", "dark", "auto"],
+      "description": "Default color mode for the tenant (written to data-ox-mode)."
+    },
+    "logo": {
+      "type": "string",
+      "format": "uri-reference",
+      "description": "Optional raster/SVG logo URL. The OX mark is type by default; supply only if the tenant requires a custom glyph."
+    }
+  }
+}

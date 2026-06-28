@@ -1,0 +1,130 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/colors.css
+ * Core neutrals + the single chromatic accent (Oxide), tier scope
+ * classes, semantic aliases.
+ *
+ * ACCENT SYSTEM — the rule, not just the color:
+ *   Oxide is the ONLY chromatic accent. It enters as a single
+ *   emphatic note (≤ 10% of any surface). The accent does not change
+ *   by edition — instead, the four PILLARS each carry a tonal
+ *   assignment of Oxide for wayfinding (see --ox-pillar-* below), and
+ *   the four membership TIERS re-map ground/accent via scope classes
+ *   (.ox-tier-founder / -compass / -sound / -distant).
+ *
+ * PROHIBITIONS (violations are catchable in review):
+ *   — NO gradients on brand surfaces (exception: token-credential
+ *     metal/glass render only, never on type or UI chrome).
+ *   — NO second chromatic accent. If asked for one: "we already have Oxide."
+ *   — NO pastels, NO tropical clichés (turquoise / flamingo / neon palm).
+ *   — NO pure black (#000) and NO pure white (#FFF). Ink and Salt only.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Core neutrals ─────────────────────────────────────────────── */
+  --ox-ink:           #0B0B0A;   /* near-black — type, structural lines, dark ground */
+  --ox-ink-soft:      #1A1916;   /* softer ink — large body blocks, secondary surfaces */
+  --ox-paper:         #ECE7DA;   /* warm cream — default ground */
+  --ox-paper-warm:    #E4DDCB;   /* deeper paper — section grounds, cards on paper */
+  --ox-salt:          #F6F2E8;   /* highest light — cards, modals, "white" */
+  --ox-stone:         #6B6660;   /* mid neutral — secondary type, rules */
+  --ox-stone-soft:    #9B958C;   /* light neutral — placeholders, disabled, tertiary */
+
+  /* ─── The accent (patinated copper) ─────────────────────────────── */
+  --ox-oxide:         #B5552E;   /* the only chromatic accent */
+  --ox-oxide-deep:    #8C3F22;   /* hover / pressed */
+  --ox-oxide-bright:  #C9612F;   /* oxide on dark ground */
+  --ox-oxide-tint:    rgba(181, 85, 46, 0.08);  /* watermark / wash only */
+
+  /* ─── Tints + rules (opacity baked in) ──────────────────────────── */
+  --ox-rule:          rgba(11, 11, 10, 0.14);    /* default hairline */
+  --ox-rule-soft:     rgba(11, 11, 10, 0.08);    /* inner-group rule */
+  --ox-rule-strong:   rgba(11, 11, 10, 0.85);    /* structural 1–3px Ink rule */
+  --ox-rule-reverse:  rgba(236, 231, 218, 0.14); /* rules on Ink ground */
+  --ox-rule-reverse-soft: rgba(236, 231, 218, 0.06);
+
+  /* ─── Pillar tonal assignments (wayfinding only, NOT new accents) ──
+     The three value-prop pillars. Each gets a tonal position of the
+     Oxide family so a member reads "which world" at a glance. These
+     never appear as fills larger than a chip or a rule.
+       1 · Gamified Fitness Training & Adventures  (train)
+       2 · Social Wellness Experiences            (social)
+       3 · Performance Lifestyle & Streetwear     (lifestyle) */
+  --ox-pillar-train:      #B5552E;  /* Oxide — the core engine */
+  --ox-pillar-social:     #C9612F;  /* Oxide bright — communal warmth */
+  --ox-pillar-lifestyle:  #8C3F22;  /* Oxide deep — refined / streetwear */
+
+  /* Heritage aliases (pre-reposition wayfinding — retained for back-compat) */
+  --ox-pillar-music:      #B5552E;  /* → train */
+  --ox-pillar-fitness:    #B5552E;  /* → train */
+  --ox-pillar-adventure:  #C9612F;  /* → social */
+  --ox-pillar-innovation: #8C3F22;  /* → lifestyle */
+
+  /* ─── Life-safety colorways (v4 §7) ─────────────────────────────────
+     EXEMPT from the one-accent rule. LOCKED — survive every theme +
+     edition. Use only on signage/wayfinding pictograms per standard. */
+  --ox-iso-green:   #237F52;  /* ISO 7010 safe-condition / egress */
+  --ox-safety-red:  #C8102E;  /* fire equipment / prohibition */
+  --ox-isa-blue:    #1B5FAA;  /* ISA accessibility / mandatory */
+  --ox-warn-yellow: #F2C200;  /* caution / hazard */
+
+  /* ─── Semantic aliases ──────────────────────────────────────────── */
+  --ox-bg:            var(--ox-paper);
+  --ox-bg-raised:     var(--ox-salt);
+  --ox-bg-inverse:    var(--ox-ink);
+  --ox-text:          var(--ox-ink);
+  --ox-text-muted:    var(--ox-stone);
+  --ox-text-inverse:  var(--ox-paper);
+  --ox-accent:        var(--ox-oxide);
+  --ox-accent-hover:  var(--ox-oxide-deep);
+  --ox-line:          var(--ox-rule);
+
+  /* ─── Status (functional, derived from the one accent + neutrals) ── */
+  --ox-status-live:   var(--ox-oxide);   /* "live now" dot */
+  --ox-status-open:   var(--ox-oxide);   /* available */
+  --ox-status-locked: var(--ox-stone);   /* closed / locked */
+  --ox-status-wait:   var(--ox-stone-soft);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * TIER SCOPE CLASSES
+ * Wrap any subtree to re-skin it for a membership tier. Components
+ * read the semantic vars, so wrapping re-skins without per-component
+ * variants. Founder is the only tier permitted the inverse (Ink)
+ * ground as a default register.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+.ox-tier-founder {
+  --ox-bg: var(--ox-ink);
+  --ox-bg-raised: #15140F;
+  --ox-text: var(--ox-paper);
+  --ox-text-muted: var(--ox-stone-soft);
+  --ox-line: var(--ox-rule-reverse);
+  --ox-accent: var(--ox-oxide-bright);
+}
+.ox-tier-compass {
+  /* default paper register — the workhorse tier */
+  --ox-bg: var(--ox-paper);
+  --ox-text: var(--ox-ink);
+  --ox-accent: var(--ox-oxide);
+}
+.ox-tier-sound {
+  --ox-bg: var(--ox-salt);
+  --ox-text: var(--ox-ink);
+  --ox-accent: var(--ox-oxide);
+}
+.ox-tier-distant {
+  --ox-bg: var(--ox-paper-warm);
+  --ox-text: var(--ox-ink-soft);
+  --ox-accent: var(--ox-oxide-deep);
+}
+
+/* Convenience inverse scope (any dark surface) */
+.ox-on-ink {
+  --ox-bg: var(--ox-ink);
+  --ox-text: var(--ox-paper);
+  --ox-text-muted: var(--ox-stone-soft);
+  --ox-line: var(--ox-rule-reverse);
+  --ox-accent: var(--ox-oxide-bright);
+  background: var(--ox-ink);
+  color: var(--ox-paper);
+}

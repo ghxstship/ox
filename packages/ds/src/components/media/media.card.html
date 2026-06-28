@@ -1,0 +1,107 @@
+<!-- @dsCard group="Media" viewport="1200x900" name="Media — pairings & player" subtitle="Service chips · curation tiers · song row + swap · now-playing · pairing cards" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); font-family: var(--ox-font-sans); color: var(--ox-ink); }
+  .wrap { padding: 28px 32px; display: grid; gap: 26px; max-width: 1120px; }
+  .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .two { display: grid; grid-template-columns: 320px 1fr; gap: 28px; align-items: start; }
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .h { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); }
+  .card { border: 1px solid var(--ox-line); padding: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div>
+    <div class="h">Service chips · connect Spotify · Apple Music · SoundCloud · Tidal</div>
+    <div class="row" style="margin-top:12px" id="svc"></div>
+  </div>
+  <div>
+    <div class="h">Curation tiers</div>
+    <div class="row" style="margin-top:12px" id="tiers"></div>
+  </div>
+  <div class="two">
+    <div>
+      <div class="h">Now playing · bound to current workout</div>
+      <div style="margin-top:12px" id="np"></div>
+    </div>
+    <div>
+      <div class="h">Workout list · one song each · per-workout swap</div>
+      <div class="card" style="margin-top:12px" id="songs"></div>
+    </div>
+  </div>
+  <div>
+    <div class="h">Community discovery · pairings + upvotes</div>
+    <div class="three" style="margin-top:12px" id="pairs"></div>
+  </div>
+  <div style="border-top:1px solid var(--ox-line); padding-top:22px">
+    <div class="h" style="color:var(--ox-oxide)">Immersive layer · music native to the training structure</div>
+  </div>
+  <div class="two">
+    <div>
+      <div class="h">Track timer · logging a set drives the music (rest rides the breakdown)</div>
+      <div style="margin-top:12px" id="tt"></div>
+    </div>
+    <div>
+      <div class="h">Cadence match · song BPM vs the move's target</div>
+      <div class="card" style="margin-top:12px; display:grid; gap:14px" id="cad"></div>
+      <div class="h" style="margin-top:22px">Energy arc · session intensity curve</div>
+      <div style="margin-top:12px" id="arc"></div>
+    </div>
+  </div>
+  <div>
+    <div class="h">Synced raid · the herd locked to one shared track</div>
+    <div style="margin-top:12px; max-width:520px" id="raid"></div>
+  </div>
+</div>
+
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script type="text/babel" data-presets="react">
+  const { OXServiceBadge, OXCurationBadge, OXUpvote, OXSongRow, OXNowPlaying, OXPairingCard, OXTrackTimer, OXCadenceMeter, OXEnergyArc, OXRaidRoom } = window.OXDesignSystem_7d2a2e;
+  const h = React.createElement;
+  ReactDOM.createRoot(document.getElementById("svc")).render(<>
+    <OXServiceBadge service="spotify" connected /><OXServiceBadge service="apple" /><OXServiceBadge service="soundcloud" /><OXServiceBadge service="tidal" selected />
+  </>);
+  ReactDOM.createRoot(document.getElementById("tiers")).render(<>
+    <OXCurationBadge tier="signature" /><OXCurationBadge tier="featured" /><OXCurationBadge tier="community" />
+  </>);
+  ReactDOM.createRoot(document.getElementById("np")).render(
+    <OXNowPlaying art="IS" title="Iron Sunrise" artist="Kova" forWorkout="Sled Push · 4×20m" service="spotify" progress={42} elapsed="1:34" dur="3:42" playing />
+  );
+  ReactDOM.createRoot(document.getElementById("songs")).render(<>
+    <OXSongRow index={1} art="IS" title="Iron Sunrise" artist="Kova" bpm={128} dur="3:42" workout="Sled Push" playing onSwap={() => {}} />
+    <OXSongRow index={2} art="HV" title="Heavy Vapor" artist="Tunnel State" bpm={140} dur="4:05" workout="Back Squat" onSwap={() => {}} />
+    <OXSongRow index={3} art="GR" title="Grind Reflex" artist="Mara K." bpm={92} dur="3:18" workout="Cooldown · Mobility" onSwap={() => {}} />
+  </>);
+  ReactDOM.createRoot(document.getElementById("pairs")).render(<>
+    <OXPairingCard name="Push Day · Sled & Press" author="OX Team" tier="signature" service="spotify" tracks={6} duration="38 min" upvotes={482} cover="P" />
+    <OXPairingCard name="Sunrise HYROX" author="Kayla R." tier="featured" service="tidal" tracks={9} duration="52 min" upvotes={312} upvoted cover="H" promoted />
+    <OXPairingCard name="Forge Strongman" author="Devon M." tier="community" service="soundcloud" tracks={7} duration="44 min" upvotes={88} cover="F" />
+  </>);
+  const fit = (bpm, t) => window.OXData.cadenceFit(bpm, t);
+  ReactDOM.createRoot(document.getElementById("tt")).render(
+    <OXTrackTimer art="PL" title="Pulse Width" artist="Northbound" forWorkout="Sled Push · 4×20m" service="spotify"
+      bpm={150} target={156} fit={fit(150, 156)} set={2} sets={4} resting={false} playing />
+  );
+  ReactDOM.createRoot(document.getElementById("cad")).render(<>
+    <OXCadenceMeter bpm={150} target={156} fit={fit(150, 156)} />
+    <OXCadenceMeter bpm={128} target={140} fit={fit(128, 140)} />
+    <OXCadenceMeter bpm={92} target={84} fit={fit(92, 84)} />
+  </>);
+  ReactDOM.createRoot(document.getElementById("arc")).render(
+    <OXEnergyArc steps={[{label:"Warmup",zone:1,done:true},{label:"Sled",zone:5,active:true},{label:"Bench",zone:4},{label:"Press",zone:4},{label:"Dips",zone:3},{label:"Cool",zone:1}]} />
+  );
+  ReactDOM.createRoot(document.getElementById("raid")).render(
+    <OXRaidRoom title="Sunrise HYROX Raid" floor="Salt House · South Beach" host="Kayla R." going={48}
+      members={[{initial:"K"},{initial:"D"},{initial:"P"},{initial:"M",me:true},{initial:"A"},{initial:"J"},{initial:"T"},{initial:"R"}]}
+      art="PL" songTitle="Pulse Width" artist="Northbound" bpm={150} forWorkout="1km Run · zone 4" service="tidal" live playing />
+  );
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/fonts.css
+ * Webfont loading. If these fail, the named system fallbacks carry
+ * the layout. Email surfaces MUST name the fallback in the caption
+ * (Geist → -apple-system/Segoe; DM Serif → Georgia; JetBrains → Menlo).
+ * ═══════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+/* Substitution flags (used by email + print where webfonts don't load):
+   --ox-font-serif  → Georgia, 'Times New Roman', serif
+   --ox-font-sans   → -apple-system, 'Segoe UI', system-ui, sans-serif
+   --ox-font-mono   → 'Menlo', ui-monospace, monospace
+*/

@@ -1,0 +1,65 @@
+<!-- @dsCard group="Fitness" viewport="700x460" name="Tribe & Booking · Classes, Coaches, Events, Raids, Herd that" subtitle="Tribe leaderboard, the Herd-that co-sign stamp, class booking, coach cards, Clubhouse events, group raids" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  .wrap { padding: 24px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px 36px; align-items: start; }
+  .stack { display: grid; gap: 16px; }
+  .h { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-stone); }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXTribeBoard, OXClassRow, OXCoachCard, OXEventCard, OXRaidCard, OXBookingCard, OXHerdThat } = window.OXDesignSystem_7d2a2e;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <>
+      <div className="stack">
+        <div>
+          <div className="h" style={{marginBottom:8}}>— Tribe · The Herd</div>
+          <OXTribeBoard rows={[
+            {rank:1,name:"Kai R.",xp:6120,initial:"K"},
+            {rank:2,name:"Mara L.",xp:5540,initial:"M"},
+            {rank:3,name:"You",xp:3840,initial:"Y",me:true},
+          ]} />
+        </div>
+        <div>
+          <div className="h" style={{marginBottom:8}}>— Herd that · co-sign stamp</div>
+          <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+            <OXHerdThat count={47} withAvatars={[{initial:"K"},{initial:"M"},{initial:"D"}]} />
+            <OXHerdThat active count={128} />
+            <OXHerdThat size="sm" count={12} />
+          </div>
+        </div>
+        <div>
+          <div className="h" style={{marginBottom:8}}>— Schedule · Salt House</div>
+          <OXClassRow time="06:00" title="Sunrise strength" coach="Mara L." spots={4} status="filling" />
+          <OXClassRow time="07:30" title="Cold plunge + sauna" coach="Dev O." status="booked" />
+          <OXClassRow time="18:00" title="Sled conditioning" coach="Kai R." status="full" />
+        </div>
+        <OXBookingCard title="Cold plunge + sauna" when="Mon · 07:30" where="Salt House · Edgewater" code="BK-0314" />
+      </div>
+      <div className="stack">
+        <div>
+          <div className="h" style={{marginBottom:8}}>— Coaches</div>
+          <OXCoachCard name="Mara López" specialty="Strength · Powerlifting" meta="4.9 · 320 sessions" action="Book →" />
+        </div>
+        <OXRaidCard title="Causeway hill repeats" when="Sat · 06:30" floor="MacArthur"
+          filled={6} capacity={8} rewardXp={500} />
+        <div>
+          <div className="h" style={{marginBottom:8}}>— Clubhouse</div>
+          <OXEventCard day="Sun · 16:00" title={<>Sunset <em>movement</em></>} host="Lux" attendees={22} soft status="going" />
+        </div>
+      </div>
+    </>
+  );
+</script>
+</body>
+</html>

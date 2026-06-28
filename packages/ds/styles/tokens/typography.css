@@ -1,0 +1,64 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/typography.css
+ * Three faces, one voice.
+ *   Display — DM Serif Display (Regular + Italic). High-contrast
+ *             modern serif. Headlines, pullquotes, hero moments.
+ *             Italic (often + Oxide) is the only ornament.
+ *   Text    — Geist (300–700). Body, forms, dispatches, app UI.
+ *   Mono    — JetBrains Mono (400/500/700/800). Field-note labels,
+ *             data, ticket info, the MARK itself at 800.
+ *
+ * The MARK: the word "OX" set in JetBrains Mono ExtraBold (800),
+ * letter-spacing −4%. Horizontal = wordmark. Rotated 90° CW = flag.
+ * One source string, one transform. Never drawn, never another face.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ox-font-serif: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+  --ox-font-sans:  'Geist', -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --ox-font-mono:  'JetBrains Mono', 'Menlo', ui-monospace, monospace;
+
+  /* ─── Type scale (px) ───────────────────────────────────────────── */
+  --ox-text-display: 132px;  /* hero / cover */
+  --ox-text-title:   96px;   /* section opener */
+  --ox-text-h2:      64px;   /* spread / page H2 */
+  --ox-text-spread:  38px;   /* sub-section head */
+  --ox-text-lede:    22px;   /* serif lede */
+  --ox-text-body-l:  18px;   /* large body */
+  --ox-text-body:    15px;   /* running body */
+  --ox-text-small:   13px;   /* caption */
+  --ox-text-meta:    11px;   /* mono label */
+  --ox-text-meta-sm: 9px;    /* tiny mono caption */
+
+  /* ─── Leading ───────────────────────────────────────────────────── */
+  --ox-lead-tight:   0.92;  /* @kind other */
+  --ox-lead-snug:    1.06;  /* @kind other */
+  --ox-lead-body:    1.55;  /* @kind other */
+  --ox-lead-loose:   1.7;   /* @kind other */
+
+  /* ─── Tracking ──────────────────────────────────────────────────── */
+  --ox-track-display: -0.022em;  /* @kind other */
+  --ox-track-tight:   -0.04em;   /* @kind other */
+  --ox-track-mono:    0.16em;    /* @kind other */
+  --ox-track-mono-lg: 0.24em;    /* @kind other */
+}
+
+/* ─── Editorial helpers (used in the guide + brand surfaces) ───────── */
+.ox-display { font-family: var(--ox-font-serif); font-weight: 400; font-size: var(--ox-text-display); line-height: var(--ox-lead-tight); letter-spacing: var(--ox-track-display); }
+.ox-h1      { font-family: var(--ox-font-serif); font-weight: 400; font-size: var(--ox-text-title); line-height: 0.94; letter-spacing: var(--ox-track-display); }
+.ox-h2      { font-family: var(--ox-font-serif); font-weight: 400; font-size: var(--ox-text-h2); line-height: 0.96; letter-spacing: -0.018em; }
+.ox-h3      { font-family: var(--ox-font-serif); font-weight: 400; font-size: var(--ox-text-spread); line-height: 1.06; letter-spacing: -0.012em; }
+.ox-lede    { font-family: var(--ox-font-serif); font-weight: 400; font-size: var(--ox-text-lede); line-height: 1.35; }
+.ox-body    { font-family: var(--ox-font-sans); font-weight: 400; font-size: var(--ox-text-body); line-height: var(--ox-lead-body); }
+.ox-italic  { font-style: italic; color: var(--ox-accent); }
+
+.ox-meta {
+  font-family: var(--ox-font-mono);
+  font-weight: 500;
+  font-size: var(--ox-text-meta);
+  letter-spacing: var(--ox-track-mono);
+  text-transform: uppercase;
+  color: var(--ox-text-muted);
+}
+.ox-meta--ink   { color: var(--ox-ink); }
+.ox-meta--oxide { color: var(--ox-oxide); }

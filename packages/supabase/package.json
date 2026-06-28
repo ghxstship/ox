@@ -1,0 +1,24 @@
+{
+  "name": "@ox/supabase",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed Supabase clients (browser + server) for the OX project xaepcwnqjwphuwvuekfb, over the generated Database types. RLS is enforced by Supabase; the anon/publishable key is safe in the browser.",
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" },
+    "./types": { "types": "./src/database.types.ts", "default": "./src/database.types.ts" },
+    "./server": { "types": "./src/server.ts", "default": "./src/server.ts" }
+  },
+  "scripts": {
+    "gen:types": "supabase gen types typescript --project-id xaepcwnqjwphuwvuekfb > src/database.types.ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/ssr": "^0.5.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

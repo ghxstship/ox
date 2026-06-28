@@ -1,0 +1,170 @@
+{
+  "brand": {
+    "tagline": "Plug in. Level up.",
+    "herd": "Herd that."
+  },
+  "nav": {
+    "home": "Home",
+    "train": "Train",
+    "tribe": "Tribe",
+    "map": "Map",
+    "you": "You",
+    "shop": "Shop",
+    "events": "Events",
+    "today": "Today",
+    "schedule": "Schedule",
+    "members": "Members",
+    "clients": "Clients",
+    "inbox": "Inbox",
+    "more": "More",
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "payments": "Payments",
+    "reports": "Reports",
+    "floor": "Floor",
+    "signOut": "Sign out",
+    "switchRole": "Switch identity"
+  },
+  "auth": {
+    "kicker": "Sign in",
+    "title": "Plug in.",
+    "titleEm": "Level up.",
+    "sub": "Pick an identity — each role opens a different surface with its own row-level scope.",
+    "identities": "Demo identities",
+    "rbacNote": "RBAC picks the surface · RLS scopes every list to what this identity may see.",
+    "consumer": "Consumer app · book, train, shop, earn XP",
+    "coach": "Operator · own roster + own classes only",
+    "host": "Operator · one floor's members & revenue",
+    "admin": "Operator · all floors, billing, analytics"
+  },
+  "common": {
+    "loading": "Loading",
+    "retry": "Retry",
+    "empty": "Nothing here yet",
+    "error": "We hit a snag",
+    "errorSub": "We could not reach the field. Try again.",
+    "skipToContent": "Skip to content",
+    "live": "Live",
+    "book": "Book",
+    "booked": "Booked",
+    "join": "Join",
+    "rsvp": "RSVP",
+    "going": "Going",
+    "add": "Add",
+    "checkout": "Checkout",
+    "locked": "Locked",
+    "save": "Save",
+    "demoData": "Demo data — API offline"
+  },
+  "home": {
+    "title": "Home",
+    "todaySession": "Today's session",
+    "quests": "Quests",
+    "feedTeaser": "From the herd",
+    "level": "Level",
+    "nextLevel": "to next level",
+    "streak": "day streak",
+    "noQuests": "No active quests — generate a session to start one."
+  },
+  "train": {
+    "title": "Train",
+    "library": "Exercise library",
+    "generate": "Generate session",
+    "recovery": "Recovery",
+    "prs": "Personal records",
+    "noResult": "No moves match these filters.",
+    "find": "Find floors",
+    "startSession": "Start session"
+  },
+  "player": {
+    "title": "Session",
+    "logSet": "Log set",
+    "rest": "Rest",
+    "work": "Work",
+    "finish": "Finish",
+    "finished": "Session logged",
+    "xpAwarded": "XP awarded"
+  },
+  "tribe": {
+    "title": "Tribe",
+    "feed": "Feed",
+    "leaderboard": "Leaderboard",
+    "classes": "Classes",
+    "noFeed": "Quiet on the floor — be the first to post."
+  },
+  "map": {
+    "title": "Map",
+    "discover": "Floor discovery",
+    "nearby": "Nearby floors",
+    "noFloors": "No floors nearby."
+  },
+  "you": {
+    "title": "You",
+    "credential": "Credential",
+    "prs": "Personal records",
+    "recovery": "Recovery",
+    "settings": "Settings",
+    "orders": "Orders",
+    "locale": "Language",
+    "units": "Units",
+    "currency": "Currency",
+    "noOrders": "No orders yet."
+  },
+  "shop": {
+    "title": "Shop",
+    "collection": "Collection",
+    "gated": "Reach level {level} to unlock",
+    "addToCart": "Add to cart",
+    "cart": "Cart",
+    "emptyCart": "Your cart is empty.",
+    "total": "Total",
+    "size": "Size"
+  },
+  "events": {
+    "title": "Events",
+    "raids": "Raids",
+    "noEvents": "No events nearby.",
+    "reward": "reward"
+  },
+  "ops": {
+    "scope": "Scope",
+    "dashboard": "Dashboard",
+    "revenue": "Revenue",
+    "floorLoad": "Floor load",
+    "activeMembers": "Active members",
+    "newClass": "Add class",
+    "members": "Members",
+    "clients": "Clients",
+    "payments": "Payments",
+    "retry": "Retry",
+    "failedRecovery": "Recover failed payment",
+    "reports": "Reports",
+    "campaigns": "Campaigns",
+    "send": "Send",
+    "noPayments": "No transactions in scope.",
+    "noMembers": "No members in scope."
+  },
+  "marketing": {
+    "kicker": "Gamified adventure fitness · No gym required",
+    "heroTitle": "Train like a beast.",
+    "heroTitleEm": "Move as a herd.",
+    "heroLede": "The training app that turns every workout into a quest — real programming, a living world to explore, and a herd that shows up with you.",
+    "startSafari": "Start your safari",
+    "howItWorks": "See how it works",
+    "pricing": "Pricing",
+    "personas": "Personas",
+    "company": "Company",
+    "signIn": "Sign in",
+    "pricingTitle": "Plans",
+    "personasTitle": "Built for every explorer",
+    "accessibility": "Accessibility"
+  },
+  "a11y": {
+    "title": "Accessibility",
+    "kicker": "Commitment",
+    "intro": "OX is built to be usable by everyone. We target WCAG 2.2 AA and EN 301 549.",
+    "standards": "Standards",
+    "features": "What we do",
+    "contact": "Report a barrier"
+  }
+}

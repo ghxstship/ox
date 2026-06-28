@@ -1,0 +1,15 @@
+{
+  "extends": "../../packages/config/tsconfig.react.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "types": ["react"],
+    "paths": {
+      "@ox/types": ["../../packages/types/src/index.ts"],
+      "@ox/rbac": ["../../packages/rbac/src/index.ts"],
+      "@ox/api-client": ["../../packages/api-client/src/index.ts"]
+    }
+  },
+  "include": ["app/**/*", "src/**/*", "index.ts"]
+}

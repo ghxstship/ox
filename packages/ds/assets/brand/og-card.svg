@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0B0B0A"></rect>
+  
+  <text x="80" y="92" font-family="JetBrains Mono, monospace" font-weight="700" font-size="22" letter-spacing="5" fill="#C9612F">— A PRIVATE MEMBERSHIP · MIAMI</text>
+  <text x="1120" y="92" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="22" letter-spacing="5" fill="#6B6660">EST. MMXXVI</text>
+  
+  <text x="80" y="360" font-family="JetBrains Mono, monospace" font-weight="800" font-size="200" letter-spacing="-10" fill="#ECE7DA">OX</text>
+  
+  <text x="86" y="460" font-family="DM Serif Display, Georgia, serif" font-size="76" fill="#ECE7DA">Beyond the <tspan font-style="italic" fill="#C9612F">scene.</tspan></text>
+  
+  <rect x="80" y="540" width="1040" height="1" fill="#6B6660"></rect>
+  <text x="80" y="582" font-family="JetBrains Mono, monospace" font-size="20" letter-spacing="4" fill="#6B6660">SOUND · MOVEMENT · COMPANY</text>
+  <text x="1120" y="582" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="20" letter-spacing="4" fill="#ECE7DA">OX.CLUB</text>
+</svg>

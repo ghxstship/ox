@@ -1,0 +1,300 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "$description": "OX Design System — DTCG token export. Generated from tokens/*.css. The CSS custom properties remain the source of truth; this mirror feeds tooling (Style Dictionary, Figma Tokens, native platforms).",
+  "color": {
+    "$type": "color",
+    "ink": {
+      "$value": "#0B0B0A",
+      "$description": "Primary text + dark ground. Never pure #000."
+    },
+    "ink-soft": {
+      "$value": "#1A1916"
+    },
+    "stone": {
+      "$value": "#6B6660",
+      "$description": "Secondary text — AA at body size."
+    },
+    "stone-soft": {
+      "$value": "#9B958C",
+      "$description": "Decorative only — fails AA as text."
+    },
+    "paper-warm": {
+      "$value": "#E4DDCB"
+    },
+    "paper": {
+      "$value": "#ECE7DA",
+      "$description": "Primary light ground. Never pure #FFF."
+    },
+    "salt": {
+      "$value": "#F6F2E8"
+    },
+    "oxide": {
+      "$value": "#B5552E",
+      "$description": "The single chromatic accent. ≤10% of any surface; large text only on light."
+    },
+    "oxide-deep": {
+      "$value": "#8C3F22",
+      "$description": "Hover/press; AA body on light grounds."
+    },
+    "oxide-bright": {
+      "$value": "#C9612F",
+      "$description": "Accent on Ink grounds; AA body on Ink."
+    },
+    "semantic": {
+      "success": {
+        "$value": "{color.oxide-deep}",
+        "$description": "Functional UI green is muted; pairs with shape/label, never color alone."
+      },
+      "warning": {
+        "$value": "#9A6B1E"
+      },
+      "danger": {
+        "$value": "#9E3B2E"
+      },
+      "info": {
+        "$value": "{color.stone}"
+      }
+    }
+  },
+  "brand": {
+    "$type": "color",
+    "$description": "White-label input layer (tokens/whitelabel.css). Override per tenant; the system rebinds these into the component primitives. Defaults alias OX. name/mark are CSS string inputs (not DTCG-typed).",
+    "accent": { "$value": "{color.oxide}", "$description": "The tenant's one chromatic accent." },
+    "accent-deep": { "$value": "{color.oxide-deep}" },
+    "accent-bright": { "$value": "{color.oxide-bright}" },
+    "ground": { "$value": "{color.paper}" },
+    "raised": { "$value": "{color.salt}" },
+    "deep": { "$value": "{color.paper-warm}" },
+    "ink": { "$value": "{color.ink}" },
+    "ink-soft": { "$value": "{color.ink-soft}" },
+    "font-display": { "$type": "fontFamily", "$value": "{fontFamily.serif}" },
+    "font-body": { "$type": "fontFamily", "$value": "{fontFamily.sans}" },
+    "font-mono": { "$type": "fontFamily", "$value": "{fontFamily.mono}" }
+  },
+  "fontFamily": {
+    "$type": "fontFamily",
+    "serif": {
+      "$value": [
+        "DM Serif Display",
+        "Georgia",
+        "serif"
+      ],
+      "$description": "Display + the italic-Oxide ornament."
+    },
+    "sans": {
+      "$value": [
+        "Geist",
+        "-apple-system",
+        "system-ui",
+        "sans-serif"
+      ],
+      "$description": "Body, forms, app UI."
+    },
+    "mono": {
+      "$value": [
+        "JetBrains Mono",
+        "ui-monospace",
+        "monospace"
+      ],
+      "$description": "Labels, data, and the mark itself."
+    }
+  },
+  "fontWeight": {
+    "$type": "fontWeight",
+    "light": {
+      "$value": 300
+    },
+    "regular": {
+      "$value": 400
+    },
+    "medium": {
+      "$value": 500
+    },
+    "semibold": {
+      "$value": 600
+    },
+    "bold": {
+      "$value": 700
+    },
+    "extrabold": {
+      "$value": 800
+    }
+  },
+  "dimension": {
+    "$type": "dimension",
+    "space": {
+      "xs": {
+        "$value": "8px"
+      },
+      "sm": {
+        "$value": "16px"
+      },
+      "md": {
+        "$value": "24px"
+      },
+      "base": {
+        "$value": "32px"
+      },
+      "lg": {
+        "$value": "48px"
+      },
+      "xl": {
+        "$value": "64px"
+      },
+      "2xl": {
+        "$value": "96px"
+      },
+      "3xl": {
+        "$value": "140px"
+      }
+    },
+    "radius": {
+      "none": {
+        "$value": "0px",
+        "$description": "Default — OX is square."
+      },
+      "pill": {
+        "$value": "999px",
+        "$description": "Avatars + status dots only."
+      },
+      "credential": {
+        "$value": "10px",
+        "$description": "The member-credential corner — the one card radius."
+      }
+    },
+    "border": {
+      "hair": {
+        "$value": "1px"
+      },
+      "ink": {
+        "$value": "1px"
+      },
+      "strong": {
+        "$value": "3px"
+      }
+    },
+    "breakpoint": {
+      "sm": {
+        "$value": "480px"
+      },
+      "md": {
+        "$value": "768px"
+      },
+      "lg": {
+        "$value": "1024px"
+      },
+      "xl": {
+        "$value": "1440px"
+      }
+    },
+    "container": {
+      "canvas": {
+        "$value": "1440px"
+      },
+      "reading": {
+        "$value": "760px"
+      },
+      "app": {
+        "$value": "390px"
+      },
+      "margin": {
+        "$value": "96px"
+      },
+      "gutter": {
+        "$value": "24px"
+      },
+      "touch-min": {
+        "$value": "44px"
+      }
+    }
+  },
+  "zIndex": {
+    "$type": "number",
+    "base": {
+      "$value": 0
+    },
+    "raised": {
+      "$value": 10
+    },
+    "sticky": {
+      "$value": 20
+    },
+    "dropdown": {
+      "$value": 30
+    },
+    "scrim": {
+      "$value": 40
+    },
+    "modal": {
+      "$value": 50
+    },
+    "toast": {
+      "$value": 60
+    }
+  },
+  "duration": {
+    "$type": "duration",
+    "instant": {
+      "$value": "0ms"
+    },
+    "fast": {
+      "$value": "120ms"
+    },
+    "base": {
+      "$value": "160ms"
+    },
+    "slow": {
+      "$value": "240ms"
+    }
+  },
+  "cubicBezier": {
+    "$type": "cubicBezier",
+    "standard": {
+      "$value": [
+        0.2,
+        0,
+        0,
+        1
+      ]
+    },
+    "out": {
+      "$value": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "in": {
+      "$value": [
+        0.4,
+        0,
+        1,
+        1
+      ]
+    }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "none": {
+      "$value": {
+        "color": "#00000000",
+        "offsetX": "0",
+        "offsetY": "0",
+        "blur": "0",
+        "spread": "0"
+      },
+      "$description": "Default — depth comes from rules, not shadows."
+    },
+    "stage": {
+      "$value": {
+        "color": "#0B0B0A2E",
+        "offsetX": "0px",
+        "offsetY": "12px",
+        "blur": "28px",
+        "spread": "0px"
+      },
+      "$description": "Physical-mockup staging + FAB only."
+    }
+  }
+}

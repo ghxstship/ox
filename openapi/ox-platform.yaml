@@ -1,0 +1,685 @@
+openapi: 3.1.0
+info:
+  title: OX Platform API
+  version: 1.12.0
+  summary: The data contracts behind the OX design system.
+  description: |
+    The OX platform API. Every schema here is the data shape that backs one or
+    more OX design-system components — the `x-ox-component` extension on each
+    schema names the binding, so a consuming app can wire `window.OXDesignSystem_7d2a2e`
+    components straight to these payloads.
+
+    The system is **white-label ready**: `GET /tenant/brand` returns a brand
+    config (see `BrandConfig`) that `whitelabel/apply-brand.js` applies at
+    runtime, re-skinning every component without a redeploy.
+
+    Conventions: JSON over HTTPS, cursor pagination, RFC 3339 timestamps,
+    a single error envelope (`Error`), and bearer (JWT) auth. The one-accent /
+    square / flat brand rules are enforced in the design layer, not here.
+  contact:
+    name: OX Platform
+    email: platform@ox.fit
+    url: https://ox.fit
+  license:
+    name: Proprietary
+x-ox-design-system:
+  namespace: OXDesignSystem_7d2a2e
+  tokens: tokens/tokens.dtcg.json
+  whitelabel: whitelabel/brand.schema.json
+  note: Schemas map to components via the per-schema `x-ox-component` field.
+servers:
+  - url: https://api.ox.fit/v1
+    description: Production
+  - url: https://sandbox.api.ox.fit/v1
+    description: Sandbox
+security:
+  - bearerAuth: []
+tags:
+  - name: Me
+    description: The authenticated member, progress, recovery, credential.
+  - name: Tenant
+    description: White-label brand config for the current tenant.
+  - name: Floors
+    description: Partner floors + equipment (the matchmaking source).
+  - name: Training
+    description: Exercises, programs, sessions, sets, PRs.
+  - name: Social
+    description: Tribes, classes, events, raids, check-ins, feed.
+  - name: Media
+    description: Program↔playlist pairings and tracks.
+
+paths:
+  /me:
+    get:
+      tags: [Me]
+      operationId: getMe
+      summary: The authenticated member.
+      responses:
+        "200":
+          description: The member.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Member" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /me/progress:
+    get:
+      tags: [Me]
+      operationId: getProgress
+      summary: Level, XP, rank, and streak.
+      responses:
+        "200":
+          description: Progress.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Progress" }
+
+  /me/recovery:
+    get:
+      tags: [Me]
+      operationId: getRecovery
+      summary: Per-region recovery state (backs OXRecoveryMap).
+      responses:
+        "200":
+          description: Recovery regions.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+                    items: { $ref: "#/components/schemas/RecoveryRegion" }
+
+  /me/credential:
+    get:
+      tags: [Me]
+      operationId: getCredential
+      summary: The member credential (physical + digital).
+      responses:
+        "200":
+          description: Credential.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Credential" }
+
+  /tenant/brand:
+    get:
+      tags: [Tenant]
+      operationId: getTenantBrand
+      summary: White-label brand config for the current tenant.
+      description: Returns the brand applied by `whitelabel/apply-brand.js`. Defaults to OX when the tenant is unbranded.
+      security: []
+      responses:
+        "200":
+          description: Brand config.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BrandConfig" }
+
+  /floors:
+    get:
+      tags: [Floors]
+      operationId: listFloors
+      summary: Partner floors near a point.
+      parameters:
+        - { name: near, in: query, schema: { type: string }, description: "lat,lng" }
+        - { name: radius, in: query, schema: { type: integer, default: 5000 }, description: meters }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Limit" }
+      responses:
+        "200":
+          description: A page of floors.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/Page" }
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: "#/components/schemas/Floor" }
+
+  /floors/{floorId}:
+    get:
+      tags: [Floors]
+      operationId: getFloor
+      parameters: [{ $ref: "#/components/parameters/FloorId" }]
+      responses:
+        "200":
+          description: A floor.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Floor" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /exercises:
+    get:
+      tags: [Training]
+      operationId: listExercises
+      summary: Discoverable moves (backs OXExerciseCard / OXFilterBar).
+      parameters:
+        - { name: muscle, in: query, schema: { type: string } }
+        - { name: equipment, in: query, schema: { type: string } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Limit" }
+      responses:
+        "200":
+          description: A page of exercises.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/Page" }
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: "#/components/schemas/Exercise" }
+
+  /exercises/{exerciseId}/floor-matches:
+    get:
+      tags: [Training]
+      operationId: listFloorMatches
+      summary: Floors that have this move's equipment (backs OXFloorMatch).
+      parameters: [{ $ref: "#/components/parameters/ExerciseId" }]
+      responses:
+        "200":
+          description: Floor matches.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/FloorMatch" }
+
+  /sessions:
+    post:
+      tags: [Training]
+      operationId: startSession
+      summary: Start a training session from a program day.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [floorId]
+              properties:
+                programId: { type: string }
+                floorId: { type: string }
+      responses:
+        "201":
+          description: The started session.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Session" }
+
+  /sessions/{sessionId}/sets:
+    post:
+      tags: [Training]
+      operationId: logSet
+      summary: Log a set (backs OXSetRow / OXExercisePlayer).
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SetInput" }
+      responses:
+        "201":
+          description: The logged set + running session state.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Set" }
+
+  /sessions/{sessionId}/finish:
+    post:
+      tags: [Training]
+      operationId: finishSession
+      summary: Finish a session; returns XP earned + any level-up / PRs.
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      responses:
+        "200":
+          description: Session result.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SessionResult" }
+
+  /tribes/{tribeId}/leaderboard:
+    get:
+      tags: [Social]
+      operationId: getLeaderboard
+      summary: Ranked tribe leaderboard (backs OXTribeBoard).
+      parameters: [{ $ref: "#/components/parameters/TribeId" }]
+      responses:
+        "200":
+          description: Leaderboard rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  unit: { type: string, example: XP }
+                  rows:
+                    type: array
+                    items: { $ref: "#/components/schemas/LeaderboardRow" }
+
+  /classes/{classId}/book:
+    post:
+      tags: [Social]
+      operationId: bookClass
+      summary: Book a class (backs OXClassRow / OXBookingCard).
+      parameters: [{ $ref: "#/components/parameters/ClassId" }]
+      responses:
+        "201":
+          description: The booking.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  /events/{eventId}/rsvp:
+    post:
+      tags: [Social]
+      operationId: rsvpEvent
+      summary: RSVP to an event (backs OXEventCard).
+      parameters: [{ $ref: "#/components/parameters/EventId" }]
+      responses:
+        "200":
+          description: Updated event.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Event" }
+
+  /raids/{raidId}/join:
+    post:
+      tags: [Social]
+      operationId: joinRaid
+      summary: Join a synced raid (backs OXRaidCard / OXRaidRoom).
+      parameters: [{ $ref: "#/components/parameters/RaidId" }]
+      responses:
+        "200":
+          description: Updated raid.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Raid" }
+
+  /checkins:
+    post:
+      tags: [Social]
+      operationId: checkIn
+      summary: Check in to a floor (backs OXCheckIn).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [floorId]
+              properties:
+                floorId: { type: string }
+                code: { type: string }
+      responses:
+        "201":
+          description: Check-in result with XP.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  floor: { type: string }
+                  xp: { type: integer }
+
+  /pairings:
+    get:
+      tags: [Media]
+      operationId: listPairings
+      summary: Program↔playlist pairings for discovery (backs OXPairingCard).
+      parameters:
+        - { name: tier, in: query, schema: { $ref: "#/components/schemas/CurationTier" } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Limit" }
+      responses:
+        "200":
+          description: A page of pairings.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/Page" }
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: "#/components/schemas/Pairing" }
+
+  /pairings/{pairingId}/upvote:
+    post:
+      tags: [Media]
+      operationId: upvotePairing
+      summary: Upvote a pairing (backs OXUpvote).
+      parameters: [{ $ref: "#/components/parameters/PairingId" }]
+      responses:
+        "200":
+          description: Updated vote state.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  upvotes: { type: integer }
+                  upvoted: { type: boolean }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Cursor: { name: cursor, in: query, schema: { type: string }, description: Opaque pagination cursor. }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    FloorId: { name: floorId, in: path, required: true, schema: { type: string } }
+    ExerciseId: { name: exerciseId, in: path, required: true, schema: { type: string } }
+    SessionId: { name: sessionId, in: path, required: true, schema: { type: string } }
+    TribeId: { name: tribeId, in: path, required: true, schema: { type: string } }
+    ClassId: { name: classId, in: path, required: true, schema: { type: string } }
+    EventId: { name: eventId, in: path, required: true, schema: { type: string } }
+    RaidId: { name: raidId, in: path, required: true, schema: { type: string } }
+    PairingId: { name: pairingId, in: path, required: true, schema: { type: string } }
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    NotFound:
+      description: Resource not found.
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Conflict:
+      description: State conflict (e.g. class full).
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, example: not_found }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+
+    Page:
+      type: object
+      properties:
+        items: { type: array, items: {} }
+        nextCursor: { type: string, nullable: true }
+        total: { type: integer }
+
+    Tier:
+      type: string
+      enum: [founder, compass, sound, distant]
+      description: Membership tier — maps to the .ox-tier-* scope + OXTierBadge.
+
+    BrandConfig:
+      description: White-label brand config — consumed by whitelabel/apply-brand.js. Mirrors whitelabel/brand.schema.json.
+      type: object
+      required: [slug, name, accent]
+      x-ox-component: "(tokens/whitelabel.css · OXBrand.apply)"
+      properties:
+        slug: { type: string, pattern: "^[a-z0-9][a-z0-9-]*$" }
+        name: { type: string }
+        mark: { type: string }
+        accent: { type: string, pattern: "^#([0-9a-fA-F]{6})$" }
+        accentDeep: { type: string, pattern: "^#([0-9a-fA-F]{6})$" }
+        accentBright: { type: string, pattern: "^#([0-9a-fA-F]{6})$" }
+        ground: { type: string, pattern: "^#([0-9a-fA-F]{6})$" }
+        ink: { type: string, pattern: "^#([0-9a-fA-F]{6})$" }
+        mode: { type: string, enum: [light, dark, auto] }
+        logo: { type: string, format: uri-reference }
+
+    Member:
+      type: object
+      x-ox-component: OXAvatar · OXPost · OXCredential
+      required: [id, handle, name, tier]
+      properties:
+        id: { type: string }
+        handle: { type: string, example: "@mara" }
+        name: { type: string }
+        initial: { type: string, maxLength: 1 }
+        tier: { $ref: "#/components/schemas/Tier" }
+        memberNumber: { type: string, example: "014" }
+        joinedAt: { type: string, format: date-time }
+
+    Progress:
+      type: object
+      x-ox-component: OXLevelBadge · OXXPBar · OXStreak
+      required: [level, xp, xpToNext]
+      properties:
+        level: { type: integer }
+        rank: { type: string, example: Pathfinder }
+        xp: { type: integer }
+        xpMax: { type: integer }
+        xpToNext: { type: integer }
+        streakDays: { type: integer }
+        streakActive: { type: boolean }
+
+    Credential:
+      type: object
+      x-ox-component: OXCredential
+      required: [memberNumber, fields]
+      properties:
+        material: { type: string, enum: [physical, digital] }
+        memberNumber: { type: string }
+        fields:
+          type: array
+          items:
+            type: object
+            properties:
+              label: { type: string }
+              value: { type: string }
+        strip: { type: string }
+        verified: { type: boolean }
+
+    Floor:
+      type: object
+      x-ox-component: OXFloorMatch · OXCheckIn
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        locality: { type: string }
+        distance: { type: string, example: "0.4 mi" }
+        isHome: { type: boolean }
+        scenery: { type: string, description: "indoor | trail | rooftop | …" }
+        equipment:
+          type: array
+          items: { $ref: "#/components/schemas/Equipment" }
+
+    Equipment:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        count: { type: integer }
+
+    Exercise:
+      type: object
+      x-ox-component: OXExerciseCard
+      required: [id, name]
+      properties:
+        id: { type: string }
+        index: { type: string }
+        name: { type: string }
+        equipment: { type: string }
+        muscles: { type: string }
+        floors: { type: integer, description: "# of nearby floors with the gear" }
+
+    FloorMatch:
+      type: object
+      x-ox-component: OXFloorMatch
+      properties:
+        floorId: { type: string }
+        name: { type: string }
+        distance: { type: string }
+        has: { type: string, description: matching equipment summary }
+        scenery: { type: string }
+        xp: { type: integer }
+        isHome: { type: boolean }
+
+    Session:
+      type: object
+      x-ox-component: OXExercisePlayer · OXSetRow · OXZoneBar
+      required: [id, status]
+      properties:
+        id: { type: string }
+        programId: { type: string }
+        floorId: { type: string }
+        status: { type: string, enum: [active, finished] }
+        startedAt: { type: string, format: date-time }
+        sets:
+          type: array
+          items: { $ref: "#/components/schemas/Set" }
+
+    SetInput:
+      type: object
+      x-ox-component: OXSetRow
+      required: [exerciseId, reps]
+      properties:
+        exerciseId: { type: string }
+        weight: { type: number }
+        reps: { type: integer }
+        rpe: { type: number, minimum: 1, maximum: 10 }
+
+    Set:
+      allOf:
+        - { $ref: "#/components/schemas/SetInput" }
+        - type: object
+          properties:
+            index: { type: integer }
+            done: { type: boolean }
+            loggedAt: { type: string, format: date-time }
+
+    SessionResult:
+      type: object
+      x-ox-component: OXPRChip · OXLevelBadge
+      properties:
+        xp: { type: integer }
+        leveledUp: { type: boolean }
+        level: { type: integer }
+        prs:
+          type: array
+          items: { $ref: "#/components/schemas/PR" }
+
+    PR:
+      type: object
+      x-ox-component: OXPRChip
+      required: [lift, value]
+      properties:
+        lift: { type: string }
+        value: { type: number }
+        unit: { type: string }
+        delta: { type: number }
+        prev: { type: number }
+        history: { type: array, items: { type: number } }
+
+    RecoveryRegion:
+      type: object
+      x-ox-component: OXRecoveryMap
+      required: [name, state]
+      properties:
+        name: { type: string }
+        state: { type: string, enum: [fresh, light, worked, spent] }
+
+    LeaderboardRow:
+      type: object
+      x-ox-component: OXTribeBoard
+      required: [rank, name, xp]
+      properties:
+        rank: { type: integer }
+        name: { type: string }
+        initial: { type: string }
+        xp: { type: integer }
+        me: { type: boolean }
+
+    Booking:
+      type: object
+      x-ox-component: OXBookingCard · OXClassRow
+      required: [id, title, when, where]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        when: { type: string }
+        where: { type: string }
+        locality: { type: string }
+        status: { type: string, enum: [open, filling, full, booked] }
+        code: { type: string }
+
+    Event:
+      type: object
+      x-ox-component: OXEventCard
+      required: [id, day, title]
+      properties:
+        id: { type: string }
+        day: { type: string, example: "Sat · Mar 14" }
+        title: { type: string }
+        host: { type: string }
+        attendees: { type: integer }
+        status: { type: string, enum: [open, going] }
+
+    Raid:
+      type: object
+      x-ox-component: OXRaidCard · OXRaidRoom
+      required: [id, title, filled, capacity]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        when: { type: string }
+        floor: { type: string }
+        filled: { type: integer }
+        capacity: { type: integer }
+        rewardXp: { type: integer }
+        live: { type: boolean }
+
+    CurationTier:
+      type: string
+      enum: [signature, featured, community]
+      description: Backs OXCurationBadge.
+
+    Service:
+      type: string
+      enum: [spotify, apple, soundcloud, tidal]
+      description: Streaming service — backs OXServiceBadge (neutral chip, never the real logo).
+
+    Track:
+      type: object
+      x-ox-component: OXSongRow · OXNowPlaying
+      required: [id, title]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        artist: { type: string }
+        dur: { type: string, example: "3:42" }
+        bpm: { type: integer }
+        workout: { type: string, description: the move this song maps to }
+        service: { $ref: "#/components/schemas/Service" }
+
+    Pairing:
+      type: object
+      x-ox-component: OXPairingCard
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        author: { type: string }
+        tier: { $ref: "#/components/schemas/CurationTier" }
+        service: { $ref: "#/components/schemas/Service" }
+        tracks: { type: integer }
+        duration: { type: string }
+        upvotes: { type: integer }
+        upvoted: { type: boolean }

@@ -1,0 +1,26 @@
+{
+  "name": "@ox/types",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OX shared types — domain enums (02-data-model) + OpenAPI-generated API schema types (openapi/ox-platform.yaml).",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./openapi": {
+      "types": "./src/openapi.gen.ts",
+      "default": "./src/openapi.gen.ts"
+    }
+  },
+  "scripts": {
+    "generate": "openapi-typescript ../../openapi/ox-platform.yaml -o src/openapi.gen.ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.0",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,134 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/whitelabel.css   (white-label / multi-tenant brand layer)
+ *
+ * The OX system is white-label ready: every component reads SEMANTIC
+ * vars (--ox-oxide ramp · --ox-ink/-paper/-salt grounds · --ox-font-*),
+ * never raw hex. This file inserts a BRAND-INPUT layer in front of those
+ * primitives. A tenant overrides a small, documented set of
+ * `--ox-brand-*` inputs — on :root for a whole deployment, or on a
+ * `[data-ox-brand="slug"]` subtree for many tenants on one page — and
+ * the ENTIRE library re-skins.
+ *
+ * WHAT WHITE-LABEL CHANGES:  the one accent (hue + ramp), the grounds +
+ * ink, the type families, and the mark string.
+ * WHAT IT PRESERVES (non-negotiable structure):  square (radius 0), flat
+ * (no shadows), ruled, ONE accent per tenant, the editorial grid + scale.
+ * A tenant gets THEIR accent — but still exactly one, used the OX way.
+ *
+ * LOAD ORDER: imported after colors/fonts/theming so it wins; semantic
+ * aliases (--ox-accent: var(--ox-oxide)) and tier/mode scopes resolve at
+ * use-time, so they inherit the tenant brand automatically.
+ *
+ * RUNTIME: whitelabel/apply-brand.js sets these inputs from a brand
+ * config object (see whitelabel/brand.schema.json) for arbitrary tenants.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Brand identity ───────────────────────────────────────────────
+     The mark is type. --ox-brand-mark is the wordmark string; the flag
+     is the same string rotated 90° CW. Default = OX. */
+  --ox-brand-name: "OX";  /* @kind other */
+  --ox-brand-mark: "OX";  /* @kind other */
+
+  /* ─── The one accent (a tenant gets ONE accent of their choosing) ───
+     ramp = base · deep (hover/press, ~12% darker) · bright (on Ink). */
+  --ox-brand-accent:        #B5552E;
+  --ox-brand-accent-deep:   #8C3F22;
+  --ox-brand-accent-bright: #C9612F;
+
+  /* ─── Grounds + ink (kept warm + near-mono by default) ────────────── */
+  --ox-brand-ground:   #ECE7DA;   /* default page ground (paper) */
+  --ox-brand-raised:   #F6F2E8;   /* cards / modals (salt) */
+  --ox-brand-deep:     #E4DDCB;   /* section grounds (paper-warm) */
+  --ox-brand-ink:      #0B0B0A;   /* type / structural / dark ground */
+  --ox-brand-ink-soft: #1A1916;   /* large body blocks */
+
+  /* ─── Type (one display, one body, one mono — swap per tenant) ────── */
+  --ox-brand-font-display: "DM Serif Display", Georgia, "Times New Roman", serif;
+  --ox-brand-font-body:    Geist, system-ui, -apple-system, sans-serif;
+  --ox-brand-font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ─── Rewire the consumed primitives to the brand inputs ──────────────
+   Declared on :root AND [data-ox-brand] so a per-subtree tenant scope
+   re-resolves the inputs in its own context (CSS custom-property
+   indirection is computed where declared — this is what makes nested
+   tenants work). */
+:root,
+[data-ox-brand] {
+  --ox-oxide:        var(--ox-brand-accent);
+  --ox-oxide-deep:   var(--ox-brand-accent-deep);
+  --ox-oxide-bright: var(--ox-brand-accent-bright);
+  --ox-oxide-tint:   color-mix(in srgb, var(--ox-brand-accent) 8%, transparent);
+
+  --ox-ink:          var(--ox-brand-ink);
+  --ox-ink-soft:     var(--ox-brand-ink-soft);
+  --ox-paper:        var(--ox-brand-ground);
+  --ox-salt:         var(--ox-brand-raised);
+  --ox-paper-warm:   var(--ox-brand-deep);
+
+  --ox-font-serif:   var(--ox-brand-font-display);
+  --ox-font-sans:    var(--ox-brand-font-body);
+  --ox-font-mono:    var(--ox-brand-font-mono);
+
+  /* keep pillar wayfinding tonal to the tenant accent, not OX copper */
+  --ox-pillar-train:     var(--ox-brand-accent);
+  --ox-pillar-social:    var(--ox-brand-accent-bright);
+  --ox-pillar-lifestyle: var(--ox-brand-accent-deep);
+}
+
+/* A [data-ox-brand] subtree paints its own ground/text by default (so a
+   tenant panel on a neutral page reads as that tenant). */
+[data-ox-brand] {
+  background: var(--ox-bg);
+  color: var(--ox-text);
+}
+
+/* The wordmark, driven by the brand string. The mark is type — set in
+   the brand mono at ExtraBold, OX tracking. `.ox-wm--flag` rotates it. */
+.ox-wm { font-family: var(--ox-font-mono); font-weight: 800; letter-spacing: -0.04em; line-height: 1; display: inline-block; }
+.ox-wm::after { content: var(--ox-brand-mark); }
+.ox-wm--flag { transform: rotate(90deg); transform-origin: center; }
+.ox-brand-name::after { content: var(--ox-brand-name); }
+
+/* ═══════════════════════════════════════════════════════════════════
+ * EXAMPLE TENANT THEMES — proof the re-skin holds. Each keeps exactly
+ * ONE accent and the OX structure; only hue / grounds / mark change.
+ * Copy one of these (or generate via apply-brand.js) for a real tenant.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* FORGE — an ironworks-gym chain. Ember accent, OX warm neutrals. */
+[data-ox-brand="forge"] {
+  --ox-brand-name: "FORGE";  /* @kind other */
+  --ox-brand-mark: "FORGE";  /* @kind other */
+  --ox-brand-accent:        #C2502A;
+  --ox-brand-accent-deep:   #93371A;
+  --ox-brand-accent-bright: #D86A36;
+}
+
+/* TIDE — a coastal recovery studio. Deep-teal accent, cool bone grounds. */
+[data-ox-brand="tide"] {
+  --ox-brand-name: "TIDE";  /* @kind other */
+  --ox-brand-mark: "TIDE";  /* @kind other */
+  --ox-brand-accent:        #1F6F6B;
+  --ox-brand-accent-deep:   #14524F;
+  --ox-brand-accent-bright: #2A8F88;
+  --ox-brand-ground:   #EAEEEC;
+  --ox-brand-raised:   #F3F6F4;
+  --ox-brand-deep:     #DCE4E1;
+  --ox-brand-ink:      #0C1413;
+  --ox-brand-ink-soft: #16201E;
+}
+
+/* NOIR — a premium night-training club. Crimson accent, bone ground. */
+[data-ox-brand="noir"] {
+  --ox-brand-name: "NOIR";  /* @kind other */
+  --ox-brand-mark: "NOIR";  /* @kind other */
+  --ox-brand-accent:        #A8324A;
+  --ox-brand-accent-deep:   #7E2236;
+  --ox-brand-accent-bright: #C24A62;
+  --ox-brand-ground:   #ECE9E4;
+  --ox-brand-raised:   #F4F1EC;
+  --ox-brand-deep:     #E3DFD8;
+  --ox-brand-ink:      #0B0A0A;
+}

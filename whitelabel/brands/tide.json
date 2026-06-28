@@ -1,0 +1,14 @@
+{
+  "slug": "tide",
+  "name": "TIDE",
+  "mark": "TIDE",
+  "accent": "#1F6F6B",
+  "accentDeep": "#14524F",
+  "accentBright": "#2A8F88",
+  "ground": "#EAEEEC",
+  "raised": "#F3F6F4",
+  "deep": "#DCE4E1",
+  "ink": "#0C1413",
+  "inkSoft": "#16201E",
+  "mode": "light"
+}

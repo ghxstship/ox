@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/motion.css
+ * The motion layer. OX motion is mechanical, not playful: decisive
+ * value-flips, ruled reveals, and a single reserved "stamp" punch for
+ * capture / PR / unlock moments. No ambient drift, no spring on chrome.
+ *
+ * Every transition and animation in the system resolves to a token
+ * here — durations, easings, and composed transitions — so motion is
+ * tuned in one place and respects reduced-motion globally.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Duration scale ────────────────────────────────────────────────
+     Deliberately short. OX never lingers. */
+  --ox-dur-0:     0ms;     /* @kind other */ /* instant — reduced-motion target */
+  --ox-dur-1:     90ms;    /* @kind other */ /* micro — press, dot, checkbox flip */
+  --ox-dur-2:     140ms;   /* @kind other */ /* fast — the default control flip */
+  --ox-dur-3:     200ms;   /* @kind other */ /* base — card/border, tab underline */
+  --ox-dur-4:     320ms;   /* @kind other */ /* slow — overlay/sheet, reveal, meter fill */
+  --ox-dur-5:     560ms;   /* @kind other */ /* stately — number tickers, ring sweeps */
+
+  /* ─── Easing ────────────────────────────────────────────────────────
+     Named curves. "standard" is decisive in, soft out — the OX feel. */
+  --ox-ease-standard: cubic-bezier(.2, .7, .2, 1);    /* @kind other */ /* default */
+  --ox-ease-out:      cubic-bezier(.16, 1, .3, 1);    /* @kind other */ /* entrances */
+  --ox-ease-in:       cubic-bezier(.5, 0, .9, .3);    /* @kind other */ /* exits */
+  --ox-ease-inout:    cubic-bezier(.65, 0, .35, 1);   /* @kind other */ /* symmetric */
+  --ox-ease-linear:   linear;                          /* @kind other */ /* tickers, scrub, shimmer */
+  --ox-ease-stamp:    cubic-bezier(.2, 1.5, .35, 1);  /* @kind other */ /* RESERVED — capture/PR/unlock only */
+
+  /* ─── Composed transitions ──────────────────────────────────────────
+     Reach for these on components instead of re-spelling durations. */
+  --ox-tr-color:     color var(--ox-dur-2) var(--ox-ease-standard),
+                     background-color var(--ox-dur-2) var(--ox-ease-standard),
+                     border-color var(--ox-dur-2) var(--ox-ease-standard);  /* @kind other */
+  --ox-tr-flip:      background var(--ox-dur-2) var(--ox-ease-standard),
+                     color var(--ox-dur-2) var(--ox-ease-standard),
+                     border-color var(--ox-dur-2) var(--ox-ease-standard);  /* @kind other */
+  --ox-tr-transform: transform var(--ox-dur-2) var(--ox-ease-standard);  /* @kind other */
+  --ox-tr-nudge:     transform var(--ox-dur-1) var(--ox-ease-out);  /* @kind other */
+  --ox-tr-opacity:   opacity var(--ox-dur-3) var(--ox-ease-standard);  /* @kind other */
+  --ox-tr-border:    border-color var(--ox-dur-3) var(--ox-ease-standard);  /* @kind other */
+  --ox-tr-overlay:   opacity var(--ox-dur-4) var(--ox-ease-out);  /* @kind other */
+  --ox-tr-reveal:    opacity var(--ox-dur-4) var(--ox-ease-out),
+                     transform var(--ox-dur-4) var(--ox-ease-out);  /* @kind other */
+
+  /* ─── Interaction primitives ────────────────────────────────────────
+     The OX micro-interaction vocabulary — square/ruled, no shadow.
+     Depth reads from translate + rule + accent, never blur. */
+  --ox-press:        translateY(1px);              /* @kind other */
+  --ox-lift:         translateY(-2px);             /* @kind other */
+  --ox-nudge-x:      translateX(2px);              /* @kind other */
+  --ox-focus-ring:   0 0 0 2px var(--ox-bg), 0 0 0 4px var(--ox-oxide); /* @kind other */
+  --ox-focus-width:  2px;                          /* @kind other */
+  --ox-focus-offset: 2px;                          /* @kind other */
+}
+
+/* ─── Keyframes — the sanctioned set ────────────────────────────────── */
+/* Ruled reveal: fade + 8px rise. Scroll-in for editorial/cards. */
+@keyframes ox-reveal { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* Stamp: the ONE punch — capture, PR, unlock, mint. Uses ease-stamp. */
+@keyframes ox-stamp { 0% { opacity: 0; transform: scale(.8) rotate(-2deg); } 60% { opacity: 1; } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+/* Accent flash: a copper pulse for kudos / herd-that / confirm. */
+@keyframes ox-flash { 0% { color: var(--ox-oxide); } 100% { color: inherit; } }
+/* Tick: number-roll substitute — a tight rise on value change. */
+@keyframes ox-tick { from { opacity: 0; transform: translateY(0.4em); } to { opacity: 1; transform: none; } }
+/* Sweep: meter / ring fill from 0. Driven by --ox-fill custom prop. */
+@keyframes ox-sweep { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* Scrim fade for overlays. */
+@keyframes ox-scrim-in { from { opacity: 0; } to { opacity: 1; } }
+/* Live dot pulse — the single sanctioned loop, on status only. */
+@keyframes ox-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+
+/* Utility hooks (opt-in; components mostly use the transition tokens). */
+.ox-reveal-on { animation: ox-reveal var(--ox-dur-4) var(--ox-ease-out) both; }
+.ox-stamp-on  { animation: ox-stamp var(--ox-dur-4) var(--ox-ease-stamp) both; }
+.ox-flash-on  { animation: ox-flash var(--ox-dur-5) var(--ox-ease-standard) both; }
+.ox-tick-on   { animation: ox-tick var(--ox-dur-3) var(--ox-ease-out) both; }
+
+/* ─── Reduced motion — collapse everything to instant value-flips ──────
+     The token-level guarantee: no transform, no loop, no animation for
+     anyone who asks for less. Components inherit this for free. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ox-tr-color: color var(--ox-dur-0) linear, background-color var(--ox-dur-0) linear, border-color var(--ox-dur-0) linear;
+    --ox-tr-flip: none;      /* @kind other */
+    --ox-tr-transform: none; /* @kind other */
+    --ox-tr-nudge: none;     /* @kind other */
+    --ox-tr-opacity: none;   /* @kind other */
+    --ox-tr-border: none;    /* @kind other */
+    --ox-tr-overlay: none;   /* @kind other */
+    --ox-tr-reveal: none;    /* @kind other */
+    --ox-press: none;        /* @kind other */
+    --ox-lift: none;         /* @kind other */
+    --ox-nudge-x: none;      /* @kind other */
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

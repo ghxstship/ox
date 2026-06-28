@@ -1,0 +1,55 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Forms · Field, Input, Select, Choice" subtitle="The ruled, serif form language — fields, selects, radios, switch" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-salt); }
+  .wrap { padding: 30px 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; align-items: start; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXField, OXInput, OXSelect, OXChoice, OXSwitch } = window.OXDesignSystem_7d2a2e;
+  function Demo() {
+    const [name, setName] = React.useState("Mariana Cruz");
+    const [pillar, setPillar] = React.useState("mus");
+    const [tier, setTier] = React.useState("compass");
+    const [notify, setNotify] = React.useState(true);
+    return (
+      <>
+        <div>
+          <OXField label="Full name" hint="as on ID" help="Printed on your credential">
+            <OXInput value={name} onChange={setName} />
+          </OXField>
+          <OXField label="Home pillar">
+            <OXSelect value={pillar} onChange={setPillar} options={[
+              {value:"mus",label:"Music"},{value:"fit",label:"Fitness"},
+              {value:"adv",label:"Adventure"},{value:"inv",label:"Innovation"}]} />
+          </OXField>
+          <OXField label="Wallet" state="error" help="Address not found on Base">
+            <OXInput value="0x91…2f" state="error" onChange={()=>{}} />
+          </OXField>
+        </div>
+        <div>
+          <OXChoice type="radio" name="tier" label="Compass" sub="250 seats — the workhorse tier" checked={tier==="compass"} onChange={()=>setTier("compass")} />
+          <OXChoice type="radio" name="tier" label="Sound" sub="200 seats" checked={tier==="sound"} onChange={()=>setTier("sound")} />
+          <OXChoice type="checkbox" label="I accept the house code" checked onChange={()=>{}} />
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:18}}>
+            <span style={{fontFamily:"var(--ox-font-sans)",fontSize:14}}>Door notifications</span>
+            <OXSwitch on={notify} onChange={setNotify} />
+          </div>
+        </div>
+      </>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

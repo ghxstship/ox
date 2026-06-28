@@ -1,0 +1,797 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — components.css
+ * The full component library. Utility classes mirror the component
+ * roster in components.d.ts. Requires tokens (loaded via styles.css).
+ *
+ * Everything reads the semantic vars (--ox-bg / --ox-text / --ox-accent)
+ * so wrapping a subtree in a tier scope class re-skins it whole.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 0 · THE MARK — wordmark (horizontal) + flag (rotated 90° CW)
+ * One source string "OX", JetBrains Mono ExtraBold, tracking −4%.
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-wordmark {
+  font-family: var(--ox-font-mono);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  color: currentColor;
+}
+.ox-flag {
+  font-family: var(--ox-font-mono);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  display: inline-block;
+  width: 1em;
+  height: 1.2em;
+  position: relative;
+  vertical-align: middle;
+  color: currentColor;
+}
+.ox-flag > span {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center;
+  white-space: nowrap; line-height: 1;
+}
+
+/* Location / pillar code chip */
+.ox-code {
+  font-family: var(--ox-font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+  padding: 4px 8px;
+  display: inline-block;
+  color: var(--ox-accent);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 1 · BUTTONS — rectangular, mono caps labels, hover = value flip
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-btn {
+  font-family: var(--ox-font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 14px 22px;
+  border: 1px solid var(--ox-text);
+  background: transparent; color: var(--ox-text);
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  border-radius: 0;
+  transition: var(--ox-tr-flip), var(--ox-tr-transform);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ox-btn:hover { background: var(--ox-text); color: var(--ox-bg); }
+.ox-btn:active { transform: var(--ox-press); }
+.ox-btn:focus-visible { outline: var(--ox-focus-width) solid var(--ox-oxide); outline-offset: var(--ox-focus-offset); }
+.ox-btn .ox-arrow { transition: var(--ox-tr-nudge); }
+.ox-btn:hover .ox-arrow { transform: var(--ox-nudge-x); }
+.ox-btn--primary { background: var(--ox-text); color: var(--ox-bg); }
+.ox-btn--primary:hover { background: var(--ox-accent); border-color: var(--ox-accent); color: var(--ox-salt); }
+.ox-btn--oxide { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-salt); }
+.ox-btn--oxide:hover { background: var(--ox-oxide-deep); border-color: var(--ox-oxide-deep); }
+.ox-btn--ghost { border-color: var(--ox-rule); color: var(--ox-text-muted); }
+.ox-btn--ghost:hover { color: var(--ox-text); border-color: var(--ox-text); background: transparent; }
+.ox-btn--sm { padding: 10px 16px; font-size: 10px; letter-spacing: 0.16em; }
+.ox-btn--lg { padding: 18px 30px; font-size: 12px; }
+.ox-btn--block { display: flex; width: 100%; justify-content: center; }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 2 · CHIPS / TABS / SEGMENTED SWITCHER
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-chip {
+  transition: var(--ox-tr-flip);
+  font-family: var(--ox-font-mono);
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 5px 10px; border: 1px solid var(--ox-text);
+  color: var(--ox-text); background: transparent; display: inline-block;
+}
+.ox-chip--solid { background: var(--ox-text); color: var(--ox-bg); }
+.ox-chip--oxide { background: var(--ox-oxide); color: var(--ox-salt); border-color: var(--ox-oxide); }
+.ox-chip--oxide-line { color: var(--ox-oxide); border-color: var(--ox-oxide); }
+.ox-chip--ghost { color: var(--ox-text-muted); border-color: var(--ox-rule); }
+.ox-chip--live::before { content: "●"; color: var(--ox-oxide); margin-right: 6px; }
+
+/* Filter tabs (underline active) */
+.ox-tabs { display: flex; border-bottom: 1px solid var(--ox-text); }
+.ox-tabs a {
+  transition: var(--ox-tr-color);
+  padding: 14px 24px; font-family: var(--ox-font-mono);
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ox-text-muted); text-decoration: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.ox-tabs a:hover { color: var(--ox-text); }
+.ox-tabs a:focus-visible { outline: var(--ox-focus-width) solid var(--ox-oxide); outline-offset: calc(-1 * var(--ox-focus-offset)); }
+.ox-tabs a.is-active { color: var(--ox-text); border-bottom-color: var(--ox-oxide); }
+
+/* Segmented switcher (edition / pillar / tier) */
+.ox-seg { display: inline-flex; border: 1px solid var(--ox-text); }
+.ox-seg button {
+  transition: var(--ox-tr-flip);
+  font-family: var(--ox-font-mono); font-size: 10px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 9px 16px; background: transparent; color: var(--ox-text);
+  border: none; border-right: 1px solid var(--ox-text); cursor: pointer;
+}
+.ox-seg button:last-child { border-right: none; }
+.ox-seg button:active { transform: var(--ox-press); }
+.ox-seg button:focus-visible { outline: var(--ox-focus-width) solid var(--ox-oxide); outline-offset: calc(-1 * var(--ox-focus-offset)); }
+.ox-seg button.is-active { background: var(--ox-oxide); color: var(--ox-salt); }
+
+/* Tier badge */
+.ox-tier {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 8px 16px; border: 1px solid var(--ox-text);
+  font-family: var(--ox-font-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase; background: var(--ox-bg-raised);
+}
+.ox-tier .num { color: var(--ox-oxide); }
+.ox-tier--founder { background: var(--ox-ink); color: var(--ox-paper); border-color: var(--ox-ink); }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 3 · CARDS / LIST ROWS
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-card {
+  background: var(--ox-bg-raised); border: 1px solid var(--ox-rule);
+  padding: 28px; display: grid; gap: 16px;
+  transition: var(--ox-tr-border); border-radius: 0;
+}
+.ox-card:hover { border-color: var(--ox-text); }
+.ox-card__head { display: flex; justify-content: space-between; align-items: baseline; }
+.ox-card__day { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; color: var(--ox-oxide); text-transform: uppercase; }
+.ox-card__cat { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; color: var(--ox-text-muted); text-transform: uppercase; }
+.ox-card__title { font-family: var(--ox-font-serif); font-size: 36px; line-height: 1; letter-spacing: -0.014em; color: var(--ox-text); }
+.ox-card__title em { font-style: italic; color: var(--ox-oxide); }
+.ox-card__desc { font-family: var(--ox-font-sans); font-size: 13px; line-height: 1.55; color: var(--ox-text-muted); max-width: 38ch; }
+.ox-card__foot { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--ox-rule-soft); }
+
+.ox-row { display: grid; grid-template-columns: 60px 1fr auto; gap: 24px; padding: 22px 0; border-bottom: 1px solid var(--ox-rule); align-items: center; }
+.ox-row__n { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-oxide); letter-spacing: 0.12em; }
+.ox-row__title { font-family: var(--ox-font-serif); font-size: 24px; color: var(--ox-text); }
+.ox-row__title em { font-style: italic; }
+.ox-row__sub { font-family: var(--ox-font-sans); font-size: 13px; color: var(--ox-text-muted); margin-top: 2px; }
+.ox-row__action { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 4 · LIVE-STATE — status ticker · capacity meter · alert bar
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-ticker {
+  background: var(--ox-oxide); color: var(--ox-ink);
+  font-family: var(--ox-font-mono); font-weight: 800;
+  font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+  padding: 11px 20px; white-space: nowrap; overflow: hidden;
+  display: flex; gap: 14px;
+}
+.ox-ticker .dot { opacity: 0.6; }
+
+.ox-meter { background: var(--ox-bg-raised); border: 1px solid var(--ox-rule); padding: 24px; }
+.ox-meter__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+.ox-meter__title { font-family: var(--ox-font-serif); font-size: 22px; color: var(--ox-text); }
+.ox-meter__val { font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--ox-oxide); }
+.ox-meter__bar { height: 4px; background: rgba(11,11,10,0.08); position: relative; }
+.ox-meter__fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ox-oxide); }
+.ox-meter__fill.is-locked { background: var(--ox-stone); }      /* price-lock / threshold reached */
+.ox-meter__meta { display: flex; justify-content: space-between; margin-top: 10px; }
+.ox-meter__meta span { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.12em; color: var(--ox-text-muted); }
+
+.ox-alert {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; border: 1px solid var(--ox-oxide);
+  background: var(--ox-oxide-tint);
+  font-family: var(--ox-font-mono); font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-oxide-deep);
+}
+.ox-alert::before { content: "●"; color: var(--ox-oxide); }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 5 · FORMS — underlined inputs, mono labels, serif field type
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.ox-field__label { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text); }
+.ox-field__input {
+  font-family: var(--ox-font-serif); font-size: 22px;
+  background: transparent; border: none; border-bottom: 1px solid var(--ox-text);
+  padding: 8px 0; color: var(--ox-text); outline: none; width: 100%; border-radius: 0;
+}
+.ox-field__input::placeholder { color: var(--ox-stone-soft); font-style: italic; }
+.ox-field__input:focus { border-bottom-color: var(--ox-oxide); }
+.ox-field__help { font-family: var(--ox-font-sans); font-size: 12px; color: var(--ox-text-muted); }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 6 · TABLE — mono headers, serif body, italic-Oxide "matter" value
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-table { width: 100%; border-collapse: collapse; }
+.ox-table th, .ox-table td { text-align: left; padding: 16px 18px; border-bottom: 1px solid var(--ox-rule); vertical-align: baseline; }
+.ox-table th { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); font-weight: 400; border-bottom: 1px solid var(--ox-ink); }
+.ox-table td { font-family: var(--ox-font-serif); font-size: 19px; color: var(--ox-text); }
+.ox-table td.amt { font-family: var(--ox-font-mono); font-size: 13px; letter-spacing: 0.08em; text-align: right; }
+.ox-table td.amt em { font-style: italic; color: var(--ox-oxide); font-family: var(--ox-font-serif); font-size: 19px; letter-spacing: 0; }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 7 · DIVIDERS
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-hr { height: 1px; background: var(--ox-rule); border: none; }
+.ox-hr--ink { height: 1px; background: var(--ox-ink); border: none; }
+.ox-hr--double { height: 5px; border-top: 1px solid var(--ox-ink); border-bottom: 1px solid var(--ox-ink); }
+.ox-hr--oxide { height: 3px; background: var(--ox-oxide); width: 56px; border: none; }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 8 · MOBILE APP COMPONENTS (390px native) — the social membership app
+ * Tab bar, app header, feed post, credential mini, RSVP/CTA, list item.
+ * Hit targets ≥ 44px. These read tier scope vars too.
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-app {
+  width: 390px; background: var(--ox-bg); color: var(--ox-text);
+  font-family: var(--ox-font-sans); position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.ox-app__statusbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 22px 6px; font-family: var(--ox-font-mono);
+  font-size: 12px; font-weight: 500; color: var(--ox-text);
+}
+.ox-app__header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; border-bottom: 1px solid var(--ox-line);
+}
+.ox-app__title { font-family: var(--ox-font-serif); font-size: 26px; line-height: 1; letter-spacing: -0.018em; color: var(--ox-text); }
+.ox-app__title em { font-style: italic; color: var(--ox-accent); }
+
+/* App tab bar (bottom) */
+.ox-tabbar {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid var(--ox-line); background: var(--ox-bg);
+}
+.ox-tabbar a {
+  min-height: 56px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  text-decoration: none; color: var(--ox-text-muted);
+  font-family: var(--ox-font-mono); font-size: 8px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.ox-tabbar a .ic { width: 22px; height: 22px; display: grid; place-items: center; }
+.ox-tabbar a.is-active { color: var(--ox-accent); }
+
+/* Social feed post */
+.ox-post { border-bottom: 1px solid var(--ox-line); padding: 18px 20px; display: grid; gap: 12px; }
+.ox-post__head { display: flex; align-items: center; gap: 12px; }
+.ox-avatar { width: 40px; height: 40px; border-radius: var(--ox-radius-pill); background: var(--ox-oxide); color: var(--ox-ink); display: grid; place-items: center; font-family: var(--ox-font-serif); font-size: 18px; flex-shrink: 0; overflow: hidden; }
+.ox-post__name { font-family: var(--ox-font-serif); font-size: 17px; line-height: 1.05; color: var(--ox-text); }
+.ox-post__name em { font-style: italic; color: var(--ox-accent); }
+.ox-post__meta { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 2px; }
+.ox-post__body { font-family: var(--ox-font-sans); font-size: 14px; line-height: 1.5; color: var(--ox-text); }
+.ox-post__media { aspect-ratio: 4/3; background: var(--ox-ink-soft); border: 1px solid var(--ox-line); position: relative; overflow: hidden; }
+.ox-post__actions { display: flex; gap: 24px; padding-top: 4px; }
+.ox-post__action { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); display: flex; align-items: center; gap: 6px; }
+.ox-post__action.is-on { color: var(--ox-accent); }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * 9 · CREDENTIAL — NFT + physical membership card
+ * Card aspect 1.586/1. Physical = oxidized copper; digital = Ink + glow.
+ * The ONLY components allowed --ox-radius-card and gradients.
+ * ──────────────────────────────────────────────────────────────────── */
+.ox-cred {
+  aspect-ratio: 1.586/1; border-radius: var(--ox-radius-card);
+  padding: 22px 24px; position: relative; overflow: hidden;
+  display: grid; grid-template-rows: auto 1fr auto; gap: 12px;
+}
+.ox-cred--physical {
+  background:
+    radial-gradient(ellipse at 22% 14%, rgba(232,184,144,0.45), transparent 55%),
+    radial-gradient(ellipse at 82% 88%, rgba(20,10,6,0.55), transparent 50%),
+    linear-gradient(138deg, #3a221a 0%, #5e3422 35%, #7d4628 55%, #4a2818 100%);
+  color: #f4d8bc; border: 1px solid #1a0e08;
+  box-shadow: inset 0 0 0 1px rgba(240,212,184,0.18), inset 0 2px 8px rgba(255,220,180,0.12), inset 0 -6px 14px rgba(20,10,6,0.4);
+}
+.ox-cred--digital {
+  background:
+    radial-gradient(ellipse at 25% 18%, rgba(201,97,47,0.35), transparent 55%),
+    radial-gradient(ellipse at 82% 85%, rgba(181,85,46,0.18), transparent 60%),
+    #0B0B0A;
+  color: var(--ox-paper); border: 1px solid var(--ox-ink);
+  box-shadow: inset 0 0 0 1px rgba(236,231,218,0.08);
+}
+.ox-cred__head { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 8px; }
+.ox-cred--physical .ox-cred__head { border-bottom: 1px solid rgba(244,216,184,0.3); }
+.ox-cred--digital .ox-cred__head { border-bottom: 1px solid rgba(236,231,218,0.2); }
+.ox-cred__doctype { font-family: var(--ox-font-mono); font-weight: 800; font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; }
+.ox-cred__doctype .sub { display: block; font-size: 7px; letter-spacing: 0.2em; font-weight: 500; margin-top: 4px; opacity: 0.65; }
+.ox-cred__body { display: grid; grid-template-columns: 150px 1fr; gap: 30px; align-items: stretch; }
+.ox-cred__num { font-family: var(--ox-font-mono); font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -0.04em; text-align: center; align-self: center; }
+.ox-cred--physical .ox-cred__num { color: #fce8c8; }
+.ox-cred--digital .ox-cred__num { color: var(--ox-oxide); }
+.ox-cred__emblem { display: grid; place-items: center; padding-right: 22px; }
+.ox-cred--physical .ox-cred__emblem { border-right: 1px solid rgba(244,216,184,0.22); }
+.ox-cred--digital .ox-cred__emblem { border-right: 1px solid rgba(236,231,218,0.18); }
+.ox-cred__fields { display: grid; align-content: center; }
+.ox-cred__fields .r { display: grid; grid-template-columns: 84px 1fr; align-items: baseline; padding: 4px 0; }
+.ox-cred--physical .ox-cred__fields .r { border-bottom: 1px solid rgba(244,216,184,0.18); }
+.ox-cred--digital .ox-cred__fields .r { border-bottom: 1px solid rgba(236,231,218,0.14); }
+.ox-cred__fields .r:last-child { border-bottom: none; }
+.ox-cred__fields .l { font-family: var(--ox-font-mono); font-size: 7px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 700; opacity: 0.6; }
+.ox-cred__fields .v { font-family: var(--ox-font-mono); font-weight: 700; font-size: 12px; letter-spacing: 0.04em; }
+.ox-cred__fields .v em { font-style: italic; font-family: var(--ox-font-serif); font-size: 15px; letter-spacing: 0; color: var(--ox-oxide); }
+.ox-cred__strip { font-family: var(--ox-font-mono); font-weight: 700; font-size: 9px; letter-spacing: 0.12em; padding: 7px 12px; white-space: nowrap; overflow: hidden; text-transform: uppercase; }
+.ox-cred--physical .ox-cred__strip { background: linear-gradient(180deg, rgba(20,10,6,0.5), rgba(20,10,6,0.85)); color: #fce8c8; border: 1px solid rgba(20,10,6,0.6); }
+.ox-cred--digital .ox-cred__strip { background: var(--ox-paper); color: var(--ox-ink); }
+.ox-cred__live { position: absolute; top: 20px; right: 26px; display: flex; align-items: center; gap: 6px; font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.22em; color: var(--ox-oxide); text-transform: uppercase; font-weight: 800; z-index: 2; }
+.ox-cred__live::before { content: "●"; font-size: 11px; }
+
+/* Stage utility — ONLY for staging physical mockups in the guide. */
+.ox-stage-shadow { box-shadow: var(--ox-stage-shadow); }
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 10 · APP SYSTEM — the full mobile component set (390px native)
+ * Everything needed to build the OX app: shells, navigation patterns,
+ * lists, inputs, overlays, social, wallet, and state surfaces. All
+ * read tier-scope vars; all hit targets ≥ 44px.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 10.1 · Shells & scroll ─────────────────────────────────────────── */
+.ox-screen { width: 390px; height: 800px; background: var(--ox-bg); color: var(--ox-text); display: flex; flex-direction: column; font-family: var(--ox-font-sans); overflow: hidden; position: relative; }
+.ox-screen__scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.ox-statusbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 22px 6px; font-family: var(--ox-font-mono); font-size: 12px; font-weight: 500; color: var(--ox-text); }
+
+/* App header variants */
+.ox-appbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--ox-line); min-height: 56px; }
+.ox-appbar--lg { padding: 8px 20px 16px; flex-direction: column; align-items: stretch; gap: 10px; }
+.ox-appbar__lead, .ox-appbar__trail { display: flex; align-items: center; gap: 14px; }
+.ox-appbar__icon { width: 44px; height: 44px; display: grid; place-items: center; margin: -10px; color: var(--ox-text); font-family: var(--ox-font-mono); font-size: 16px; cursor: pointer; }
+.ox-appbar__title { font-family: var(--ox-font-serif); font-size: 26px; line-height: 1; letter-spacing: -0.018em; }
+.ox-appbar__title em { font-style: italic; color: var(--ox-accent); }
+.ox-appbar__big { font-family: var(--ox-font-serif); font-size: 44px; line-height: 0.9; letter-spacing: -0.02em; }
+.ox-appbar__big em { font-style: italic; color: var(--ox-accent); }
+
+/* Section header inside a scroll */
+.ox-secheader { display: flex; align-items: baseline; justify-content: space-between; padding: 22px 20px 10px; }
+.ox-secheader__t { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-accent); }
+.ox-secheader__a { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); text-decoration: none; }
+
+/* ── 10.2 · Search & filter ─────────────────────────────────────────── */
+.ox-search { display: flex; align-items: center; gap: 10px; margin: 12px 20px; padding: 12px 14px; border: 1px solid var(--ox-line); background: var(--ox-bg-raised); }
+.ox-search__ic { font-family: var(--ox-font-mono); font-size: 13px; color: var(--ox-text-muted); }
+.ox-search input { flex: 1; border: none; background: transparent; outline: none; font-family: var(--ox-font-sans); font-size: 15px; color: var(--ox-text); }
+.ox-search input::placeholder { color: var(--ox-stone-soft); }
+.ox-chipscroll { display: flex; gap: 8px; overflow-x: auto; padding: 8px 20px; }
+.ox-chipscroll::-webkit-scrollbar { display: none; }
+.ox-chipscroll .ox-chip { flex: 0 0 auto; }
+
+/* ── 10.3 · List rows / nav rows ────────────────────────────────────── */
+.ox-listrow { transition: var(--ox-tr-color); display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--ox-line); min-height: 44px; text-decoration: none; color: var(--ox-text); }
+.ox-listrow:hover { background: var(--ox-bg-raised); }
+.ox-listrow:active { background: var(--ox-bg-raised); transform: var(--ox-press); }
+.ox-listrow:focus-visible { outline: var(--ox-focus-width) solid var(--ox-oxide); outline-offset: calc(-1 * var(--ox-focus-offset)); }
+.ox-listrow__ic { width: 38px; height: 38px; border: 1px solid var(--ox-line); display: grid; place-items: center; flex-shrink: 0; font-family: var(--ox-font-mono); font-weight: 700; font-size: 11px; color: var(--ox-accent); }
+.ox-listrow__main { flex: 1; min-width: 0; }
+.ox-listrow__t { font-family: var(--ox-font-serif); font-size: 18px; line-height: 1.1; }
+.ox-listrow__t em { font-style: italic; color: var(--ox-accent); }
+.ox-listrow__s { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 3px; }
+.ox-listrow__trail { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); flex-shrink: 0; }
+.ox-listrow__chev::after { content: "›"; font-size: 18px; color: var(--ox-text-muted); margin-left: 4px; }
+
+/* Settings / toggle row */
+.ox-setting { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--ox-line); min-height: 44px; }
+.ox-setting__t { font-family: var(--ox-font-sans); font-size: 15px; color: var(--ox-text); }
+.ox-setting__s { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 2px; }
+
+/* Switch */
+.ox-switch { width: 44px; height: 26px; border: 1px solid var(--ox-text); background: transparent; position: relative; flex-shrink: 0; cursor: pointer; }
+.ox-switch { transition: var(--ox-tr-flip); }
+.ox-switch:focus-visible { outline: var(--ox-focus-width) solid var(--ox-oxide); outline-offset: var(--ox-focus-offset); }
+.ox-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: var(--ox-text); transition: transform var(--ox-dur-2) var(--ox-ease-standard), background var(--ox-dur-2) var(--ox-ease-standard); }
+.ox-switch.is-on { background: var(--ox-oxide); border-color: var(--ox-oxide); }
+.ox-switch.is-on::after { transform: translateX(18px); background: var(--ox-salt); }
+
+/* ── 10.4 · Inputs (app-scale) ──────────────────────────────────────── */
+.ox-input { width: 100%; border: none; border-bottom: 1px solid var(--ox-text); background: transparent; padding: 12px 0; font-family: var(--ox-font-serif); font-size: 20px; color: var(--ox-text); outline: none; }
+.ox-input::placeholder { color: var(--ox-stone-soft); font-style: italic; }
+.ox-input { transition: var(--ox-tr-border); }
+.ox-input:focus { border-bottom-color: var(--ox-oxide); }
+.ox-otp { display: flex; gap: 10px; }
+.ox-otp__cell { flex: 1; aspect-ratio: 3/4; border: 1px solid var(--ox-text); display: grid; place-items: center; font-family: var(--ox-font-mono); font-weight: 800; font-size: 28px; color: var(--ox-text); }
+.ox-otp__cell.is-active { border-color: var(--ox-oxide); }
+.ox-stepper { display: inline-flex; border: 1px solid var(--ox-text); }
+.ox-stepper button { width: 44px; height: 44px; border: none; background: transparent; color: var(--ox-text); font-family: var(--ox-font-mono); font-size: 18px; cursor: pointer; }
+.ox-stepper__v { min-width: 44px; display: grid; place-items: center; font-family: var(--ox-font-mono); font-weight: 700; font-size: 15px; border-left: 1px solid var(--ox-text); border-right: 1px solid var(--ox-text); }
+
+/* ── 10.5 · Overlays — sheet · modal · toast · fab ──────────────────── */
+.ox-sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--ox-bg); border-top: 1px solid var(--ox-text); padding: 10px 20px 24px; z-index: 30; }
+.ox-sheet__grab { width: 40px; height: 3px; background: var(--ox-stone); margin: 0 auto 16px; }
+.ox-scrim { position: absolute; inset: 0; background: rgba(11,11,10,0.55); z-index: 20; }
+.ox-modal { position: absolute; left: 20px; right: 20px; top: 50%; transform: translateY(-50%); background: var(--ox-bg); border: 1px solid var(--ox-text); padding: 24px; z-index: 30; }
+.ox-toast { position: absolute; left: 20px; right: 20px; bottom: 80px; background: var(--ox-ink); color: var(--ox-paper); border-left: 3px solid var(--ox-oxide); padding: 14px 18px; display: flex; align-items: center; gap: 12px; z-index: 40; }
+.ox-toast__t { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ox-fab { position: absolute; right: 20px; bottom: 76px; width: 56px; height: 56px; border-radius: var(--ox-radius-pill); background: var(--ox-oxide); color: var(--ox-salt); border: none; display: grid; place-items: center; font-family: var(--ox-font-serif); font-size: 28px; z-index: 15; cursor: pointer; box-shadow: var(--ox-stage-shadow); }
+
+/* ── 10.6 · Notifications · messages ────────────────────────────────── */
+.ox-notif { display: flex; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--ox-line); align-items: flex-start; }
+.ox-notif.is-unread { background: var(--ox-oxide-tint); }
+.ox-notif__dot { width: 6px; height: 6px; border-radius: var(--ox-radius-pill); background: var(--ox-oxide); margin-top: 7px; flex-shrink: 0; }
+.ox-notif__body { flex: 1; font-family: var(--ox-font-sans); font-size: 13px; line-height: 1.45; color: var(--ox-text); }
+.ox-notif__body b { font-family: var(--ox-font-serif); font-weight: 400; font-style: italic; }
+.ox-notif__time { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 4px; }
+.ox-msg { max-width: 75%; padding: 10px 14px; font-family: var(--ox-font-sans); font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
+.ox-msg--in { background: var(--ox-bg-raised); border: 1px solid var(--ox-line); align-self: flex-start; }
+.ox-msg--out { background: var(--ox-ink); color: var(--ox-paper); margin-left: auto; }
+.ox-msg__time { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-text-muted); margin: 2px 4px 10px; }
+.ox-composer { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--ox-line); }
+.ox-composer input { flex: 1; border: 1px solid var(--ox-line); background: var(--ox-bg-raised); padding: 10px 14px; font-family: var(--ox-font-sans); font-size: 14px; color: var(--ox-text); outline: none; }
+.ox-composer button { width: 44px; height: 44px; border: none; background: var(--ox-oxide); color: var(--ox-salt); font-size: 16px; cursor: pointer; flex-shrink: 0; }
+
+/* Avatar stack */
+.ox-avatars { display: flex; }
+.ox-avatars .ox-avatar { width: 28px; height: 28px; font-size: 12px; border: 1.5px solid var(--ox-bg); margin-left: -8px; }
+.ox-avatars .ox-avatar:first-child { margin-left: 0; }
+
+/* ── 10.7 · Wallet rows ─────────────────────────────────────────────── */
+.ox-txrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--ox-line); }
+.ox-txrow__t { font-family: var(--ox-font-serif); font-size: 17px; }
+.ox-txrow__s { font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 2px; }
+.ox-txrow__v { font-family: var(--ox-font-mono); font-weight: 700; font-size: 13px; letter-spacing: 0.04em; text-align: right; white-space: nowrap; }
+.ox-txrow__v.is-in { color: var(--ox-oxide); }
+
+/* ── 10.8 · State surfaces — empty · skeleton · banner ──────────────── */
+.ox-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 64px 32px; gap: 14px; }
+.ox-empty__mark { font-family: var(--ox-font-serif); font-size: 56px; color: var(--ox-stone-soft); line-height: 1; }
+.ox-empty__t { font-family: var(--ox-font-serif); font-size: 24px; }
+.ox-empty__t em { font-style: italic; color: var(--ox-accent); }
+.ox-empty__s { font-family: var(--ox-font-sans); font-size: 13px; color: var(--ox-text-muted); max-width: 28ch; }
+.ox-skel { background: var(--ox-bg-raised); position: relative; overflow: hidden; }
+.ox-skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(11,11,10,0.04), transparent); animation: ox-shimmer 1.4s infinite; }
+@keyframes ox-shimmer { 100% { transform: translateX(100%); } }
+.ox-appbanner { display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: var(--ox-ink); color: var(--ox-paper); border-bottom: 1px solid var(--ox-oxide); }
+.ox-appbanner__t { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; flex: 1; }
+
+/* ── 10.9 · Onboarding slide ────────────────────────────────────────── */
+.ox-onb { height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 32px; }
+.ox-onb__dots { display: flex; gap: 6px; justify-content: center; }
+.ox-onb__dots span { width: 6px; height: 6px; border-radius: var(--ox-radius-pill); background: var(--ox-stone-soft); }
+.ox-onb__dots span.is-on { background: var(--ox-oxide); width: 18px; }
+
+/* ── 10.10 · Progress / mint states ─────────────────────────────────── */
+.ox-mintstate { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 48px 32px; }
+.ox-mintstate__ring { width: 96px; height: 96px; border-radius: var(--ox-radius-pill); border: 2px solid var(--ox-line); border-top-color: var(--ox-oxide); }
+.ox-mintstate__ring.is-done { border-color: var(--ox-oxide); display: grid; place-items: center; font-size: 36px; color: var(--ox-oxide); }
+.ox-mintstate__t { font-family: var(--ox-font-serif); font-size: 28px; }
+.ox-mintstate__t em { font-style: italic; color: var(--ox-accent); }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 11 · FORM CONTROLS + STATES  (P1)
+ * The labeled field wrapper is the spine: label (mono caps) + optional
+ * hint + control + help/error. Every control is tier-aware, square,
+ * underline-or-ruled. State is set with .is-error / .is-success /
+ * [disabled]. All read --ox-text / --ox-line / --ox-accent.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 11.1 · Labeled field wrapper + fieldset ────────────────────────── */
+.ox-fieldset { display: flex; flex-direction: column; gap: 24px; border: none; margin: 0; padding: 0; }
+.ox-fieldset__legend { font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ox-accent); padding: 0 0 14px; border-bottom: 1px solid var(--ox-line); margin-bottom: 4px; width: 100%; }
+.ox-fld { display: flex; flex-direction: column; gap: 8px; }
+.ox-fld__label { font-family: var(--ox-font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text); display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ox-fld__hint { font-family: var(--ox-font-serif); font-style: italic; font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--ox-text-muted); }
+.ox-fld__help { font-family: var(--ox-font-sans); font-size: 12px; line-height: 1.45; color: var(--ox-text-muted); }
+.ox-fld.is-error .ox-fld__help { color: var(--ox-oxide-deep); }
+.ox-fld.is-success .ox-fld__help { color: var(--ox-oxide); }
+.ox-fld.is-error .ox-fld__help::before,
+.ox-fld.is-success .ox-fld__help::before { font-family: var(--ox-font-mono); margin-right: 6px; }
+.ox-fld.is-error .ox-fld__help::before { content: "✕"; }
+.ox-fld.is-success .ox-fld__help::before { content: "✓"; }
+
+/* ── 11.2 · Text input / textarea (ruled) ───────────────────────────── */
+.ox-control { font-family: var(--ox-font-serif); font-size: 20px; background: transparent; border: none; border-bottom: 1px solid var(--ox-text); padding: 10px 0; color: var(--ox-text); outline: none; width: 100%; border-radius: 0; }
+.ox-control::placeholder { color: var(--ox-stone-soft); font-style: italic; }
+.ox-control { transition: var(--ox-tr-border), box-shadow var(--ox-dur-3) var(--ox-ease-standard); }
+.ox-control:focus-visible { border-bottom-color: var(--ox-oxide); box-shadow: 0 1px 0 0 var(--ox-oxide); }
+.ox-control:disabled { color: var(--ox-stone-soft); border-bottom-style: dashed; cursor: not-allowed; }
+.ox-fld.is-error .ox-control { border-bottom-color: var(--ox-oxide-deep); }
+.ox-fld.is-success .ox-control { border-bottom-color: var(--ox-oxide); }
+textarea.ox-control { resize: vertical; min-height: 96px; line-height: 1.4; font-size: 17px; }
+
+/* ── 11.3 · Select — native + custom-styled ─────────────────────────── */
+.ox-select { position: relative; display: block; }
+.ox-select select {
+  appearance: none; -webkit-appearance: none;
+  font-family: var(--ox-font-serif); font-size: 20px; color: var(--ox-text);
+  background: transparent; border: none; border-bottom: 1px solid var(--ox-text);
+  padding: 10px 28px 10px 0; width: 100%; outline: none; border-radius: 0; cursor: pointer;
+}
+.ox-select select:focus-visible { border-bottom-color: var(--ox-oxide); box-shadow: 0 1px 0 0 var(--ox-oxide); }
+.ox-select select:disabled { color: var(--ox-stone-soft); border-bottom-style: dashed; cursor: not-allowed; }
+.ox-select::after { content: "▾"; position: absolute; right: 2px; top: 50%; transform: translateY(-50%); font-family: var(--ox-font-mono); font-size: 13px; color: var(--ox-accent); pointer-events: none; }
+.ox-select option { color: var(--ox-ink); }
+/* Custom listbox (when native won't do) */
+.ox-listbox { border: 1px solid var(--ox-text); background: var(--ox-bg); }
+.ox-listbox__opt { padding: 12px 16px; font-family: var(--ox-font-serif); font-size: 18px; color: var(--ox-text); cursor: pointer; border-bottom: 1px solid var(--ox-line); display: flex; justify-content: space-between; align-items: center; min-height: 44px; }
+.ox-listbox__opt:last-child { border-bottom: none; }
+.ox-listbox__opt:hover, .ox-listbox__opt.is-active { background: var(--ox-bg-raised); }
+.ox-listbox__opt[aria-selected="true"]::after { content: "✓"; font-family: var(--ox-font-mono); font-size: 12px; color: var(--ox-accent); }
+
+/* ── 11.4 · Radio + checkbox (square; radios pill-dot) ──────────────── */
+.ox-choice { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; cursor: pointer; min-height: 44px; }
+.ox-choice input { position: absolute; opacity: 0; width: 0; height: 0; }
+.ox-choice__box { width: 20px; height: 20px; flex-shrink: 0; border: 1px solid var(--ox-text); background: transparent; margin-top: 2px; position: relative; }
+.ox-choice__box--radio { border-radius: var(--ox-radius-pill); }
+.ox-choice input:checked + .ox-choice__box::after { content: ""; position: absolute; inset: 4px; background: var(--ox-oxide); }
+.ox-choice__box--radio::after { border-radius: var(--ox-radius-pill); }
+.ox-choice input:focus-visible + .ox-choice__box { outline: 2px solid var(--ox-oxide); outline-offset: 2px; }
+.ox-choice input:disabled + .ox-choice__box { border-style: dashed; opacity: 0.5; }
+.ox-choice__label { font-family: var(--ox-font-serif); font-size: 18px; line-height: 1.3; color: var(--ox-text); }
+.ox-choice__label .ox-choice__sub { display: block; font-family: var(--ox-font-sans); font-size: 12px; color: var(--ox-text-muted); margin-top: 2px; }
+.ox-choicegroup { display: flex; flex-direction: column; }
+.ox-choicegroup .ox-choice { border-bottom: 1px solid var(--ox-line); }
+.ox-choicegroup .ox-choice:last-child { border-bottom: none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 12 · OVERLAYS — popover · tooltip · menu · accordion · tab panels (P2)
+ * Behaviour contract (implement in the React layer / vanilla JS):
+ *   open/close · scrim click dismiss · ESC closes · focus trap while open ·
+ *   return focus to trigger on close · enter/exit = 120ms opacity only
+ *   (no translate/scale beyond 4px); under prefers-reduced-motion the
+ *   transition is opacity 0ms (instant). ARIA noted per component.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 12.1 · Popover  [role=dialog] / [role=menu] anchored ───────────── */
+.ox-popover { position: absolute; z-index: 30; min-width: 220px; background: var(--ox-bg); border: 1px solid var(--ox-text); padding: 16px; }
+.ox-popover__title { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-accent); margin-bottom: 10px; }
+
+/* ── 12.2 · Tooltip  [role=tooltip] ─────────────────────────────────── */
+.ox-tooltip { position: absolute; z-index: 40; background: var(--ox-ink); color: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 9px; white-space: nowrap; pointer-events: none; }
+.ox-tooltip::after { content: ""; position: absolute; top: 100%; left: 16px; border: 5px solid transparent; border-top-color: var(--ox-ink); }
+
+/* ── 12.3 · Dropdown menu  [role=menu] / [role=menuitem] ────────────── */
+.ox-menu { min-width: 200px; background: var(--ox-bg); border: 1px solid var(--ox-text); }
+.ox-menu__item { transition: var(--ox-tr-color); display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 44px; font-family: var(--ox-font-sans); font-size: 14px; color: var(--ox-text); text-decoration: none; cursor: pointer; border-bottom: 1px solid var(--ox-line); background: transparent; width: 100%; text-align: left; }
+.ox-menu__item:last-child { border-bottom: none; }
+.ox-menu__item:hover, .ox-menu__item.is-active { background: var(--ox-bg-raised); }
+.ox-menu__item:focus-visible { outline: 2px solid var(--ox-oxide); outline-offset: -2px; }
+.ox-menu__item--danger { color: var(--ox-oxide-deep); }
+.ox-menu__sep { height: 1px; background: var(--ox-line); }
+.ox-menu__key { margin-left: auto; font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; color: var(--ox-text-muted); }
+
+/* ── 12.4 · Accordion  [aria-expanded] / region ─────────────────────── */
+.ox-accordion { border-top: 1px solid var(--ox-line); }
+.ox-accordion__item { border-bottom: 1px solid var(--ox-line); }
+.ox-accordion__trigger { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; padding: 20px 0; background: transparent; border: none; cursor: pointer; text-align: left; min-height: 44px; font-family: var(--ox-font-serif); font-size: 24px; line-height: 1.05; color: var(--ox-text); }
+.ox-accordion__trigger em { font-style: italic; color: var(--ox-accent); }
+.ox-accordion__trigger:focus-visible { outline: 2px solid var(--ox-oxide); outline-offset: 2px; }
+.ox-accordion__sign { font-family: var(--ox-font-mono); font-size: 18px; color: var(--ox-accent); flex-shrink: 0; transition: var(--ox-tr-transform); }
+.ox-accordion__trigger[aria-expanded="true"] .ox-accordion__sign { transform: rotate(45deg); }
+.ox-accordion__panel { overflow: hidden; }
+.ox-accordion__panel[hidden] { display: none; }
+.ox-accordion__inner { padding: 0 0 22px; font-family: var(--ox-font-sans); font-size: 15px; line-height: 1.6; color: var(--ox-text-muted); max-width: 60ch; }
+
+/* ── 12.5 · True tab panels  [role=tablist/tab/tabpanel] ────────────── */
+.ox-tabset__list { display: flex; border-bottom: 1px solid var(--ox-text); gap: 0; }
+.ox-tabset__tab { padding: 14px 22px; font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ox-text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; min-height: 44px; }
+.ox-tabset__tab[aria-selected="true"] { color: var(--ox-text); border-bottom-color: var(--ox-oxide); }
+.ox-tabset__tab:focus-visible { outline: 2px solid var(--ox-oxide); outline-offset: -2px; }
+.ox-tabset__panel { padding: 28px 0; }
+.ox-tabset__panel[hidden] { display: none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 13 · PROSE / EDITORIAL  (P4)
+ * Long-form reading. ~640px measure, serif body, Oxide italic emphasis,
+ * ruled blockquote, figure+caption, lists, read-more, article header.
+ * ═══════════════════════════════════════════════════════════════════ */
+.ox-prose { max-width: 640px; font-family: var(--ox-font-sans); font-size: 17px; line-height: 1.65; color: var(--ox-text); }
+.ox-prose > * + * { margin-top: 1.1em; }
+.ox-prose p { text-wrap: pretty; }
+.ox-prose em { font-family: var(--ox-font-serif); font-style: italic; color: var(--ox-accent); }
+.ox-prose h2 { font-family: var(--ox-font-serif); font-weight: 400; font-size: 38px; line-height: 1.04; letter-spacing: -0.014em; color: var(--ox-text); margin-top: 1.6em; }
+.ox-prose h3 { font-family: var(--ox-font-serif); font-weight: 400; font-size: 26px; line-height: 1.1; color: var(--ox-text); margin-top: 1.4em; }
+.ox-prose a { transition: var(--ox-tr-color); color: var(--ox-text); text-decoration: none; border-bottom: 1px solid var(--ox-accent); }
+.ox-prose a:hover { color: var(--ox-accent); }
+.ox-prose ul, .ox-prose ol { padding-left: 0; list-style: none; }
+.ox-prose li { padding-left: 28px; position: relative; margin-top: 0.5em; }
+.ox-prose ul li::before { content: "—"; position: absolute; left: 0; color: var(--ox-accent); font-family: var(--ox-font-mono); }
+.ox-prose ol { counter-reset: ox; }
+.ox-prose ol li { counter-increment: ox; }
+.ox-prose ol li::before { content: counter(ox, decimal-leading-zero); position: absolute; left: 0; color: var(--ox-accent); font-family: var(--ox-font-mono); font-size: 12px; top: 4px; }
+.ox-prose blockquote { border-left: 3px solid var(--ox-oxide); padding-left: 24px; margin-left: 0; font-family: var(--ox-font-serif); font-size: 28px; line-height: 1.2; color: var(--ox-text); }
+.ox-prose blockquote cite { display: block; font-family: var(--ox-font-mono); font-style: normal; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 14px; }
+.ox-pullquote { font-family: var(--ox-font-serif); font-style: italic; font-size: 40px; line-height: 1.06; letter-spacing: -0.012em; color: var(--ox-text); padding: 16px 0; border-top: 1px solid var(--ox-line); border-bottom: 1px solid var(--ox-line); }
+.ox-pullquote b { font-style: italic; font-weight: 400; color: var(--ox-accent); }
+.ox-figure { margin: 0; }
+.ox-figure__media { aspect-ratio: 3/2; background: var(--ox-ink-soft); border: 1px solid var(--ox-line); }
+.ox-figure figcaption, .ox-figcaption { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); margin-top: 10px; display: flex; gap: 10px; }
+.ox-figure figcaption::before, .ox-figcaption::before { content: "—"; color: var(--ox-accent); }
+.ox-readmore { font-family: var(--ox-font-serif); font-style: italic; font-size: 20px; color: var(--ox-text); text-decoration: none; border-bottom: 1px solid var(--ox-accent); }
+.ox-readmore:hover { color: var(--ox-accent); }
+.ox-readmore::after { content: " →"; font-style: normal; }
+/* Article header + byline */
+.ox-article__head { border-bottom: 1px solid var(--ox-ink); padding-bottom: 28px; margin-bottom: 36px; }
+.ox-article__kicker { font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ox-accent); }
+.ox-article__title { font-family: var(--ox-font-serif); font-weight: 400; font-size: 64px; line-height: 0.96; letter-spacing: -0.02em; color: var(--ox-text); margin: 18px 0 0; }
+.ox-article__title em { font-style: italic; color: var(--ox-accent); }
+.ox-article__byline { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 20px; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 14 · DATA DISPLAY — data table + charts + KPI  (P5)
+ * Extends the simple .ox-table into a real surface, plus ruled
+ * Oxide+neutral viz primitives (no gradients). Matches the meter style.
+ * ═══════════════════════════════════════════════════════════════════ */
+.ox-data { width: 100%; border-collapse: collapse; }
+.ox-data thead th { position: sticky; top: 0; background: var(--ox-bg); z-index: 1; }
+.ox-data th { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--ox-ink); font-family: var(--ox-font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); }
+.ox-data th.is-sortable { cursor: pointer; }
+.ox-data th .ox-sort { margin-left: 6px; color: var(--ox-accent); font-size: 9px; opacity: 0; }
+.ox-data th.is-sortable:hover .ox-sort, .ox-data th[aria-sort] .ox-sort { opacity: 1; }
+.ox-data td { padding: 14px 16px; border-bottom: 1px solid var(--ox-line); font-family: var(--ox-font-serif); font-size: 17px; color: var(--ox-text); vertical-align: baseline; }
+.ox-data td.num { font-family: var(--ox-font-mono); font-size: 13px; letter-spacing: 0.04em; text-align: right; }
+.ox-data tr.is-selected td { background: var(--ox-oxide-tint); }
+.ox-data td.sel, .ox-data th.sel { width: 44px; text-align: center; }
+.ox-data__check { width: 18px; height: 18px; border: 1px solid var(--ox-text); display: inline-grid; place-items: center; cursor: pointer; vertical-align: middle; }
+.ox-data__check.is-on { background: var(--ox-oxide); border-color: var(--ox-oxide); }
+.ox-data__check.is-on::after { content: "✓"; color: var(--ox-salt); font-family: var(--ox-font-mono); font-size: 11px; }
+.ox-pagination { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 16px; }
+.ox-pagination__meta { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); }
+.ox-pagination__nav { display: flex; gap: 6px; }
+.ox-pagination__btn { min-width: 36px; height: 36px; border: 1px solid var(--ox-line); background: transparent; color: var(--ox-text); font-family: var(--ox-font-mono); font-size: 11px; cursor: pointer; }
+.ox-pagination__btn.is-active { background: var(--ox-ink); color: var(--ox-paper); border-color: var(--ox-ink); }
+.ox-pagination__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── 14.x · Charts (ruled, Oxide + neutral) ─────────────────────────── */
+.ox-kpi { border: 1px solid var(--ox-line); padding: 22px; display: flex; flex-direction: column; gap: 6px; }
+.ox-kpi__label { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); }
+.ox-kpi__value { font-family: var(--ox-font-serif); font-size: 52px; line-height: 0.9; color: var(--ox-text); }
+.ox-kpi__delta { font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--ox-accent); }
+.ox-kpi__delta.is-down { color: var(--ox-stone); }
+.ox-bars { display: flex; align-items: flex-end; gap: 8px; height: 140px; padding-top: 8px; }
+.ox-bars__bar { flex: 1; background: var(--ox-stone); position: relative; min-width: 6px; }
+.ox-bars__bar.is-peak { background: var(--ox-oxide); }
+.ox-bars__bar::after { content: attr(data-label); position: absolute; bottom: -20px; left: 0; right: 0; text-align: center; font-family: var(--ox-font-mono); font-size: 8px; letter-spacing: 0.1em; color: var(--ox-text-muted); }
+.ox-bars-wrap { padding-bottom: 24px; }
+.ox-spark { display: inline-block; vertical-align: middle; }
+.ox-spark polyline { fill: none; stroke: var(--ox-oxide); stroke-width: 1.5; }
+.ox-line-chart { width: 100%; }
+.ox-line-chart .grid { stroke: var(--ox-line); stroke-width: 1; }
+.ox-line-chart .series { fill: none; stroke: var(--ox-oxide); stroke-width: 1.5; }
+.ox-line-chart .dot { fill: var(--ox-oxide); }
+.ox-line-chart .axis { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; fill: var(--ox-text-muted); text-transform: uppercase; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 15 · LAYOUT & WEB CHROME  (P6)
+ * Container + 12-col grid utilities, page-section system, and the
+ * DESKTOP web nav the kit lacked (distinct from mobile appbar/tabbar).
+ * ═══════════════════════════════════════════════════════════════════ */
+.ox-container { max-width: var(--ox-canvas); margin: 0 auto; padding-left: var(--ox-margin); padding-right: var(--ox-margin); }
+.ox-container--reading { max-width: 760px; }
+.ox-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--ox-gutter); }
+.ox-col-2 { grid-column: span 2; } .ox-col-3 { grid-column: span 3; } .ox-col-4 { grid-column: span 4; }
+.ox-col-5 { grid-column: span 5; } .ox-col-6 { grid-column: span 6; } .ox-col-7 { grid-column: span 7; }
+.ox-col-8 { grid-column: span 8; } .ox-col-9 { grid-column: span 9; } .ox-col-12 { grid-column: span 12; }
+@media (max-width: 768px) { [class*="ox-col-"] { grid-column: span 12; } }
+
+/* Page-section system */
+.ox-cover { padding: var(--ox-space-3xl) 0; border-bottom: 1px solid var(--ox-line); }
+.ox-cover__kicker { font-family: var(--ox-font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ox-accent); margin-bottom: 24px; }
+.ox-cover__title { font-family: var(--ox-font-serif); font-weight: 400; font-size: 96px; line-height: 0.92; letter-spacing: -0.022em; color: var(--ox-text); }
+.ox-cover__title em { font-style: italic; color: var(--ox-accent); }
+.ox-band { padding: var(--ox-space-2xl) 0; border-bottom: 1px solid var(--ox-line); }
+.ox-band--cta { background: var(--ox-ink); color: var(--ox-paper); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding: var(--ox-space-xl) var(--ox-margin); }
+.ox-band--cta .ox-band__t { font-family: var(--ox-font-serif); font-size: 44px; line-height: 0.98; }
+.ox-band--cta .ox-band__t em { font-style: italic; color: var(--ox-oxide-bright); }
+.ox-featuregrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--ox-line); border: 1px solid var(--ox-line); }
+.ox-featuregrid > * { background: var(--ox-bg); padding: 32px; }
+.ox-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ox-space-xl); align-items: center; }
+@media (max-width: 768px) { .ox-featuregrid { grid-template-columns: 1fr; } .ox-split { grid-template-columns: 1fr; } }
+
+/* Desktop site header */
+.ox-siteheader { display: flex; align-items: center; justify-content: space-between; padding: 20px var(--ox-margin); border-bottom: 1px solid var(--ox-line); background: var(--ox-bg); }
+.ox-siteheader__nav { display: flex; gap: 28px; align-items: center; }
+.ox-siteheader__nav a { font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); text-decoration: none; }
+.ox-siteheader__nav a:hover, .ox-siteheader__nav a.is-active { color: var(--ox-text); }
+/* Desktop footer */
+.ox-sitefooter { padding: var(--ox-space-xl) var(--ox-margin) var(--ox-space-base); border-top: 1px solid var(--ox-ink); display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: var(--ox-space-lg); }
+.ox-sitefooter__col h4 { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); margin: 0 0 14px; font-weight: 500; }
+.ox-sitefooter__col a { display: block; font-family: var(--ox-font-sans); font-size: 14px; color: var(--ox-text); text-decoration: none; padding: 5px 0; }
+.ox-sitefooter__col a:hover { color: var(--ox-accent); }
+/* Breadcrumbs */
+.ox-crumbs { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+.ox-crumbs a { color: var(--ox-text-muted); text-decoration: none; }
+.ox-crumbs a:hover { color: var(--ox-accent); }
+.ox-crumbs__sep { color: var(--ox-stone-soft); }
+.ox-crumbs__here { color: var(--ox-text); }
+/* Desktop pagination (prev/next pager) */
+.ox-pager-web { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--ox-line); padding-top: 24px; }
+.ox-pager-web a { font-family: var(--ox-font-serif); font-size: 22px; color: var(--ox-text); text-decoration: none; }
+.ox-pager-web a .ox-pager-web__d { display: block; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); margin-bottom: 4px; }
+
+/* Responsive: footer columns collapse; data tables scroll within their frame */
+@media (max-width: 860px) { .ox-sitefooter { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) {
+  .ox-sitefooter { grid-template-columns: 1fr; }
+  .ox-cover__title { font-size: 56px; }
+  .ox-band--cta .ox-band__t { font-size: 30px; }
+  .ox-siteheader__nav { gap: 16px; overflow-x: auto; }
+}
+@media (max-width: 640px) {
+  .ox-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 16 · ICONS  (P3)
+ * Line only · 1.5 stroke · currentColor · 24px grid · no fills · square
+ * terminals. Use inline <svg class="ox-ic"> (see assets/icons/) or the
+ * sprite. Size via font-size or width/height; stroke stays 1.5 visually
+ * because vectors scale — for very large sizes drop to 1.25.
+ * ═══════════════════════════════════════════════════════════════════ */
+.ox-ic { width: 24px; height: 24px; display: inline-block; vertical-align: middle; color: currentColor; flex-shrink: 0; }
+.ox-ic--sm { width: 18px; height: 18px; }
+.ox-ic--lg { width: 32px; height: 32px; }
+/* When .ox-ic is a WRAPPER around an <svg>/<use>, the inner svg fills it.
+   A bare <svg class="ox-ic"> sizes from the width/height above (do NOT
+   force 100% on svg.ox-ic — that would ignore the 24/32px box). */
+.ox-ic > svg { width: 100%; height: 100%; display: block; }
+/* Line-icon rendering: the sprite <symbol>s are unstroked paths — they
+   inherit the OX icon contract here (1.5 stroke, no fill, square caps). */
+svg.ox-ic, .ox-ic svg, .ox-ic use { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: square; stroke-linejoin: miter; }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+ * 17 · ACCESSIBILITY + SYSTEM UTILITIES  (P7)
+ * Skip-link, sr-only, focus-visible ring, dark-mode + print + motion.
+ * ═══════════════════════════════════════════════════════════════════ */
+.ox-skip { position: absolute; left: 8px; top: -48px; z-index: 100; background: var(--ox-ink); color: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; padding: 12px 18px; text-decoration: none; transition: top 0.1s ease; }
+.ox-skip:focus { top: 8px; }
+.ox-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ox-focus-ring:focus-visible, .ox-focusable:focus-visible { outline: 2px solid var(--ox-oxide); outline-offset: 2px; }
+
+/* Automatic dark mode — maps to the .ox-on-ink inversion. Opt-in by
+   adding .ox-auto-dark to a root; respects the tier system (a tier
+   scope inside still wins because it sets the same vars locally). */
+@media (prefers-color-scheme: dark) {
+  .ox-auto-dark {
+    --ox-bg: var(--ox-ink);
+    --ox-bg-raised: #15140F;
+    --ox-text: var(--ox-paper);
+    --ox-text-muted: var(--ox-stone-soft);
+    --ox-line: var(--ox-rule-reverse);
+    --ox-accent: var(--ox-oxide-bright);
+    background: var(--ox-ink);
+    color: var(--ox-paper);
+  }
+}
+
+/* Premium entrance motion — meters sweep from 0, KPI/stat values tick up,
+   bar charts grow. One-shot on mount, token-timed, and only when motion is
+   welcome (reduced-motion collapses it via the block below). */
+@media (prefers-reduced-motion: no-preference) {
+  .ox-meter__fill { transform-origin: left center; animation: ox-sweep var(--ox-dur-5) var(--ox-ease-out) both; }
+  .ox-bars__bar  { transform-origin: bottom; animation: ox-sweep-y var(--ox-dur-4) var(--ox-ease-out) both; }
+  .ox-kpi__value { animation: ox-tick var(--ox-dur-3) var(--ox-ease-out) both; }
+}
+@keyframes ox-sweep-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+/* Motion system — near-zero by default. The ONLY permitted transitions
+   are (a) 120-150ms value/colour flips on interactive controls and
+   (b) 120ms opacity on overlays. No decorative/looping motion on brand
+   content. Under reduced-motion, all of it collapses to instant. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Print — paper ground, ink type, hide app chrome; outline SVG text
+   (the mark) before print since webfonts may not embed. */
+@media print {
+  body { background: #fff; color: var(--ox-ink); }
+  .ox-tabbar, .ox-fab, .ox-toast, .ox-appbanner, .ox-skip, .g-head, .g-nav, .g-pager { display: none !important; }
+  .ox-card, .ox-cred, .ox-kpi { break-inside: avoid; }
+  /* NB: the .ox-flag / .ox-wordmark are live JetBrains Mono text — outline
+     to paths (see assets/readme.md) before sending to a printer. */
+}

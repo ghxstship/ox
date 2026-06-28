@@ -1,0 +1,769 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/app/**",
+              "components/brand/**",
+              "components/core/**",
+              "components/data/**",
+              "components/editorial/**",
+              "components/feedback/**",
+              "components/fitness/**",
+              "components/forms/**",
+              "components/game/**",
+              "components/layout/**",
+              "components/media/**",
+              "components/navigation/**",
+              "components/overlays/**",
+              "components/product/**",
+              "components/xr/**",
+              "design_handoff_ox_app/references/_app/**",
+              "design_handoff_ox_app/references/ox-mobile/**",
+              "design_handoff_ox_app/references/ox-web/**",
+              "marketing/**",
+              "ui_kits/_app/**",
+              "ui_kits/iron-safari/**",
+              "ui_kits/member-app/**",
+              "ui_kits/ox-mobile/**",
+              "ui_kits/ox-web/**",
+              "ui_kits/storefront/**",
+              "whitelabel/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:DM Serif Display|Geist|JetBrains Mono))/i]",
+        "message": "Font not provided by the design system. Available: DM Serif Display, Geist, JetBrains Mono."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXAlert'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|style|key|ref|className|style|children)$/]",
+        "message": "<OXAlert> doesn't accept that prop. Declared props: children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXAppShell'] > JSXAttribute > JSXIdentifier[name!=/^(?:product|appCode|brand|nav|topbar|children|style|key|ref|className|style|children)$/]",
+        "message": "<OXAppShell> doesn't accept that prop. Declared props: product, appCode, brand, nav, topbar, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXXRFrame'] > JSXAttribute > JSXIdentifier[name!=/^(?:device|status|eyeConnect|hint|children|key|ref|className|style|children)$/]",
+        "message": "<OXXRFrame> doesn't accept that prop. Declared props: device, status, eyeConnect, hint, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXButton'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|block|arrow|href|onClick|children|style|key|ref|className|style|children)$/]",
+        "message": "<OXButton> doesn't accept that prop. Declared props: variant, size, block, arrow, href, onClick, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXButton'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:default|primary|oxide|ghost)$/]",
+        "message": "<OXButton> variant must be one of 'default' | 'primary' | 'oxide' | 'ghost'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXButton'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<OXButton> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:day|category|title|description|status|meta|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<OXCard> doesn't accept that prop. Declared props: day, category, title, description, status, meta, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXChip'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|live|children|style|key|ref|className|style|children)$/]",
+        "message": "<OXChip> doesn't accept that prop. Declared props: variant, live, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXChip'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:default|solid|oxide|oxide-line|ghost)$/]",
+        "message": "<OXChip> variant must be one of 'default' | 'solid' | 'oxide' | 'oxide-line' | 'ghost'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXChoice'] > JSXAttribute > JSXIdentifier[name!=/^(?:type|name|label|sub|checked|disabled|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<OXChoice> doesn't accept that prop. Declared props: type, name, label, sub, checked, disabled, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXChoice'] > JSXAttribute[name.name='type'] > Literal[value!=/^(?:radio|checkbox)$/]",
+        "message": "<OXChoice> type must be one of 'radio' | 'checkbox'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXCode'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|style|key|ref|className|style|children)$/]",
+        "message": "<OXCode> doesn't accept that prop. Declared props: children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXContainer'] > JSXAttribute > JSXIdentifier[name!=/^(?:reading|children|style|key|ref|className|style|children)$/]",
+        "message": "<OXContainer> doesn't accept that prop. Declared props: reading, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXCredential'] > JSXAttribute > JSXIdentifier[name!=/^(?:material|memberNumber|fields|strip|verified|style|key|ref|className|style|children)$/]",
+        "message": "<OXCredential> doesn't accept that prop. Declared props: material, memberNumber, fields, strip, verified, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXCredential'] > JSXAttribute[name.name='material'] > Literal[value!=/^(?:physical|digital)$/]",
+        "message": "<OXCredential> material must be one of 'physical' | 'digital'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXDataColumn'] > JSXAttribute > JSXIdentifier[name!=/^(?:key|label|numeric|sortable|key|ref|className|style|children)$/]",
+        "message": "<OXDataColumn> doesn't accept that prop. Declared props: key, label, numeric, sortable."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXEmpty'] > JSXAttribute > JSXIdentifier[name!=/^(?:mark|title|sub|action|style|key|ref|className|style|children)$/]",
+        "message": "<OXEmpty> doesn't accept that prop. Declared props: mark, title, sub, action, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXExerciseCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:index|name|equipment|muscles|floors|onFind|style|key|ref|className|style|children)$/]",
+        "message": "<OXExerciseCard> doesn't accept that prop. Declared props: index, name, equipment, muscles, floors, onFind, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXField'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|hint|help|state|htmlFor|children|style|key|ref|className|style|children)$/]",
+        "message": "<OXField> doesn't accept that prop. Declared props: label, hint, help, state, htmlFor, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXIcon'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|size|title|style|key|ref|className|style|children)$/]",
+        "message": "<OXIcon> doesn't accept that prop. Declared props: name, size, title, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXInput'] > JSXAttribute > JSXIdentifier[name!=/^(?:value|placeholder|state|multiline|rows|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<OXInput> doesn't accept that prop. Declared props: value, placeholder, state, multiline, rows, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXInput'] > JSXAttribute[name.name='state'] > Literal[value!=/^(?:default|error|success|disabled)$/]",
+        "message": "<OXInput> state must be one of 'default' | 'error' | 'success' | 'disabled'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXKpi'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|delta|trend|style|key|ref|className|style|children)$/]",
+        "message": "<OXKpi> doesn't accept that prop. Declared props: label, value, delta, trend, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXKpi'] > JSXAttribute[name.name='trend'] > Literal[value!=/^(?:up|down)$/]",
+        "message": "<OXKpi> trend must be one of 'up' | 'down'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXLevelBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:level|rank|tone|style|key|ref|className|style|children)$/]",
+        "message": "<OXLevelBadge> doesn't accept that prop. Declared props: level, rank, tone, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXLevelBadge'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:oxide|ink)$/]",
+        "message": "<OXLevelBadge> tone must be one of 'oxide' | 'ink'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXMark'] > JSXAttribute > JSXIdentifier[name!=/^(?:as|size|color|style|key|ref|className|style|children)$/]",
+        "message": "<OXMark> doesn't accept that prop. Declared props: as, size, color, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXMark'] > JSXAttribute[name.name='as'] > Literal[value!=/^(?:wordmark|flag)$/]",
+        "message": "<OXMark> as must be one of 'wordmark' | 'flag'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXMeter'] > JSXAttribute > JSXIdentifier[name!=/^(?:title|current|total|lockAt|openLabel|lockedLabel|style|key|ref|className|style|children)$/]",
+        "message": "<OXMeter> doesn't accept that prop. Declared props: title, current, total, lockAt, openLabel, lockedLabel, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXModal'] > JSXAttribute > JSXIdentifier[name!=/^(?:open|onClose|label|labelledBy|children|style|key|ref|className|style|children)$/]",
+        "message": "<OXModal> doesn't accept that prop. Declared props: open, onClose, label, labelledBy, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXServiceBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:service|connected|selected|label|size|onClick|key|ref|className|style|children)$/]",
+        "message": "<OXServiceBadge> doesn't accept that prop. Declared props: service, connected, selected, label, size, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXServiceBadge'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md)$/]",
+        "message": "<OXServiceBadge> size must be one of 'sm' | 'md'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXOTP'] > JSXAttribute > JSXIdentifier[name!=/^(?:length|value|style|key|ref|className|style|children)$/]",
+        "message": "<OXOTP> doesn't accept that prop. Declared props: length, value, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXPost'] > JSXAttribute > JSXIdentifier[name!=/^(?:author|handle|time|body|media|liked|likes|comments|style|key|ref|className|style|children)$/]",
+        "message": "<OXPost> doesn't accept that prop. Declared props: author, handle, time, body, media, liked, likes, comments, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXProse'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|style|key|ref|className|style|children)$/]",
+        "message": "<OXProse> doesn't accept that prop. Declared props: children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXRow'] > JSXAttribute > JSXIdentifier[name!=/^(?:index|title|sub|action|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<OXRow> doesn't accept that prop. Declared props: index, title, sub, action, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXSegmented'] > JSXAttribute > JSXIdentifier[name!=/^(?:options|value|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<OXSegmented> doesn't accept that prop. Declared props: options, value, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXSelect'] > JSXAttribute > JSXIdentifier[name!=/^(?:options|value|disabled|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<OXSelect> doesn't accept that prop. Declared props: options, value, disabled, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXSwitch'] > JSXAttribute > JSXIdentifier[name!=/^(?:on|onChange|style|key|ref|className|style|children)$/]",
+        "message": "<OXSwitch> doesn't accept that prop. Declared props: on, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXTableColumn'] > JSXAttribute > JSXIdentifier[name!=/^(?:key|label|align|amount|key|ref|className|style|children)$/]",
+        "message": "<OXTableColumn> doesn't accept that prop. Declared props: key, label, align, amount."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXTableColumn'] > JSXAttribute[name.name='align'] > Literal[value!=/^(?:left|right)$/]",
+        "message": "<OXTableColumn> align must be one of 'left' | 'right'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXTabs'] > JSXAttribute > JSXIdentifier[name!=/^(?:items|style|key|ref|className|style|children)$/]",
+        "message": "<OXTabs> doesn't accept that prop. Declared props: items, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXTicker'] > JSXAttribute > JSXIdentifier[name!=/^(?:items|style|key|ref|className|style|children)$/]",
+        "message": "<OXTicker> doesn't accept that prop. Declared props: items, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXTierBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:tier|number|style|key|ref|className|style|children)$/]",
+        "message": "<OXTierBadge> doesn't accept that prop. Declared props: tier, number, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXTribeBoard'] > JSXAttribute > JSXIdentifier[name!=/^(?:rows|unit|style|key|ref|className|style|children)$/]",
+        "message": "<OXTribeBoard> doesn't accept that prop. Declared props: rows, unit, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXMapPin'] > JSXAttribute > JSXIdentifier[name!=/^(?:type|label|sub|live|active|held|onClick|key|ref|className|style|children)$/]",
+        "message": "<OXMapPin> doesn't accept that prop. Declared props: type, label, sub, live, active, held, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='OXMapPin'] > JSXAttribute[name.name='held'] > Literal[value!=/^(?:mine|rival)$/]",
+        "message": "<OXMapPin> held must be one of 'mine' | 'rival'."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "OXAlert": {
+        "replaces": []
+      },
+      "OXAppShell": {
+        "replaces": []
+      },
+      "OXXRFrame": {
+        "replaces": []
+      },
+      "OXButton": {
+        "replaces": []
+      },
+      "OXCard": {
+        "replaces": []
+      },
+      "OXChip": {
+        "replaces": []
+      },
+      "OXChoice": {
+        "replaces": []
+      },
+      "OXCode": {
+        "replaces": []
+      },
+      "OXContainer": {
+        "replaces": []
+      },
+      "OXCredential": {
+        "replaces": []
+      },
+      "OXDataColumn": {
+        "replaces": []
+      },
+      "OXEmpty": {
+        "replaces": []
+      },
+      "OXExerciseCard": {
+        "replaces": []
+      },
+      "OXField": {
+        "replaces": []
+      },
+      "OXIcon": {
+        "replaces": []
+      },
+      "OXInput": {
+        "replaces": []
+      },
+      "OXKpi": {
+        "replaces": []
+      },
+      "OXLevelBadge": {
+        "replaces": []
+      },
+      "OXMark": {
+        "replaces": []
+      },
+      "OXMeter": {
+        "replaces": []
+      },
+      "OXModal": {
+        "replaces": []
+      },
+      "OXServiceBadge": {
+        "replaces": []
+      },
+      "OXOTP": {
+        "replaces": []
+      },
+      "OXPost": {
+        "replaces": []
+      },
+      "OXProse": {
+        "replaces": []
+      },
+      "OXRow": {
+        "replaces": []
+      },
+      "OXSegmented": {
+        "replaces": []
+      },
+      "OXSelect": {
+        "replaces": []
+      },
+      "OXSwitch": {
+        "replaces": []
+      },
+      "OXTableColumn": {
+        "replaces": []
+      },
+      "OXTabs": {
+        "replaces": []
+      },
+      "OXTicker": {
+        "replaces": []
+      },
+      "OXTierBadge": {
+        "replaces": []
+      },
+      "OXTribeBoard": {
+        "replaces": []
+      },
+      "OXMapPin": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--ox-accent",
+      "--ox-accent-hover",
+      "--ox-accent-text",
+      "--ox-accent-weak",
+      "--ox-app-code",
+      "--ox-app-width",
+      "--ox-badge-earned",
+      "--ox-badge-empty",
+      "--ox-bg",
+      "--ox-bg-inverse",
+      "--ox-bg-raised",
+      "--ox-border",
+      "--ox-border-accent",
+      "--ox-border-ink",
+      "--ox-border-strong",
+      "--ox-bp-lg",
+      "--ox-bp-md",
+      "--ox-bp-sm",
+      "--ox-bp-xl",
+      "--ox-brand-accent",
+      "--ox-brand-accent-bright",
+      "--ox-brand-accent-deep",
+      "--ox-brand-deep",
+      "--ox-brand-font-body",
+      "--ox-brand-font-display",
+      "--ox-brand-font-mono",
+      "--ox-brand-ground",
+      "--ox-brand-ink",
+      "--ox-brand-ink-soft",
+      "--ox-brand-mark",
+      "--ox-brand-name",
+      "--ox-brand-raised",
+      "--ox-canvas",
+      "--ox-card-pad",
+      "--ox-case-body",
+      "--ox-case-button",
+      "--ox-case-eyebrow",
+      "--ox-case-label",
+      "--ox-case-tablehead",
+      "--ox-cell-pad",
+      "--ox-control-h",
+      "--ox-danger",
+      "--ox-danger-strong",
+      "--ox-display-case",
+      "--ox-dur",
+      "--ox-dur-0",
+      "--ox-dur-1",
+      "--ox-dur-2",
+      "--ox-dur-3",
+      "--ox-dur-4",
+      "--ox-dur-5",
+      "--ox-dur-fast",
+      "--ox-dur-instant",
+      "--ox-dur-slow",
+      "--ox-ease",
+      "--ox-ease-in",
+      "--ox-ease-inout",
+      "--ox-ease-linear",
+      "--ox-ease-out",
+      "--ox-ease-stamp",
+      "--ox-ease-standard",
+      "--ox-elev-hover",
+      "--ox-elev-overlay",
+      "--ox-elev-rest",
+      "--ox-focus-offset",
+      "--ox-focus-ring",
+      "--ox-focus-width",
+      "--ox-font-mono",
+      "--ox-font-sans",
+      "--ox-font-serif",
+      "--ox-gutter",
+      "--ox-ink",
+      "--ox-ink-soft",
+      "--ox-isa-blue",
+      "--ox-iso-green",
+      "--ox-lead-body",
+      "--ox-lead-loose",
+      "--ox-lead-snug",
+      "--ox-lead-tight",
+      "--ox-level",
+      "--ox-level-text",
+      "--ox-lift",
+      "--ox-line",
+      "--ox-margin",
+      "--ox-nudge-x",
+      "--ox-ok",
+      "--ox-oxide",
+      "--ox-oxide-bright",
+      "--ox-oxide-deep",
+      "--ox-oxide-tint",
+      "--ox-paper",
+      "--ox-paper-warm",
+      "--ox-pillar-adventure",
+      "--ox-pillar-fitness",
+      "--ox-pillar-innovation",
+      "--ox-pillar-lifestyle",
+      "--ox-pillar-music",
+      "--ox-pillar-social",
+      "--ox-pillar-train",
+      "--ox-press",
+      "--ox-quest-active",
+      "--ox-quest-done",
+      "--ox-quest-locked",
+      "--ox-radius",
+      "--ox-radius-card",
+      "--ox-radius-pill",
+      "--ox-ratio-credential",
+      "--ox-ratio-photo",
+      "--ox-ratio-portrait",
+      "--ox-ratio-square",
+      "--ox-ratio-wide",
+      "--ox-recovery-fresh",
+      "--ox-recovery-light",
+      "--ox-recovery-spent",
+      "--ox-recovery-worked",
+      "--ox-row-h",
+      "--ox-rpe-high",
+      "--ox-rpe-low",
+      "--ox-rpe-mid",
+      "--ox-rule",
+      "--ox-rule-reverse",
+      "--ox-rule-reverse-soft",
+      "--ox-rule-soft",
+      "--ox-rule-strong",
+      "--ox-safety-red",
+      "--ox-salt",
+      "--ox-scenery-forest",
+      "--ox-scenery-industrial",
+      "--ox-scenery-ocean",
+      "--ox-scenery-rooftop",
+      "--ox-scenery-sunrise",
+      "--ox-shadow",
+      "--ox-space-2xl",
+      "--ox-space-3xl",
+      "--ox-space-base",
+      "--ox-space-lg",
+      "--ox-space-md",
+      "--ox-space-sm",
+      "--ox-space-xl",
+      "--ox-space-xs",
+      "--ox-stage-shadow",
+      "--ox-status-live",
+      "--ox-status-locked",
+      "--ox-status-open",
+      "--ox-status-wait",
+      "--ox-stone",
+      "--ox-stone-soft",
+      "--ox-streak",
+      "--ox-text",
+      "--ox-text-body",
+      "--ox-text-body-l",
+      "--ox-text-display",
+      "--ox-text-h2",
+      "--ox-text-inverse",
+      "--ox-text-lede",
+      "--ox-text-meta",
+      "--ox-text-meta-sm",
+      "--ox-text-muted",
+      "--ox-text-small",
+      "--ox-text-spread",
+      "--ox-text-title",
+      "--ox-touch-min",
+      "--ox-tr-border",
+      "--ox-tr-color",
+      "--ox-tr-flip",
+      "--ox-tr-nudge",
+      "--ox-tr-opacity",
+      "--ox-tr-overlay",
+      "--ox-tr-reveal",
+      "--ox-tr-transform",
+      "--ox-track-display",
+      "--ox-track-mono",
+      "--ox-track-mono-lg",
+      "--ox-track-tight",
+      "--ox-transition",
+      "--ox-transition-colors",
+      "--ox-transition-fast",
+      "--ox-warn",
+      "--ox-warn-yellow",
+      "--ox-xp",
+      "--ox-xp-track",
+      "--ox-z-base",
+      "--ox-z-dropdown",
+      "--ox-z-modal",
+      "--ox-z-raised",
+      "--ox-z-scrim",
+      "--ox-z-sticky",
+      "--ox-z-toast",
+      "--ox-zone-1",
+      "--ox-zone-2",
+      "--ox-zone-3",
+      "--ox-zone-4",
+      "--ox-zone-5"
+    ],
+    "tokenKinds": {
+      "--ox-ink": "color",
+      "--ox-ink-soft": "color",
+      "--ox-paper": "color",
+      "--ox-paper-warm": "color",
+      "--ox-salt": "color",
+      "--ox-stone": "color",
+      "--ox-stone-soft": "color",
+      "--ox-oxide": "color",
+      "--ox-oxide-deep": "color",
+      "--ox-oxide-bright": "color",
+      "--ox-oxide-tint": "color",
+      "--ox-rule": "color",
+      "--ox-rule-soft": "color",
+      "--ox-rule-strong": "color",
+      "--ox-rule-reverse": "color",
+      "--ox-rule-reverse-soft": "color",
+      "--ox-pillar-train": "color",
+      "--ox-pillar-social": "color",
+      "--ox-pillar-lifestyle": "color",
+      "--ox-pillar-music": "color",
+      "--ox-pillar-fitness": "color",
+      "--ox-pillar-adventure": "color",
+      "--ox-pillar-innovation": "color",
+      "--ox-iso-green": "color",
+      "--ox-safety-red": "color",
+      "--ox-isa-blue": "color",
+      "--ox-warn-yellow": "color",
+      "--ox-bg": "color",
+      "--ox-bg-raised": "color",
+      "--ox-bg-inverse": "color",
+      "--ox-text": "font",
+      "--ox-text-muted": "font",
+      "--ox-text-inverse": "font",
+      "--ox-accent": "color",
+      "--ox-accent-hover": "color",
+      "--ox-line": "color",
+      "--ox-status-live": "color",
+      "--ox-status-open": "color",
+      "--ox-status-locked": "color",
+      "--ox-status-wait": "color",
+      "--ox-font-serif": "font",
+      "--ox-font-sans": "font",
+      "--ox-font-mono": "font",
+      "--ox-text-display": "font",
+      "--ox-text-title": "font",
+      "--ox-text-h2": "font",
+      "--ox-text-spread": "font",
+      "--ox-text-lede": "font",
+      "--ox-text-body-l": "font",
+      "--ox-text-body": "font",
+      "--ox-text-small": "font",
+      "--ox-text-meta": "font",
+      "--ox-text-meta-sm": "font",
+      "--ox-lead-tight": "other",
+      "--ox-lead-snug": "other",
+      "--ox-lead-body": "other",
+      "--ox-lead-loose": "other",
+      "--ox-track-display": "other",
+      "--ox-track-tight": "other",
+      "--ox-track-mono": "other",
+      "--ox-track-mono-lg": "other",
+      "--ox-space-xs": "spacing",
+      "--ox-space-sm": "spacing",
+      "--ox-space-md": "spacing",
+      "--ox-space-base": "spacing",
+      "--ox-space-lg": "spacing",
+      "--ox-space-xl": "spacing",
+      "--ox-space-2xl": "spacing",
+      "--ox-space-3xl": "spacing",
+      "--ox-border": "color",
+      "--ox-border-ink": "color",
+      "--ox-border-strong": "color",
+      "--ox-border-accent": "color",
+      "--ox-radius": "radius",
+      "--ox-radius-pill": "radius",
+      "--ox-radius-card": "radius",
+      "--ox-shadow": "shadow",
+      "--ox-stage-shadow": "shadow",
+      "--ox-canvas": "spacing",
+      "--ox-margin": "spacing",
+      "--ox-gutter": "spacing",
+      "--ox-app-width": "spacing",
+      "--ox-touch-min": "spacing",
+      "--ox-bp-sm": "spacing",
+      "--ox-bp-md": "spacing",
+      "--ox-bp-lg": "spacing",
+      "--ox-bp-xl": "spacing",
+      "--ox-z-base": "other",
+      "--ox-z-raised": "other",
+      "--ox-z-sticky": "other",
+      "--ox-z-dropdown": "other",
+      "--ox-z-scrim": "other",
+      "--ox-z-modal": "other",
+      "--ox-z-toast": "other",
+      "--ox-ratio-square": "other",
+      "--ox-ratio-portrait": "other",
+      "--ox-ratio-photo": "other",
+      "--ox-ratio-wide": "other",
+      "--ox-ratio-credential": "other",
+      "--ox-dur-0": "other",
+      "--ox-dur-1": "other",
+      "--ox-dur-2": "other",
+      "--ox-dur-3": "other",
+      "--ox-dur-4": "other",
+      "--ox-dur-5": "other",
+      "--ox-ease-standard": "other",
+      "--ox-ease-out": "other",
+      "--ox-ease-in": "other",
+      "--ox-ease-inout": "other",
+      "--ox-ease-linear": "other",
+      "--ox-ease-stamp": "other",
+      "--ox-tr-color": "color",
+      "--ox-tr-flip": "other",
+      "--ox-tr-transform": "other",
+      "--ox-tr-nudge": "other",
+      "--ox-tr-opacity": "other",
+      "--ox-tr-border": "other",
+      "--ox-tr-overlay": "other",
+      "--ox-tr-reveal": "other",
+      "--ox-press": "other",
+      "--ox-lift": "other",
+      "--ox-nudge-x": "other",
+      "--ox-focus-ring": "other",
+      "--ox-focus-width": "other",
+      "--ox-focus-offset": "other",
+      "--ox-accent-text": "font",
+      "--ox-accent-weak": "color",
+      "--ox-case-eyebrow": "other",
+      "--ox-case-label": "other",
+      "--ox-case-button": "other",
+      "--ox-case-tablehead": "other",
+      "--ox-case-body": "other",
+      "--ox-display-case": "other",
+      "--ox-elev-rest": "shadow",
+      "--ox-elev-hover": "shadow",
+      "--ox-elev-overlay": "shadow",
+      "--ox-dur-instant": "other",
+      "--ox-dur-fast": "other",
+      "--ox-dur": "other",
+      "--ox-dur-slow": "other",
+      "--ox-ease": "other",
+      "--ox-transition": "other",
+      "--ox-transition-fast": "other",
+      "--ox-transition-colors": "other",
+      "--ox-app-code": "other",
+      "--ox-row-h": "spacing",
+      "--ox-control-h": "spacing",
+      "--ox-cell-pad": "spacing",
+      "--ox-card-pad": "spacing",
+      "--ox-brand-name": "other",
+      "--ox-brand-mark": "other",
+      "--ox-brand-accent": "color",
+      "--ox-brand-accent-deep": "color",
+      "--ox-brand-accent-bright": "color",
+      "--ox-brand-ground": "color",
+      "--ox-brand-raised": "color",
+      "--ox-brand-deep": "color",
+      "--ox-brand-ink": "color",
+      "--ox-brand-ink-soft": "color",
+      "--ox-brand-font-display": "font",
+      "--ox-brand-font-body": "font",
+      "--ox-brand-font-mono": "font",
+      "--ox-xp": "color",
+      "--ox-xp-track": "color",
+      "--ox-level": "color",
+      "--ox-level-text": "font",
+      "--ox-streak": "color",
+      "--ox-zone-1": "color",
+      "--ox-zone-2": "color",
+      "--ox-zone-3": "color",
+      "--ox-zone-4": "color",
+      "--ox-zone-5": "color",
+      "--ox-rpe-low": "color",
+      "--ox-rpe-mid": "color",
+      "--ox-rpe-high": "color",
+      "--ox-recovery-fresh": "color",
+      "--ox-recovery-light": "color",
+      "--ox-recovery-worked": "color",
+      "--ox-recovery-spent": "color",
+      "--ox-scenery-ocean": "color",
+      "--ox-scenery-rooftop": "color",
+      "--ox-scenery-industrial": "color",
+      "--ox-scenery-sunrise": "color",
+      "--ox-scenery-forest": "color",
+      "--ox-quest-done": "color",
+      "--ox-quest-active": "color",
+      "--ox-quest-locked": "color",
+      "--ox-badge-earned": "color",
+      "--ox-badge-empty": "color",
+      "--ox-ok": "color",
+      "--ox-warn": "color",
+      "--ox-danger": "color",
+      "--ox-danger-strong": "color"
+    },
+    "fontFamilies": [
+      "DM Serif Display",
+      "Geist",
+      "JetBrains Mono"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/fitness.css
+ * The gamified-fitness layer: levels/XP, effort zones, RPE, recovery,
+ * and scenery. CRITICAL: this stays inside the one-accent rule — every
+ * "color" here is a tonal step of Oxide → Stone, never a new hue. Wayfinding
+ * comes from position + label + shape, not a rainbow.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Game layer ──────────────────────────────────────────────────── */
+  --ox-xp:            var(--ox-oxide);        /* XP fill + level accents */
+  --ox-xp-track:      var(--ox-paper-warm);   /* unfilled XP track */
+  --ox-level:         var(--ox-oxide);        /* the LV badge ground */
+  --ox-level-text:    var(--ox-paper);        /* LV badge label */
+  --ox-streak:        var(--ox-oxide-deep);   /* active streak flame */
+
+  /* ─── Effort zones (Z1 easy → Z5 max) ─────────────────────────────────
+     A 5-step ramp from cool stone (easy) to deep copper (max). Read by
+     position (Z1 bottom → Z5 top) + label, never hue alone. */
+  --ox-zone-1:        #C9C2B2;   /* @kind color */ /* easy — pale stone */
+  --ox-zone-2:        #9B958C;   /* @kind color */ /* base — stone */
+  --ox-zone-3:        #C9612F;   /* @kind color */ /* tempo — oxide bright */
+  --ox-zone-4:        #B5552E;   /* @kind color */ /* hard — oxide */
+  --ox-zone-5:        #8C3F22;   /* @kind color */ /* max — oxide deep */
+
+  /* ─── RPE (rate of perceived exertion, 1–10) ──────────────────────────
+     Same family; UI shows the number + a copper fill proportion. */
+  --ox-rpe-low:       var(--ox-stone-soft);
+  --ox-rpe-mid:       var(--ox-oxide-bright);
+  --ox-rpe-high:      var(--ox-oxide-deep);
+
+  /* ─── Recovery / readiness ────────────────────────────────────────────
+     Muscle-heatmap + readiness. "Fresh" = quiet paper-warm; "worked" =
+     copper; "spent" = deep copper. Intensity, not category. */
+  --ox-recovery-fresh:  var(--ox-paper-warm);
+  --ox-recovery-light:  #E2C4A8;   /* @kind color */ /* lightly worked */
+  --ox-recovery-worked: var(--ox-oxide);
+  --ox-recovery-spent:  var(--ox-oxide-deep);
+
+  /* ─── Scenery (environment categories for floor discovery) ────────────
+     These are WAYFINDING tags, not chromatic accents — rendered as mono
+     labels + a tonal swatch from the warm/ink ramp, never saturated. */
+  --ox-scenery-ocean:      #6B6660;   /* @kind color */ /* stone */
+  --ox-scenery-rooftop:    #9B958C;   /* @kind color */ /* stone soft */
+  --ox-scenery-industrial: #1A1916;   /* @kind color */ /* ink soft */
+  --ox-scenery-sunrise:    #C9612F;   /* @kind color */ /* oxide bright */
+  --ox-scenery-forest:     #4A4A3E;   /* @kind color */ /* deep warm gray */
+
+  /* ─── Semantic game roles ─────────────────────────────────────────────── */
+  --ox-quest-done:    var(--ox-oxide);        /* completed objective */
+  --ox-quest-active:  var(--ox-ink);          /* current objective */
+  --ox-quest-locked:  var(--ox-stone-soft);   /* not yet unlocked */
+  --ox-badge-earned:  var(--ox-oxide);        /* collected species/medal */
+  --ox-badge-empty:   var(--ox-rule);         /* uncollected slot */
+}

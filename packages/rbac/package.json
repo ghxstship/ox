@@ -1,0 +1,22 @@
+{
+  "name": "@ox/rbac",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OX access contract — CAPS, can(), scope(), scopeLabel(), NAV, and the i18n formatting gate. Mirrors ui_kits/_app/data.js. Client-side scope is UX only; Postgres RLS is the enforcement boundary.",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/*.test.ts",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}

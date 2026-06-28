@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "OX",
+    "slug": "ox",
+    "scheme": "ox",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#ECE7DA",
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true },
+    "ios": { "supportsTablet": true, "bundleIdentifier": "fit.ox.app" },
+    "android": { "package": "fit.ox.app" },
+    "extra": { "apiUrl": "http://localhost:4000/api/v1" }
+  }
+}

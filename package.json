@@ -1,0 +1,32 @@
+{
+  "name": "ox",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OX — gamified-fitness platform. Plug in. Level up.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "gen:types": "pnpm --filter @ox/types generate",
+    "db:generate": "pnpm --filter @ox/db prisma:generate",
+    "db:migrate": "pnpm --filter @ox/db prisma:migrate",
+    "db:rls": "pnpm --filter @ox/db rls:apply",
+    "db:seed": "pnpm --filter @ox/db seed"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.0",
+    "typescript": "^5.5.4"
+  }
+}

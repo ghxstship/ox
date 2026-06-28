@@ -1,0 +1,51 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Overlays · Modal, Menu, Accordion, Tabs" subtitle="Dialogs, dropdown menu, accordion, true tab panels, toast & tooltip" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  .wrap { padding: 26px 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; align-items: start; }
+  .stack { display: grid; gap: 16px; }
+  .relbox { position: relative; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXMenu, OXAccordion, OXTabset, OXTooltip, OXToast } = window.OXDesignSystem_7d2a2e;
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <>
+      <div className="stack">
+        <OXMenu items={[
+          {label:"View credential", key:"V"},
+          {label:"Send guest pass", key:"G"},
+          {label:"Settings", key:"⌘,", separatorAfter:true},
+          {label:"Leave the house", danger:true},
+        ]} />
+        <div className="relbox" style={{height:40}}>
+          <OXTooltip label="Holding verified" style={{position:"static",display:"inline-block"}} />
+        </div>
+        <OXToast message="RSVP confirmed — see Wallet" />
+      </div>
+      <div className="stack">
+        <OXTabset tabs={[
+          {label:"Tonight", panel:<p className="ox-body" style={{margin:0}}>Listening Room VI · 22:00 · The Annex.</p>},
+          {label:"This week", panel:<p className="ox-body" style={{margin:0}}>Trailhead, cold plunge, build night.</p>},
+          {label:"Saved", panel:<p className="ox-body" style={{margin:0}}>Nothing saved yet.</p>},
+        ]} />
+        <OXAccordion defaultOpen={[0]} items={[
+          {title:<>What is <em>soulbound?</em></>, body:"Your membership credential is non-transferable. The number retires with you."},
+          {title:"How do guest passes work?", body:"Two a month. You own the introduction."},
+        ]} />
+      </div>
+    </>
+  );
+</script>
+</body>
+</html>

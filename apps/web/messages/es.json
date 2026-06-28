@@ -1,0 +1,170 @@
+{
+  "brand": {
+    "tagline": "Conéctate. Sube de nivel.",
+    "herd": "Manada."
+  },
+  "nav": {
+    "home": "Inicio",
+    "train": "Entrena",
+    "tribe": "Tribu",
+    "map": "Mapa",
+    "you": "Tú",
+    "shop": "Tienda",
+    "events": "Eventos",
+    "today": "Hoy",
+    "schedule": "Agenda",
+    "members": "Miembros",
+    "clients": "Clientes",
+    "inbox": "Bandeja",
+    "more": "Más",
+    "dashboard": "Panel",
+    "calendar": "Calendario",
+    "payments": "Pagos",
+    "reports": "Informes",
+    "floor": "Piso",
+    "signOut": "Cerrar sesión",
+    "switchRole": "Cambiar identidad"
+  },
+  "auth": {
+    "kicker": "Iniciar sesión",
+    "title": "Conéctate.",
+    "titleEm": "Sube de nivel.",
+    "sub": "Elige una identidad — cada rol abre una superficie distinta con su propio alcance por fila.",
+    "identities": "Identidades de demo",
+    "rbacNote": "RBAC elige la superficie · RLS limita cada lista a lo que esta identidad puede ver.",
+    "consumer": "App de consumo · reserva, entrena, compra, gana XP",
+    "coach": "Operador · solo tu lista y tus clases",
+    "host": "Operador · miembros e ingresos de un piso",
+    "admin": "Operador · todos los pisos, facturación, analítica"
+  },
+  "common": {
+    "loading": "Cargando",
+    "retry": "Reintentar",
+    "empty": "Aún no hay nada aquí",
+    "error": "Algo falló",
+    "errorSub": "No pudimos conectar. Inténtalo de nuevo.",
+    "skipToContent": "Saltar al contenido",
+    "live": "En vivo",
+    "book": "Reservar",
+    "booked": "Reservado",
+    "join": "Unirse",
+    "rsvp": "Confirmar",
+    "going": "Voy",
+    "add": "Añadir",
+    "checkout": "Pagar",
+    "locked": "Bloqueado",
+    "save": "Guardar",
+    "demoData": "Datos de demo — API sin conexión"
+  },
+  "home": {
+    "title": "Inicio",
+    "todaySession": "Sesión de hoy",
+    "quests": "Misiones",
+    "feedTeaser": "De la manada",
+    "level": "Nivel",
+    "nextLevel": "al siguiente nivel",
+    "streak": "días seguidos",
+    "noQuests": "Sin misiones activas — genera una sesión para empezar."
+  },
+  "train": {
+    "title": "Entrena",
+    "library": "Biblioteca de ejercicios",
+    "generate": "Generar sesión",
+    "recovery": "Recuperación",
+    "prs": "Récords personales",
+    "noResult": "Ningún movimiento coincide con los filtros.",
+    "find": "Buscar pisos",
+    "startSession": "Empezar sesión"
+  },
+  "player": {
+    "title": "Sesión",
+    "logSet": "Registrar serie",
+    "rest": "Descanso",
+    "work": "Trabajo",
+    "finish": "Terminar",
+    "finished": "Sesión registrada",
+    "xpAwarded": "XP otorgado"
+  },
+  "tribe": {
+    "title": "Tribu",
+    "feed": "Muro",
+    "leaderboard": "Clasificación",
+    "classes": "Clases",
+    "noFeed": "Todo tranquilo — sé el primero en publicar."
+  },
+  "map": {
+    "title": "Mapa",
+    "discover": "Descubrir pisos",
+    "nearby": "Pisos cercanos",
+    "noFloors": "No hay pisos cerca."
+  },
+  "you": {
+    "title": "Tú",
+    "credential": "Credencial",
+    "prs": "Récords personales",
+    "recovery": "Recuperación",
+    "settings": "Ajustes",
+    "orders": "Pedidos",
+    "locale": "Idioma",
+    "units": "Unidades",
+    "currency": "Moneda",
+    "noOrders": "Aún no hay pedidos."
+  },
+  "shop": {
+    "title": "Tienda",
+    "collection": "Colección",
+    "gated": "Alcanza el nivel {level} para desbloquear",
+    "addToCart": "Añadir al carrito",
+    "cart": "Carrito",
+    "emptyCart": "Tu carrito está vacío.",
+    "total": "Total",
+    "size": "Talla"
+  },
+  "events": {
+    "title": "Eventos",
+    "raids": "Incursiones",
+    "noEvents": "No hay eventos cerca.",
+    "reward": "recompensa"
+  },
+  "ops": {
+    "scope": "Alcance",
+    "dashboard": "Panel",
+    "revenue": "Ingresos",
+    "floorLoad": "Carga del piso",
+    "activeMembers": "Miembros activos",
+    "newClass": "Añadir clase",
+    "members": "Miembros",
+    "clients": "Clientes",
+    "payments": "Pagos",
+    "retry": "Reintentar",
+    "failedRecovery": "Recuperar pago fallido",
+    "reports": "Informes",
+    "campaigns": "Campañas",
+    "send": "Enviar",
+    "noPayments": "No hay transacciones en el alcance.",
+    "noMembers": "No hay miembros en el alcance."
+  },
+  "marketing": {
+    "kicker": "Fitness de aventura gamificado · Sin gimnasio",
+    "heroTitle": "Entrena como una bestia.",
+    "heroTitleEm": "Muévete como manada.",
+    "heroLede": "La app que convierte cada entreno en una misión — programación real, un mundo vivo que explorar y una manada que aparece contigo.",
+    "startSafari": "Empieza tu safari",
+    "howItWorks": "Cómo funciona",
+    "pricing": "Precios",
+    "personas": "Personas",
+    "company": "Compañía",
+    "signIn": "Iniciar sesión",
+    "pricingTitle": "Planes",
+    "personasTitle": "Para cada explorador",
+    "accessibility": "Accesibilidad"
+  },
+  "a11y": {
+    "title": "Accesibilidad",
+    "kicker": "Compromiso",
+    "intro": "OX está hecho para que todos lo usen. Apuntamos a WCAG 2.2 AA y EN 301 549.",
+    "standards": "Estándares",
+    "features": "Lo que hacemos",
+    "contact": "Reportar una barrera"
+  }
+}

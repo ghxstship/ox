@@ -1,0 +1,24 @@
+{
+  "name": "@ox/api-client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed fetch client for the OX Platform API (openapi/ox-platform.yaml + 03-api.md). Bearer JWT, cursor pagination, single Error envelope.",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@ox/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.4"
+  }
+}

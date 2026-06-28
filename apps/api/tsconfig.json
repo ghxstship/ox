@@ -1,0 +1,41 @@
+{
+  "extends": "../../packages/config/tsconfig.node.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "outDir": "dist",
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "incremental": true,
+    "strictPropertyInitialization": false,
+    "noUncheckedIndexedAccess": false,
+    "types": ["node"],
+    "paths": {
+      "@ox/db": ["../../db/index.ts"],
+      "@ox/rbac": ["../../packages/rbac/src/index.ts"],
+      "@ox/types": ["../../packages/types/src/index.ts"],
+      "@ox/api-client": ["../../packages/api-client/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", ".turbo"],
+  "ts-node": {
+    "transpileOnly": true,
+    "preferTsExts": true,
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node"
+    }
+  }
+}

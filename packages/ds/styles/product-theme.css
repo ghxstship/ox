@@ -1,0 +1,157 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — product-theme.css   (v4 · SaaS product primitives)
+ * Atoms + molecules + data/feedback for the OX product platform.
+ * Reads ONLY the token layer (tokens/*.css incl. theming axes), so the
+ * theming control bar re-skins the whole product by flipping a root
+ * data-attribute. Organisms (app shell, views) live in platform.css.
+ *
+ * Naming: .oxp-* (product) to sit alongside .ox-* (brand/app).
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── ATOMS ─────────────────────────────────────────────────────────── */
+
+/* Button — ghost / soft / danger / icon · sm/lg. Square, mono caps. */
+.oxp-btn {
+  font-family: var(--ox-font-mono); font-weight: 600; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: var(--ox-case-button);
+  height: var(--ox-control-h); padding: 0 16px;
+  display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+  background: var(--ox-accent); color: var(--ox-salt);
+  border: 1px solid var(--ox-accent); border-radius: 0; cursor: pointer;
+  transition: background var(--ox-dur) var(--ox-ease), color var(--ox-dur) var(--ox-ease);
+}
+.oxp-btn:hover { background: var(--ox-accent-text); border-color: var(--ox-accent-text); }
+.oxp-btn--ghost { background: transparent; color: var(--ox-text); border-color: var(--ox-line); }
+.oxp-btn--ghost:hover { border-color: var(--ox-text); background: transparent; color: var(--ox-text); }
+.oxp-btn--soft { background: var(--ox-accent-weak); color: var(--ox-accent-text); border-color: transparent; }
+.oxp-btn--soft:hover { background: var(--ox-accent-weak); color: var(--ox-accent-text); }
+.oxp-btn--danger { background: var(--ox-danger); border-color: var(--ox-danger); color: #fff; }
+.oxp-btn--icon { width: var(--ox-control-h); padding: 0; }
+.oxp-btn--sm { height: 30px; font-size: 10px; padding: 0 11px; }
+.oxp-btn--lg { height: 52px; font-size: 12px; padding: 0 22px; }
+
+/* Badge — ok/warn/danger/info/neutral */
+.oxp-badge {
+  font-family: var(--ox-font-mono); font-weight: 700; font-size: 9px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 7px; border: 1px solid currentColor; display: inline-flex; align-items: center; gap: 5px;
+}
+.oxp-badge--ok      { color: var(--ox-ok); }
+.oxp-badge--warn    { color: var(--ox-warn); }
+.oxp-badge--danger  { color: var(--ox-danger); }
+.oxp-badge--info    { color: var(--ox-accent-text); }
+.oxp-badge--neutral { color: var(--ox-text-muted); }
+
+.oxp-dot { width: 7px; height: 7px; border-radius: var(--ox-radius-pill); display: inline-block; background: var(--ox-text-muted); }
+.oxp-dot--ok { background: var(--ox-ok); } .oxp-dot--warn { background: var(--ox-warn); } .oxp-dot--danger { background: var(--ox-danger); } .oxp-dot--live { background: var(--ox-accent); }
+
+.oxp-avatar { width: 28px; height: 28px; border-radius: var(--ox-radius-pill); background: var(--ox-accent); color: var(--ox-salt); display: inline-grid; place-items: center; font-family: var(--ox-font-serif); font-size: 13px; overflow: hidden; flex-shrink: 0; }
+.oxp-avatar--lg { width: 40px; height: 40px; font-size: 18px; }
+.oxp-avstack { display: inline-flex; } .oxp-avstack .oxp-avatar { margin-left: -8px; box-shadow: 0 0 0 2px var(--ox-bg); }
+.oxp-avstack .oxp-avatar:first-child { margin-left: 0; }
+
+.oxp-tag { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 6px; background: var(--ox-bg-raised); border: 1px solid var(--ox-line); color: var(--ox-text-muted); }
+.oxp-id  { font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--ox-text-muted); }
+.oxp-kbd { font-family: var(--ox-font-mono); font-size: 10px; padding: 2px 6px; border: 1px solid var(--ox-line); border-bottom-width: 2px; background: var(--ox-bg-raised); color: var(--ox-text); }
+.oxp-eyebrow { font-family: var(--ox-font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: var(--ox-case-eyebrow); color: var(--ox-accent-text); }
+
+/* ─── MOLECULES ─────────────────────────────────────────────────────── */
+.oxp-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.oxp-label { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: var(--ox-case-label); color: var(--ox-text); }
+.oxp-input, .oxp-textarea, .oxp-selectbox {
+  font-family: var(--ox-font-sans); font-size: 14px; color: var(--ox-text);
+  background: var(--ox-bg); border: 1px solid var(--ox-line); border-radius: 0;
+  height: var(--ox-control-h); padding: 0 12px; outline: none; width: 100%;
+  transition: border-color var(--ox-dur) var(--ox-ease);
+}
+.oxp-textarea { height: auto; padding: 10px 12px; min-height: 80px; resize: vertical; }
+.oxp-input:focus, .oxp-textarea:focus, .oxp-selectbox:focus { border-color: var(--ox-accent); }
+.oxp-field.is-error .oxp-input { border-color: var(--ox-danger); }
+.oxp-hint { font-family: var(--ox-font-sans); font-size: 11px; color: var(--ox-text-muted); }
+.oxp-hint.is-error { color: var(--ox-danger); }
+.oxp-inputgroup { display: flex; } .oxp-inputgroup .oxp-input { border-right: none; } .oxp-inputgroup .oxp-btn { height: var(--ox-control-h); }
+
+.oxp-check { display: inline-flex; align-items: center; gap: 8px; font-family: var(--ox-font-sans); font-size: 13px; color: var(--ox-text); cursor: pointer; }
+.oxp-check__box { width: 16px; height: 16px; border: 1px solid var(--ox-text); position: relative; flex-shrink: 0; }
+.oxp-check__box.is-on { background: var(--ox-accent); border-color: var(--ox-accent); }
+.oxp-check__box.is-on::after { content: "✓"; position: absolute; inset: 0; color: var(--ox-salt); font-size: 11px; display: grid; place-items: center; }
+.oxp-check__box.is-radio, .oxp-check__box.is-radio.is-on::after { border-radius: var(--ox-radius-pill); }
+
+.oxp-toggle { width: 40px; height: 22px; border: 1px solid var(--ox-text); background: var(--ox-bg); position: relative; cursor: pointer; }
+.oxp-toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: var(--ox-text); transition: transform var(--ox-dur) var(--ox-ease); }
+.oxp-toggle.is-on { background: var(--ox-accent); border-color: var(--ox-accent); }
+.oxp-toggle.is-on::after { transform: translateX(18px); background: var(--ox-salt); }
+
+.oxp-seg { display: inline-flex; border: 1px solid var(--ox-text); }
+.oxp-seg button { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; padding: 7px 13px; background: transparent; color: var(--ox-text); border: none; border-right: 1px solid var(--ox-text); cursor: pointer; }
+.oxp-seg button:last-child { border-right: none; }
+.oxp-seg button.is-active { background: var(--ox-accent); color: var(--ox-salt); }
+
+.oxp-tabs { display: flex; border-bottom: 1px solid var(--ox-line); gap: 0; }
+.oxp-tabs a { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ox-text-muted); text-decoration: none; padding: 11px 16px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.oxp-tabs a.is-active { color: var(--ox-text); border-bottom-color: var(--ox-accent); }
+
+.oxp-crumbs { display: flex; gap: 8px; align-items: center; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-text-muted); }
+.oxp-crumbs .sep { opacity: 0.5; }
+.oxp-crumbs a { color: var(--ox-text-muted); text-decoration: none; }
+.oxp-crumbs [aria-current] { color: var(--ox-text); }
+
+.oxp-menu { border: 1px solid var(--ox-line); background: var(--ox-bg); box-shadow: var(--ox-elev-overlay); min-width: 180px; }
+.oxp-menu a { display: flex; justify-content: space-between; gap: 16px; padding: 9px 14px; font-family: var(--ox-font-sans); font-size: 13px; color: var(--ox-text); text-decoration: none; border-bottom: 1px solid var(--ox-rule-soft); }
+.oxp-menu a:last-child { border-bottom: none; } .oxp-menu a:hover { background: var(--ox-bg-raised); }
+
+.oxp-slider { height: 4px; background: var(--ox-bg-raised); position: relative; border: 1px solid var(--ox-line); }
+.oxp-slider__fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ox-accent); }
+.oxp-slider__knob { position: absolute; top: 50%; width: 14px; height: 14px; background: var(--ox-text); transform: translate(-50%, -50%); }
+
+/* ─── DATA & FEEDBACK ───────────────────────────────────────────────── */
+.oxp-stat { display: grid; gap: 4px; }
+.oxp-stat__n { font-family: var(--ox-font-serif); font-size: 40px; line-height: 0.95; color: var(--ox-text); }
+.oxp-stat__l { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ox-text-muted); }
+.oxp-stat__d { font-family: var(--ox-font-mono); font-size: 10px; color: var(--ox-accent-text); }
+
+.oxp-progress { height: 4px; background: var(--ox-bg-raised); position: relative; }
+.oxp-progress__fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ox-accent); }
+
+.oxp-steps { display: flex; gap: 0; }
+.oxp-steps__s { flex: 1; display: flex; flex-direction: column; gap: 6px; padding-right: 12px; }
+.oxp-steps__n { font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ox-text-muted); }
+.oxp-steps__bar { height: 2px; background: var(--ox-line); }
+.oxp-steps__s.is-done .oxp-steps__bar, .oxp-steps__s.is-now .oxp-steps__bar { background: var(--ox-accent); }
+.oxp-steps__s.is-now .oxp-steps__n { color: var(--ox-accent-text); }
+
+.oxp-banner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid; font-family: var(--ox-font-sans); font-size: 13px; }
+.oxp-banner--info { border-color: var(--ox-accent); background: var(--ox-accent-weak); color: var(--ox-text); }
+.oxp-banner--ok { border-color: var(--ox-ok); color: var(--ox-text); }
+.oxp-banner--warn { border-color: var(--ox-warn); color: var(--ox-text); }
+.oxp-banner--danger { border-color: var(--ox-danger); color: var(--ox-text); }
+
+.oxp-toast { display: inline-flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--ox-ink); color: var(--ox-paper); font-family: var(--ox-font-sans); font-size: 13px; box-shadow: var(--ox-elev-overlay); }
+.oxp-tooltip { display: inline-block; padding: 5px 9px; background: var(--ox-ink); color: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.06em; }
+
+.oxp-empty { text-align: center; padding: 48px 24px; border: 1px dashed var(--ox-line); }
+.oxp-empty__t { font-family: var(--ox-font-serif); font-size: 24px; color: var(--ox-text); margin-bottom: 6px; }
+.oxp-empty__d { font-family: var(--ox-font-sans); font-size: 13px; color: var(--ox-text-muted); }
+
+.oxp-skel { background: linear-gradient(90deg, var(--ox-bg-raised) 25%, var(--ox-line) 50%, var(--ox-bg-raised) 75%); background-size: 200% 100%; animation: oxp-shimmer 1.4s linear infinite; height: 12px; }
+@keyframes oxp-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .oxp-skel { animation: none; } }
+.oxp-spinner { width: 18px; height: 18px; border: 2px solid var(--ox-line); border-top-color: var(--ox-accent); border-radius: 50%; animation: oxp-spin 0.7s linear infinite; }
+@keyframes oxp-spin { to { transform: rotate(360deg); } }
+
+/* ─── FIELD-TYPE LIBRARY (shared tint system for record fields) ─────── */
+.oxp-ft { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.08em; display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border: 1px solid var(--ox-line); }
+.oxp-ft--status { color: var(--ox-accent-text); border-color: var(--ox-accent); background: var(--ox-accent-weak); }
+.oxp-ft--person { color: var(--ox-text); }
+.oxp-ft--date   { color: var(--ox-text-muted); }
+.oxp-ft--ai     { color: var(--ox-accent-text); border-style: dashed; }
+.oxp-ft--number { color: var(--ox-text); font-weight: 700; }
+
+:root {
+  /* functional status colors — derived, kept distinct from the brand accent.
+     These are UI semantics (not brand accents); muted to stay on-brand. */
+  --ox-ok:     #3E7D5A;
+  --ox-warn:   #B5882E;
+  --ox-danger: #A33B2A;
+  --ox-danger-strong: #A33B2A;
+}

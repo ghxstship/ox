@@ -1,0 +1,37 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Layout · Cover, Feature grid, CTA band" subtitle="Page section system — cover, 3-up feature grid, Ink CTA band" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  :root { --ox-margin: 34px; }
+  .wrap { display: grid; }
+  .ox-cover { padding: 30px 34px !important; }
+  .ox-cover__title { font-size: 56px !important; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXCover, OXFeatureGrid, OXCTABand, OXButton } = window.OXDesignSystem_7d2a2e;
+  const meta = (t) => ({fontFamily:"var(--ox-font-mono)",fontSize:10,letterSpacing:"0.16em",textTransform:"uppercase",color:"var(--ox-oxide)"});
+  ReactDOM.createRoot(document.getElementById("root")).render(
+    <>
+      <OXCover kicker="Compass bearings" title={<>Four <em>pillars.</em></>} />
+      <OXFeatureGrid>
+        <div><div style={meta()}>— Music</div><p className="ox-body" style={{marginTop:8}}>Communal. The room is the audience.</p></div>
+        <div><div style={meta()}>— Fitness</div><p className="ox-body" style={{marginTop:8}}>Embodied. Outcomes, not aesthetics.</p></div>
+        <div><div style={meta()}>— Adventure</div><p className="ox-body" style={{marginTop:8}}>Kinetic. We sail under our own flag.</p></div>
+      </OXFeatureGrid>
+      <OXCTABand title={<>Beyond the <em>scene.</em></>} action={<OXButton variant="oxide" arrow>Request an invite</OXButton>} />
+    </>
+  );
+</script>
+</body>
+</html>

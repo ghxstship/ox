@@ -1,0 +1,92 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — components-xr.css
+ * Horizon 3 · the AR/spatial layer. See-through overlays, sparse copper
+ * on a clear world (one-accent rule), square HUD brackets. Tokens only.
+ * The `specs` profile targets Snap SPECS AR glasses (Snap OS).
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── XR frame (HUD) ── */
+.ox-xr { position: relative; background: #060605; color: var(--ox-paper); overflow: hidden; min-height: 320px; display: flex; flex-direction: column; }
+.ox-xr.is-seethrough { background: radial-gradient(120% 90% at 50% 30%, #14130f 0%, #060605 78%); }
+.ox-xr__hud { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-salt); z-index: 4; }
+.ox-xr__dev { display: inline-flex; align-items: center; gap: 7px; }
+.ox-xr__rec { width: 7px; height: 7px; border-radius: 999px; background: var(--ox-oxide); }
+.ox-xr__fov { color: var(--ox-stone); }
+.ox-xr__bracket { position: absolute; width: 18px; height: 18px; border: 1.5px solid rgba(193,93,42,0.7); z-index: 4; }
+.ox-xr__bracket--tl { top: 38px; left: 12px; border-right: 0; border-bottom: 0; }
+.ox-xr__bracket--tr { top: 38px; right: 12px; border-left: 0; border-bottom: 0; }
+.ox-xr__bracket--bl { bottom: 36px; left: 12px; border-right: 0; border-top: 0; }
+.ox-xr__bracket--br { bottom: 36px; right: 12px; border-left: 0; border-top: 0; }
+.ox-xr__eye { position: absolute; top: 38px; left: 50%; transform: translateX(-50%); font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-oxide); border: 1px solid var(--ox-oxide); padding: 4px 9px; z-index: 4; white-space: nowrap; }
+.ox-xr__scene { position: relative; flex: 1; display: flex; }
+.ox-xr__foot { padding: 11px 14px; text-align: center; font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ox-salt); border-top: 1px solid rgba(255,255,255,0.1); z-index: 4; }
+
+/* ── AR capture ── */
+.ox-arc2 { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 18px; min-height: 280px; }
+.ox-arc2__world { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 30px 30px; mask-image: linear-gradient(180deg, transparent 30%, #000 100%); -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
+.ox-arc2__target { position: relative; width: 132px; height: 132px; display: grid; place-items: center; }
+.ox-arc2__glyph { font-family: var(--ox-font-serif); font-size: 60px; color: var(--ox-salt); transition: color .3s ease; }
+.ox-arc2__target.is-locked .ox-arc2__glyph { color: var(--ox-oxide); }
+.ox-arc2__ring { position: absolute; inset: 18px; border: 1px solid rgba(255,255,255,0.25); border-radius: 999px; }
+.ox-arc2__target.is-locked .ox-arc2__ring { border-color: var(--ox-oxide); animation: ox-arc-pulse 1.2s ease-out infinite; }
+@keyframes ox-arc-pulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.35); opacity: 0; } }
+.ox-arc2__retic { position: absolute; inset: 0; }
+.ox-arc2__retic i { position: absolute; width: 14px; height: 14px; border: 1.5px solid var(--ox-oxide); }
+.ox-arc2__retic i:nth-child(1) { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.ox-arc2__retic i:nth-child(2) { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.ox-arc2__retic i:nth-child(3) { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.ox-arc2__retic i:nth-child(4) { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+.ox-arc2__target:not(.is-locked) .ox-arc2__retic { animation: ox-arc-seek 1.1s ease-in-out infinite; }
+@keyframes ox-arc-seek { 0%,100% { transform: scale(1.12); opacity: 0.6; } 50% { transform: scale(1); opacity: 1; } }
+.ox-arc2__tag { text-align: center; }
+.ox-arc2__name { display: block; font-family: var(--ox-font-serif); font-size: 22px; }
+.ox-arc2__meta { font-family: var(--ox-font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ox-salt); }
+.ox-arc2__row { display: flex; gap: 10px; }
+.ox-arc2__btn { padding: 11px 18px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.ox-arc2__btn--primary { background: var(--ox-oxide); border-color: var(--ox-oxide); color: var(--ox-ink); }
+.ox-arc2__btn--primary:disabled { background: transparent; border-color: rgba(255,255,255,0.2); color: var(--ox-stone); cursor: default; }
+.ox-arc2__btn--primary:not(:disabled):hover { background: var(--ox-paper); }
+
+/* ── AR form overlay ── */
+.ox-form2 { position: relative; flex: 1; display: grid; grid-template-columns: 1fr 128px; gap: 8px; padding: 12px; min-height: 280px; }
+.ox-form2__view { position: relative; border: 1px solid rgba(255,255,255,0.12); }
+.ox-form2__skel { width: 100%; height: 100%; }
+.ox-form2__barpath { stroke: rgba(193,93,42,0.5); stroke-width: 1; stroke-dasharray: 3 3; }
+.ox-form2__bones { stroke: var(--ox-salt); stroke-width: 2.4; stroke-linecap: round; fill: none; }
+.ox-form2__joint { fill: var(--ox-paper); }
+.ox-form2__bar { fill: var(--ox-oxide); }
+.ox-form2__cue { position: absolute; right: 8px; font-family: var(--ox-font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.04em; padding: 4px 8px; background: rgba(6,6,5,0.7); }
+.ox-form2__cue.is-ok { color: var(--ox-salt); border-left: 2px solid var(--ox-salt); }
+.ox-form2__cue.is-flag { color: var(--ox-oxide); border-left: 2px solid var(--ox-oxide); }
+.ox-form2__hud { display: flex; flex-direction: column; gap: 10px; padding: 6px; }
+.ox-form2__rep { font-family: var(--ox-font-mono); }
+.ox-form2__rep b { font-family: var(--ox-font-serif); font-size: 34px; color: var(--ox-oxide); }
+.ox-form2__rep span { font-size: 11px; color: var(--ox-salt); margin-left: 6px; }
+.ox-form2__stat { font-family: var(--ox-font-mono); font-size: 11px; color: var(--ox-salt); display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
+.ox-form2__stat b { color: var(--ox-paper); }
+.ox-form2__exit { margin-top: auto; padding: 9px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 10px; text-transform: uppercase; cursor: pointer; }
+.ox-form2__exit:hover { border-color: var(--ox-oxide); color: var(--ox-oxide); }
+
+/* ── Spatial raid ── */
+.ox-spr { position: relative; flex: 1; min-height: 300px; overflow: hidden; transition: box-shadow .25s ease; }
+.ox-spr.is-hit { box-shadow: inset 0 0 0 2px var(--ox-oxide); }
+.ox-spr__floor { position: absolute; left: 0; right: 0; bottom: 0; height: 55%; }
+.ox-spr__floor span { position: absolute; left: 50%; bottom: 0; width: 200%; height: 1px; background: rgba(193,93,42,0.18); transform-origin: bottom center; }
+.ox-spr__floor span:nth-child(1) { transform: translateX(-50%) perspective(200px) rotateX(72deg) translateY(-12px); }
+.ox-spr__floor span:nth-child(2) { transform: translateX(-50%) perspective(200px) rotateX(72deg) translateY(-30px); opacity: 0.7; }
+.ox-spr__floor span:nth-child(3) { transform: translateX(-50%) perspective(200px) rotateX(72deg) translateY(-52px); opacity: 0.5; }
+.ox-spr__floor span:nth-child(4) { transform: translateX(-50%) perspective(200px) rotateX(72deg) translateY(-78px); opacity: 0.3; }
+.ox-spr__track { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); text-align: center; font-family: var(--ox-font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-oxide); z-index: 3; }
+.ox-spr__track b { color: var(--ox-paper); }
+.ox-spr__track i { display: block; font-style: normal; font-family: var(--ox-font-serif); font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--ox-paper); margin-top: 3px; }
+.ox-spr__stage { position: absolute; inset: 0; }
+.ox-spr__av { position: absolute; width: 38px; height: 38px; display: grid; place-items: center; background: var(--ox-stone); color: var(--ox-ink); font-family: var(--ox-font-mono); font-weight: 700; font-size: 14px; border: 1px solid rgba(255,255,255,0.2); transition: box-shadow .2s ease; }
+.ox-spr__av.is-me { background: var(--ox-oxide); }
+.ox-spr.is-hit .ox-spr__av { box-shadow: 0 0 0 2px var(--ox-oxide); }
+.ox-spr__drop { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); font-family: var(--ox-font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ox-oxide); z-index: 3; }
+.ox-spr__leave { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); padding: 8px 14px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: var(--ox-paper); font-family: var(--ox-font-mono); font-size: 10px; text-transform: uppercase; cursor: pointer; z-index: 3; }
+.ox-spr__leave:hover { border-color: var(--ox-oxide); color: var(--ox-oxide); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ox-arc2__target.is-locked .ox-arc2__ring, .ox-arc2__target:not(.is-locked) .ox-arc2__retic { animation: none; }
+}

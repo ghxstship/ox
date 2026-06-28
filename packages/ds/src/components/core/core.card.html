@@ -1,0 +1,52 @@
+<!-- @dsCard group="Components" viewport="700x230" name="Core · Buttons, Chips, Tabs" subtitle="Actions, status chips, segmented switcher, filter tabs" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--ox-paper); }
+  .wrap { padding: 26px 30px; display: grid; gap: 20px; }
+  .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+<script src="../../_ds_bundle.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+  const { OXButton, OXChip, OXSegmented, OXTabs } = window.OXDesignSystem_7d2a2e;
+  function Demo() {
+    const [seg, setSeg] = React.useState("mus");
+    return (
+      <>
+        <div className="row">
+          <OXButton variant="primary" arrow>Request invite</OXButton>
+          <OXButton variant="oxide">Mint</OXButton>
+          <OXButton>Details</OXButton>
+          <OXButton variant="ghost" size="sm">Skip</OXButton>
+        </div>
+        <div className="row">
+          <OXChip variant="oxide-line" live>Live now</OXChip>
+          <OXChip variant="solid">Founder</OXChip>
+          <OXChip variant="oxide">Sold out</OXChip>
+          <OXChip>Music</OXChip>
+          <OXChip variant="ghost">Waitlist</OXChip>
+        </div>
+        <div className="row">
+          <OXSegmented
+            value={seg}
+            onChange={setSeg}
+            options={[{value:"mus",label:"Music"},{value:"fit",label:"Fitness"},{value:"adv",label:"Adventure"}]}
+          />
+        </div>
+        <OXTabs items={[{label:"All",active:true},{label:"Events"},{label:"Feed"},{label:"Wallet"}]} />
+      </>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

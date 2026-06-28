@@ -1,0 +1,78 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * OX — tokens/spacing.css
+ * 8u base scale, the rule/border system, and the radius + shadow
+ * policy (both effectively zero — OX is a flat, square, ruled system).
+ * ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Spacing (8u base) ─────────────────────────────────────────── */
+  --ox-space-xs:   8px;
+  --ox-space-sm:   16px;
+  --ox-space-md:   24px;
+  --ox-space-base: 32px;
+  --ox-space-lg:   48px;
+  --ox-space-xl:   64px;
+  --ox-space-2xl:  96px;
+  --ox-space-3xl:  140px;
+
+  /* ─── Borders / rules ───────────────────────────────────────────── */
+  --ox-border:        1px solid var(--ox-rule);     /* default hairline */
+  --ox-border-ink:    1px solid var(--ox-ink);      /* structural */
+  --ox-border-strong: 3px solid var(--ox-ink);      /* document masthead rule */
+  --ox-border-accent: 1px solid var(--ox-oxide);    /* stamp / accent edge */
+
+  /* ─── RADIUS POLICY ─────────────────────────────────────────────────
+     OX is a square system. Radius is 0 everywhere EXCEPT two reserved
+     exceptions:
+       --ox-radius-pill  → status dots, avatars, the live indicator
+       --ox-radius-card  → the credit-card credential corner only (2.5mm)
+     Any other rounded corner is a prohibition violation. */
+  --ox-radius:       0;
+  --ox-radius-pill:  999px;   /* avatars, dots ONLY */
+  --ox-radius-card:  10px;    /* physical/NFT credential corner ONLY */
+
+  /* ─── SHADOW POLICY ─────────────────────────────────────────────────
+     No shadows on components. Depth comes from rules and ground shifts,
+     never from blur. ONE exception: --ox-stage-shadow, used solely to
+     stage physical mockups (tickets, badges, cards) in the guide. Never
+     inside a real component. */
+  --ox-shadow: none;
+  --ox-stage-shadow: 0 12px 28px rgba(11, 11, 10, 0.18);
+
+  /* ─── Layout ────────────────────────────────────────────────────── */
+  --ox-canvas:        1440px;  /* primary desktop design width */
+  --ox-margin:        96px;    /* outer page margin (desktop) */
+  --ox-gutter:        24px;    /* 12-col gutter */
+  --ox-app-width:     390px;   /* mobile design width (native) */
+  --ox-touch-min:     44px;    /* minimum hit target */
+
+  /* ─── Breakpoints ───────────────────────────────────────────────────
+     Min-width steps. OX ships three real layouts — native mobile (390),
+     the editorial/console mid, and the 1440 desktop canvas — so the
+     breakpoints are deliberately few. Use in @media (min-width: …). */
+  --ox-bp-sm:  480px;   /* @kind spacing */ /* large phone */
+  --ox-bp-md:  768px;   /* @kind spacing */ /* tablet — grid columns collapse below this */
+  --ox-bp-lg:  1024px;  /* @kind spacing */ /* small laptop — console shell sidebar appears */
+  --ox-bp-xl:  1440px;  /* @kind spacing */ /* desktop canvas */
+
+  /* ─── Z-index layers ────────────────────────────────────────────────
+     Named stacking order. Never hard-code a z-index — reach for a step. */
+  --ox-z-base:      0;    /* @kind other */
+  --ox-z-raised:    10;   /* @kind other */ /* sticky table heads, raised cards */
+  --ox-z-sticky:    20;   /* @kind other */ /* sticky site/app headers */
+  --ox-z-dropdown:  30;   /* @kind other */ /* menus, popovers, tooltips */
+  --ox-z-scrim:     40;   /* @kind other */ /* the dimming overlay */
+  --ox-z-modal:     50;   /* @kind other */ /* dialogs, sheets, command palette */
+  --ox-z-toast:     60;   /* @kind other */ /* toasts — above everything */
+
+  /* ─── Aspect ratios ─────────────────────────────────────────────────
+     The sanctioned crops (see Art Direction). No vignette ratios. */
+  --ox-ratio-square:    1 / 1;   /* @kind other */
+  --ox-ratio-portrait:  4 / 5;   /* @kind other */ /* editorial portrait / journal media */
+  --ox-ratio-photo:     3 / 2;   /* @kind other */ /* documentary still */
+  --ox-ratio-wide:      16 / 9;  /* @kind other */ /* full-bleed / slide */
+  --ox-ratio-credential: 1.586 / 1;  /* @kind other */ /* ISO 7810 ID-1 — the member card */
+}
+
+/* Square everything by default — catch radius violations in review. */
+.ox-flat { border-radius: var(--ox-radius); box-shadow: var(--ox-shadow); }
