@@ -1,18 +1,23 @@
 // /me — the authenticated member. All reads run through RLS scope (self-only).
 import { Controller, Get, NotFoundException } from "@nestjs/common";
-import { prisma } from "@ox/db";
-import { Capability, CurrentSession } from "../common/decorators";
-import { ScopeRunner } from "../common/scope.runner";
+import { Capability, CurrentSession, CurrentToken } from "../common/decorators";
 import type { Session } from "../common/session";
+import { SupaService } from "../common/supa.service";
 
 @Controller("me")
 export class MeController {
-  constructor(private readonly scope: ScopeRunner) {}
+  constructor(private readonly supa: SupaService) {}
 
   @Get()
   @Capability("self.view")
-  async me(@CurrentSession() session: Session) {
-    const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  async me(@CurrentSession() session: Session, @CurrentToken() token?: string) {
+    const { data: user, error } = await this.supa
+      .forUser(token)
+      .from("User")
+      .select("*")
+      .eq("id", session.userId)
+      .maybeSingle();
+    if (error) throw new NotFoundException({ code: "not_found", message: error.message });
     if (!user) throw new NotFoundException({ code: "not_found", message: "No member." });
     return {
       id: user.id,
@@ -28,8 +33,13 @@ export class MeController {
 
   @Get("progress")
   @Capability("self.view")
-  async progress(@CurrentSession() session: Session) {
-    const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  async progress(@CurrentSession() session: Session, @CurrentToken() token?: string) {
+    const { data: user } = await this.supa
+      .forUser(token)
+      .from("User")
+      .select("level, xp")
+      .eq("id", session.userId)
+      .maybeSingle();
     const level = user?.level ?? 1;
     const xp = user?.xp ?? 0;
     const xpMax = level * 200;
@@ -46,34 +56,58 @@ export class MeController {
 
   @Get("recovery")
   @Capability("self.view")
-  recovery(@CurrentSession() session: Session) {
-    return this.scope.run(session, (tx) => tx.recovery.findMany({ where: { userId: session.userId } }));
+  async recovery(@CurrentSession() session: Session, @CurrentToken() token?: string) {
+    const { data, error } = await this.supa
+      .forUser(token)
+      .from("Recovery")
+      .select("*")
+      .eq("userId", session.userId);
+    if (error) throw new NotFoundException({ code: "not_found", message: error.message });
+    return data;
   }
 
   @Get("prs")
   @Capability("self.view")
-  prs(@CurrentSession() session: Session) {
-    return this.scope.run(session, (tx) =>
-      tx.pR.findMany({ where: { userId: session.userId }, orderBy: { at: "desc" } }),
-    );
+  async prs(@CurrentSession() session: Session, @CurrentToken() token?: string) {
+    const { data, error } = await this.supa
+      .forUser(token)
+      .from("PR")
+      .select("*")
+      .eq("userId", session.userId)
+      .order("at", { ascending: false });
+    if (error) throw new NotFoundException({ code: "not_found", message: error.message });
+    return data;
   }
 
   @Get("orders")
   @Capability("self.view")
-  orders(@CurrentSession() session: Session) {
-    return this.scope.run(session, (tx) =>
-      tx.order.findMany({
-        where: { userId: session.userId },
-        include: { items: true },
-        orderBy: { createdAt: "desc" },
+  async orders(@CurrentSession() session: Session, @CurrentToken() token?: string) {
+    const sb = this.supa.forUser(token);
+    const { data: orders, error } = await sb
+      .from("Order")
+      .select("*")
+      .eq("userId", session.userId)
+      .order("createdAt", { ascending: false });
+    if (error) throw new NotFoundException({ code: "not_found", message: error.message });
+    const withItems = await Promise.all(
+      (orders ?? []).map(async (order) => {
+        const { data: items } = await sb.from("OrderItem").select("*").eq("orderId", order.id);
+        return { ...order, items: items ?? [] };
       }),
     );
+    return withItems;
   }
 
   @Get("credential")
   @Capability("self.view")
-  async credential(@CurrentSession() session: Session) {
-    const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  async credential(@CurrentSession() session: Session, @CurrentToken() token?: string) {
+    const { data: user, error } = await this.supa
+      .forUser(token)
+      .from("User")
+      .select("*")
+      .eq("id", session.userId)
+      .maybeSingle();
+    if (error) throw new NotFoundException({ code: "not_found", message: error.message });
     if (!user) throw new NotFoundException({ code: "not_found", message: "No member." });
     return {
       material: "digital",

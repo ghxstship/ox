@@ -1,5 +1,5 @@
 // Classes & booking. Class rows are RLS-scoped (member=all bookable, coach=own,
-// host=floor) — we never hand-filter; the policies do it inside ScopeRunner.
+// host=floor) — we never hand-filter; the policies do it via supa.forUser(token).
 //
 // Implements the Booking state machine from 05-state-machines:
 //   (none) --book[capacity]--> booked | waitlist
@@ -7,11 +7,11 @@
 //   booked --cancel[>cutoff]--> cancelled
 //   booked --cancel[<cutoff]--> late_cancel    (penalty fee Payment row)
 //   booked --checkin.scan--> attended          (+ roster/attendance realtime)
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Prisma } from "@ox/db";
+import type { Enums, TablesUpdate } from "@ox/supabase/types";
 import type { Session } from "@ox/rbac";
-import { ScopeRunner } from "../common/scope.runner";
+import { SupaService } from "../common/supa.service";
 import { AutomationsService } from "../parity/automations.service";
 import { RealtimeBus } from "../realtime/realtime.bus";
 import type { CheckinDto, CreateClassDto, UpdateClassDto } from "./classes.dto";
@@ -28,7 +28,7 @@ export class ClassesService {
   private readonly cutoffHours: number;
 
   constructor(
-    private readonly scope: ScopeRunner,
+    private readonly supa: SupaService,
     private readonly bus: RealtimeBus,
     private readonly automations: AutomationsService,
     config: ConfigService,
@@ -36,133 +36,153 @@ export class ClassesService {
     this.cutoffHours = Number(config.get<string>("OX_CANCEL_CUTOFF_HOURS") ?? DEFAULT_CUTOFF_HOURS);
   }
 
-  list(session: Session, range: { from?: string; to?: string }) {
-    const where: Prisma.ClassWhereInput = {};
-    if (range.from || range.to) {
-      where.startsAt = {};
-      if (range.from) (where.startsAt as Prisma.DateTimeFilter).gte = new Date(range.from);
-      if (range.to) (where.startsAt as Prisma.DateTimeFilter).lte = new Date(range.to);
-    }
-    return this.scope.run(session, (tx) =>
-      tx.class.findMany({ where, orderBy: { startsAt: "asc" }, include: { _count: { select: { bookings: true } } } }),
-    );
-  }
-
-  create(session: Session, dto: CreateClassDto) {
-    return this.scope.run(session, (tx) =>
-      tx.class.create({
-        data: {
-          title: dto.title,
-          floorId: dto.floorId,
-          coachId: dto.coachId ?? session.userId,
-          startsAt: new Date(dto.startsAt),
-          capacity: dto.capacity,
-          load: dto.load ?? "open",
-          recurRule: dto.recurRule ?? null,
-        },
+  async list(session: Session, token: string | undefined, range: { from?: string; to?: string }) {
+    const sb = this.supa.forUser(token);
+    let q = sb.from("Class").select("*").order("startsAt", { ascending: true });
+    if (range.from) q = q.gte("startsAt", new Date(range.from).toISOString());
+    if (range.to) q = q.lte("startsAt", new Date(range.to).toISOString());
+    const { data: classes, error } = await q;
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return Promise.all(
+      (classes ?? []).map(async (klass) => {
+        const { count } = await sb
+          .from("Booking")
+          .select("*", { count: "exact", head: true })
+          .eq("classId", klass.id);
+        return { ...klass, _count: { bookings: count ?? 0 } };
       }),
     );
   }
 
-  update(session: Session, id: string, dto: UpdateClassDto) {
-    return this.scope.run(session, async (tx) => {
-      const found = await tx.class.findUnique({ where: { id } });
-      if (!found) throw new NotFoundException({ code: "not_found", message: "No class." });
-      return tx.class.update({
-        where: { id },
-        data: {
-          title: dto.title,
-          startsAt: dto.startsAt ? new Date(dto.startsAt) : undefined,
-          capacity: dto.capacity,
-          load: dto.load,
-          recurRule: dto.recurRule,
-        },
-      });
-    });
+  async create(session: Session, token: string | undefined, dto: CreateClassDto) {
+    const { data, error } = await this.supa
+      .forUser(token)
+      .from("Class")
+      .insert({
+        title: dto.title,
+        floorId: dto.floorId,
+        coachId: dto.coachId ?? session.userId,
+        startsAt: new Date(dto.startsAt).toISOString(),
+        capacity: dto.capacity,
+        load: (dto.load ?? "open") as Enums<"ClassLoad">,
+        recurRule: dto.recurRule ?? null,
+      })
+      .select()
+      .single();
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return data;
   }
 
-  remove(session: Session, id: string) {
-    return this.scope.run(session, async (tx) => {
-      const found = await tx.class.findUnique({ where: { id } });
-      if (!found) throw new NotFoundException({ code: "not_found", message: "No class." });
-      await tx.class.delete({ where: { id } });
-      return { ok: true };
-    });
+  async update(session: Session, token: string | undefined, id: string, dto: UpdateClassDto) {
+    const sb = this.supa.forUser(token);
+    const { data: found } = await sb.from("Class").select("id").eq("id", id).maybeSingle();
+    if (!found) throw new NotFoundException({ code: "not_found", message: "No class." });
+    const patch: TablesUpdate<"Class"> = {};
+    if (dto.title !== undefined) patch.title = dto.title;
+    if (dto.startsAt !== undefined) patch.startsAt = new Date(dto.startsAt).toISOString();
+    if (dto.capacity !== undefined) patch.capacity = dto.capacity;
+    if (dto.load !== undefined) patch.load = dto.load as Enums<"ClassLoad">;
+    if (dto.recurRule !== undefined) patch.recurRule = dto.recurRule;
+    const { data, error } = await sb.from("Class").update(patch).eq("id", id).select().single();
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return data;
+  }
+
+  async remove(session: Session, token: string | undefined, id: string) {
+    const sb = this.supa.forUser(token);
+    const { data: found } = await sb.from("Class").select("id").eq("id", id).maybeSingle();
+    if (!found) throw new NotFoundException({ code: "not_found", message: "No class." });
+    const { error } = await sb.from("Class").delete().eq("id", id);
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return { ok: true };
   }
 
   /**
    * Generate the next occurrences of a recurring class from its recurRule.
    * Supports a minimal subset of RRULE (FREQ=DAILY|WEEKLY;INTERVAL=n;COUNT=n)
    * which covers the recurring-class-builder parity surface (11 §B #30). Returns
-   * computed occurrence timestamps; persistence of materialized rows is the
-   * caller's choice (we expose `persist` to write them as real Class rows).
+   * computed occurrence timestamps; `persist` writes them as real Class rows.
    */
-  occurrences(session: Session, classId: string, opts: { count?: number; persist?: boolean }) {
-    return this.scope.run(session, async (tx) => {
-      const base = await tx.class.findUnique({ where: { id: classId } });
-      if (!base) throw new NotFoundException({ code: "not_found", message: "No class." });
-      if (!base.recurRule) return { seriesId: classId, occurrences: [base.startsAt] };
+  async occurrences(session: Session, token: string | undefined, classId: string, opts: { count?: number; persist?: boolean }) {
+    const sb = this.supa.forUser(token);
+    const { data: base } = await sb.from("Class").select("*").eq("id", classId).maybeSingle();
+    if (!base) throw new NotFoundException({ code: "not_found", message: "No class." });
+    if (!base.recurRule) return { seriesId: classId, occurrences: [base.startsAt] };
 
-      const dates = expandRule(base.recurRule, base.startsAt, opts.count ?? 8);
-      if (!opts.persist) return { seriesId: classId, occurrences: dates };
+    const dates = expandRule(base.recurRule, new Date(base.startsAt), opts.count ?? 8);
+    if (!opts.persist) return { seriesId: classId, occurrences: dates };
 
-      // Materialize each occurrence as its own Class row (single-occurrence edits
-      // then diverge from the series). The first date is the base row itself.
-      const created = [];
-      for (const at of dates.slice(1)) {
-        created.push(
-          await tx.class.create({
-            data: {
-              title: base.title,
-              floorId: base.floorId,
-              coachId: base.coachId,
-              startsAt: at,
-              capacity: base.capacity,
-              load: base.load,
-              recurRule: null, // occurrences are concrete, not recurring
-            },
-          }),
-        );
-      }
-      return { seriesId: classId, occurrences: dates, created };
-    });
+    // Materialize each occurrence as its own Class row (single-occurrence edits
+    // then diverge from the series). The first date is the base row itself.
+    const created = [];
+    for (const at of dates.slice(1)) {
+      const { data: row, error } = await sb
+        .from("Class")
+        .insert({
+          title: base.title,
+          floorId: base.floorId,
+          coachId: base.coachId,
+          startsAt: at.toISOString(),
+          capacity: base.capacity,
+          load: base.load,
+          recurRule: null, // occurrences are concrete, not recurring
+        })
+        .select()
+        .single();
+      if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+      created.push(row);
+    }
+    return { seriesId: classId, occurrences: dates, created };
   }
 
   /** Book a class; overflow goes to the waitlist. */
-  book(session: Session, classId: string) {
-    return this.scope.run(session, async (tx) => {
-      const klass = await tx.class.findUnique({ where: { id: classId } });
-      if (!klass) throw new NotFoundException({ code: "not_found", message: "No class." });
+  async book(session: Session, token: string | undefined, classId: string) {
+    const sb = this.supa.forUser(token);
+    const { data: klass } = await sb.from("Class").select("*").eq("id", classId).maybeSingle();
+    if (!klass) throw new NotFoundException({ code: "not_found", message: "No class." });
 
-      const existing = await tx.booking.findUnique({ where: { classId_userId: { classId, userId: session.userId } } });
-      if (existing && existing.state !== "cancelled" && existing.state !== "late_cancel") {
-        throw new ConflictException({ code: "conflict", message: "Already booked." });
-      }
+    const { data: existing } = await sb
+      .from("Booking")
+      .select("*")
+      .eq("classId", classId)
+      .eq("userId", session.userId)
+      .maybeSingle();
+    if (existing && existing.state !== "cancelled" && existing.state !== "late_cancel") {
+      throw new ConflictException({ code: "conflict", message: "Already booked." });
+    }
 
-      const booked = await tx.booking.count({ where: { classId, state: "booked" } });
-      const full = booked >= klass.capacity;
-      const data = {
-        state: (full ? "waitlist" : "booked") as Prisma.BookingCreateInput["state"],
-        waitlistPos: full ? booked - klass.capacity + 1 : null,
-      };
-      const booking = await tx.booking.upsert({
-        where: { classId_userId: { classId, userId: session.userId } },
-        update: data,
-        create: { classId, userId: session.userId, ...data },
-      });
-      this.bus.publish(RealtimeBus.classRoster(classId), "booking.created", {
-        bookingId: booking.id,
-        userId: session.userId,
-        state: booking.state,
-      });
-      // Fire any floor automations keyed on `booking` (11 §B #26 trigger runner).
-      await this.automations.fire(klass.floorId, "booking", {
-        bookingId: booking.id,
-        classId,
-        userId: session.userId,
-      });
-      return booking;
+    const { count: booked } = await sb
+      .from("Booking")
+      .select("*", { count: "exact", head: true })
+      .eq("classId", classId)
+      .eq("state", "booked");
+    const bookedCount = booked ?? 0;
+    const full = bookedCount >= klass.capacity;
+    const row = {
+      classId,
+      userId: session.userId,
+      state: (full ? "waitlist" : "booked") as Enums<"BookingState">,
+      waitlistPos: full ? bookedCount - klass.capacity + 1 : null,
+    };
+    const { data: booking, error } = await sb
+      .from("Booking")
+      .upsert(row, { onConflict: "classId,userId" })
+      .select()
+      .single();
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+
+    this.bus.publish(RealtimeBus.classRoster(classId), "booking.created", {
+      bookingId: booking.id,
+      userId: session.userId,
+      state: booking.state,
     });
+    // Fire any floor automations keyed on `booking` (11 §B #26 trigger runner).
+    await this.automations.fire(klass.floorId, "booking", {
+      bookingId: booking.id,
+      classId,
+      userId: session.userId,
+    });
+    return booking;
   }
 
   /**
@@ -170,100 +190,135 @@ export class ClassesService {
    * `late_cancel` plus a penalty-fee Payment row. Either way, a freed seat
    * promotes the first waitlisted booking to `booked`.
    */
-  cancel(session: Session, bookingId: string) {
-    return this.scope.run(session, async (tx) => {
-      const booking = await tx.booking.findUnique({ where: { id: bookingId }, include: { class: true } });
-      if (!booking) throw new NotFoundException({ code: "not_found", message: "No booking." });
-      if (booking.state === "cancelled" || booking.state === "late_cancel") {
-        return booking; // idempotent
+  async cancel(session: Session, token: string | undefined, bookingId: string) {
+    const sb = this.supa.forUser(token);
+    const { data: booking } = await sb.from("Booking").select("*").eq("id", bookingId).maybeSingle();
+    if (!booking) throw new NotFoundException({ code: "not_found", message: "No booking." });
+    if (booking.state === "cancelled" || booking.state === "late_cancel") {
+      return booking; // idempotent
+    }
+    const { data: klass } = await sb.from("Class").select("*").eq("id", booking.classId).maybeSingle();
+    if (!klass) throw new NotFoundException({ code: "not_found", message: "No class." });
+
+    const wasBooked = booking.state === "booked";
+    const hoursToStart = (new Date(klass.startsAt).getTime() - Date.now()) / 3_600_000;
+    const late = wasBooked && hoursToStart < this.cutoffHours;
+
+    const { data: updated, error: updErr } = await sb
+      .from("Booking")
+      .update({ state: late ? "late_cancel" : "cancelled" })
+      .eq("id", bookingId)
+      .select()
+      .single();
+    if (updErr) throw new InternalServerErrorException({ code: "internal", message: updErr.message });
+
+    let penalty: { id: string; amountCents: number } | null = null;
+    if (late) {
+      // Penalty fee — a real Payment row the operator's recovery queue can act on.
+      // Minting a Payment is privileged → service() client, scoped explicitly.
+      const { data: pay, error: payErr } = await this.supa
+        .service()
+        .from("Payment")
+        .insert({
+          userId: booking.userId,
+          floorId: klass.floorId,
+          kind: "Late cancel",
+          amountCents: PENALTY_FEE_CENTS,
+          state: "pending",
+        })
+        .select()
+        .single();
+      if (payErr) throw new InternalServerErrorException({ code: "internal", message: payErr.message });
+      penalty = { id: pay.id, amountCents: pay.amountCents };
+    }
+
+    // Waitlist promotion: free a seat only if the cancelled booking held one.
+    let promoted: { id: string; userId: string } | null = null;
+    if (wasBooked) {
+      const { data: next } = await sb
+        .from("Booking")
+        .select("*")
+        .eq("classId", booking.classId)
+        .eq("state", "waitlist")
+        .order("waitlistPos", { ascending: true })
+        .order("createdAt", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (next) {
+        const { data: p, error: pErr } = await sb
+          .from("Booking")
+          .update({ state: "booked", waitlistPos: null })
+          .eq("id", next.id)
+          .select()
+          .single();
+        if (pErr) throw new InternalServerErrorException({ code: "internal", message: pErr.message });
+        promoted = { id: p.id, userId: p.userId };
+        this.bus.publish(RealtimeBus.classRoster(booking.classId), "waitlist.promoted", promoted);
       }
+    }
 
-      const wasBooked = booking.state === "booked";
-      const hoursToStart = (booking.class.startsAt.getTime() - Date.now()) / 3_600_000;
-      const late = wasBooked && hoursToStart < this.cutoffHours;
-
-      const updated = await tx.booking.update({
-        where: { id: bookingId },
-        data: { state: late ? "late_cancel" : "cancelled" },
-      });
-
-      let penalty: { id: string; amountCents: number } | null = null;
-      if (late) {
-        // Penalty fee — a real Payment row the operator's recovery queue can act on.
-        const pay = await tx.payment.create({
-          data: {
-            userId: booking.userId,
-            floorId: booking.class.floorId,
-            kind: "Late cancel",
-            amountCents: PENALTY_FEE_CENTS,
-            state: "pending",
-          },
-        });
-        penalty = { id: pay.id, amountCents: pay.amountCents };
-      }
-
-      // Waitlist promotion: free a seat only if the cancelled booking held one.
-      let promoted: { id: string; userId: string } | null = null;
-      if (wasBooked) {
-        const next = await tx.booking.findFirst({
-          where: { classId: booking.classId, state: "waitlist" },
-          orderBy: [{ waitlistPos: "asc" }, { createdAt: "asc" }],
-        });
-        if (next) {
-          const p = await tx.booking.update({
-            where: { id: next.id },
-            data: { state: "booked", waitlistPos: null },
-          });
-          promoted = { id: p.id, userId: p.userId };
-          this.bus.publish(RealtimeBus.classRoster(booking.classId), "waitlist.promoted", promoted);
-        }
-      }
-
-      this.bus.publish(RealtimeBus.classRoster(booking.classId), "booking.cancelled", {
-        bookingId,
-        late,
-      });
-      return { booking: updated, penalty, promoted };
+    this.bus.publish(RealtimeBus.classRoster(booking.classId), "booking.cancelled", {
+      bookingId,
+      late,
     });
+    return { booking: updated, penalty, promoted };
   }
 
-  roster(session: Session, classId: string) {
-    return this.scope.run(session, async (tx) => {
-      const klass = await tx.class.findUnique({ where: { id: classId } });
-      if (!klass) throw new NotFoundException({ code: "not_found", message: "No class." });
-      return tx.booking.findMany({
-        where: { classId },
-        include: { user: { select: { id: true, name: true, initial: true } } },
-        orderBy: { createdAt: "asc" },
-      });
-    });
+  async roster(session: Session, token: string | undefined, classId: string) {
+    const sb = this.supa.forUser(token);
+    const { data: klass } = await sb.from("Class").select("id").eq("id", classId).maybeSingle();
+    if (!klass) throw new NotFoundException({ code: "not_found", message: "No class." });
+    const { data: bookings, error } = await sb
+      .from("Booking")
+      .select("*")
+      .eq("classId", classId)
+      .order("createdAt", { ascending: true });
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return Promise.all(
+      (bookings ?? []).map(async (b) => {
+        const { data: user } = await sb.from("User").select("id, name, initial").eq("id", b.userId).maybeSingle();
+        return { ...b, user };
+      }),
+    );
   }
 
   /** Scan a member into class → attended (+XP, streak), emits roster/attendance. */
-  checkin(session: Session, classId: string, dto: CheckinDto) {
-    return this.scope.run(session, async (tx) => {
-      const booking = await tx.booking.findUnique({
-        where: { classId_userId: { classId, userId: dto.userId } },
-        include: { class: true },
-      });
-      if (!booking) throw new NotFoundException({ code: "not_found", message: "No booking to check in." });
-      const updated = await tx.booking.update({ where: { id: booking.id }, data: { state: "attended" } });
+  async checkin(session: Session, token: string | undefined, classId: string, dto: CheckinDto) {
+    const sb = this.supa.forUser(token);
+    const { data: booking } = await sb
+      .from("Booking")
+      .select("*")
+      .eq("classId", classId)
+      .eq("userId", dto.userId)
+      .maybeSingle();
+    if (!booking) throw new NotFoundException({ code: "not_found", message: "No booking to check in." });
+    const { data: klass } = await sb.from("Class").select("floorId").eq("id", classId).maybeSingle();
 
-      // Attendance awards a small XP bump (class attended → +XP, per 05).
-      const ATTEND_XP = 25;
-      const user = await tx.user.update({ where: { id: dto.userId }, data: { xp: { increment: ATTEND_XP } } });
-      const nextLevel = 1 + Math.floor(user.xp / 200);
-      if (nextLevel !== user.level) {
-        await tx.user.update({ where: { id: dto.userId }, data: { level: nextLevel } });
-      }
+    const { data: updated, error: updErr } = await sb
+      .from("Booking")
+      .update({ state: "attended" })
+      .eq("id", booking.id)
+      .select()
+      .single();
+    if (updErr) throw new InternalServerErrorException({ code: "internal", message: updErr.message });
 
-      this.bus.publish(RealtimeBus.classRoster(classId), "checkin", { userId: dto.userId, bookingId: booking.id });
-      this.bus.publish(RealtimeBus.floorAttendance(booking.class.floorId), "checkin", {
+    // Attendance awards a small XP bump to the scanned member (another user) —
+    // privileged write → service() client, scoped explicitly to dto.userId.
+    const ATTEND_XP = 25;
+    const svc = this.supa.service();
+    const { data: user } = await svc.from("User").select("xp, level").eq("id", dto.userId).single();
+    const newXp = (user?.xp ?? 0) + ATTEND_XP;
+    const nextLevel = 1 + Math.floor(newXp / 200);
+    await svc.from("User").update({ xp: newXp, level: nextLevel }).eq("id", dto.userId);
+
+    this.bus.publish(RealtimeBus.classRoster(classId), "checkin", { userId: dto.userId, bookingId: booking.id });
+    if (klass?.floorId) {
+      this.bus.publish(RealtimeBus.floorAttendance(klass.floorId), "checkin", {
         userId: dto.userId,
         classId,
       });
-      return { booking: updated, xpAwarded: ATTEND_XP };
-    });
+    }
+    return { booking: updated, xpAwarded: ATTEND_XP };
   }
 }
 

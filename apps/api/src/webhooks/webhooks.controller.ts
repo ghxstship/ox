@@ -6,20 +6,22 @@
 //   - Idempotency: by event id, persisted to the `WebhookEvent` table. We upsert
 //     the event on arrival; if it already carries a `processedAt` we skip. After
 //     a handler succeeds we stamp `processedAt` so dedupe survives restarts and is
-//     shared across instances. (Trusted server context — no RLS scope.)
+//     shared across instances. (Trusted server context — service() client, RLS
+//     bypass, no user on the request.)
 //   - Handling: branch on the lifecycle events and apply the real DB mutations
-//     from 05-state-machines via Prisma (webhooks are trusted server context, so
-//     they legitimately write without an RLS scope — no user is on the request).
+//     from 05-state-machines via the service() client (webhooks are trusted
+//     server context, so they legitimately write without an RLS scope).
 //
 // Enqueue-style side effects (dunning retries, notifications) are left as logged
 // TODO comments; the DB mutations are real.
-import { Controller, Headers, HttpCode, Logger, Post, Req } from "@nestjs/common";
+import { Controller, Headers, HttpCode, InternalServerErrorException, Logger, Post, Req } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { prisma } from "@ox/db";
+import type { Enums } from "@ox/supabase";
 import type Stripe from "stripe";
 import { BillingService } from "../billing/billing.service";
 import { Public } from "../common/decorators";
 import type { OxRequest } from "../common/session";
+import { SupaService } from "../common/supa.service";
 
 @Controller("webhooks")
 export class WebhooksController {
@@ -28,6 +30,7 @@ export class WebhooksController {
   constructor(
     private readonly config: ConfigService,
     private readonly billing: BillingService,
+    private readonly supa: SupaService,
   ) {}
 
   @Public()
@@ -59,18 +62,18 @@ export class WebhooksController {
       }
     }
 
+    const sb = this.supa.service();
     const id = event.id ?? "evt_unknown";
-    // Durable idempotency by event id. Upsert the row on arrival; if it already
-    // has a processedAt, this is a replay — skip. The row is kept either way so a
-    // failed handler (which throws below) re-processes on Stripe's retry.
-    const record = await prisma.webhookEvent.upsert({
-      where: { id },
-      create: { id, type: event.type },
-      update: {},
-    });
-    if (record.processedAt) {
+    // Durable idempotency by event id. Look up first; if it already has a
+    // processedAt, this is a replay — skip. Otherwise upsert the arrival record.
+    const { data: existing } = await sb.from("WebhookEvent").select("processedAt").eq("id", id).maybeSingle();
+    if (existing?.processedAt) {
       this.log.log(`Duplicate event ${id} ignored.`);
       return { received: true, duplicate: true };
+    }
+    if (!existing) {
+      const { error } = await sb.from("WebhookEvent").insert({ id, type: event.type });
+      if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
     }
 
     try {
@@ -82,7 +85,7 @@ export class WebhooksController {
       throw e;
     }
 
-    await prisma.webhookEvent.update({ where: { id }, data: { processedAt: new Date() } });
+    await sb.from("WebhookEvent").update({ processedAt: new Date().toISOString() }).eq("id", id);
     this.log.log(`Stripe event ${id} (${event.type}) processed.`);
     return { received: true, id };
   }
@@ -135,29 +138,42 @@ export class WebhooksController {
   }
 
   private async markPaymentByPi(piId: string, state: "paid" | "failed"): Promise<void> {
-    const res = await prisma.payment.updateMany({ where: { stripePiId: piId }, data: { state } });
-    if (res.count === 0) this.log.debug(`No Payment row for PI ${piId}.`);
+    const { data } = await this.supa.service().from("Payment").update({ state }).eq("stripePiId", piId).select("id");
+    if (!data || data.length === 0) this.log.debug(`No Payment row for PI ${piId}.`);
   }
 
   private async advanceOrderForPi(piId: string, state: "paid" | "cart"): Promise<void> {
-    const payment = await prisma.payment.findFirst({ where: { stripePiId: piId, kind: "Shop" } });
+    const sb = this.supa.service();
+    const { data: payment } = await sb
+      .from("Payment")
+      .select("userId")
+      .eq("stripePiId", piId)
+      .eq("kind", "Shop")
+      .maybeSingle();
     if (!payment) return;
     // The user's most recent placed order is the one this PI settled.
-    const order = await prisma.order.findFirst({
-      where: { userId: payment.userId, state: "placed" },
-      orderBy: { placedAt: "desc" },
-    });
-    if (order) await prisma.order.update({ where: { id: order.id }, data: { state } });
+    const { data: order } = await sb
+      .from("Order")
+      .select("id")
+      .eq("userId", payment.userId)
+      .eq("state", "placed")
+      .order("placedAt", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (order) await sb.from("Order").update({ state }).eq("id", order.id);
   }
 
   private async markTicketsPaidForPi(piId: string): Promise<void> {
-    const payment = await prisma.payment.findFirst({ where: { stripePiId: piId, kind: "Ticket" } });
+    const sb = this.supa.service();
+    const { data: payment } = await sb
+      .from("Payment")
+      .select("userId")
+      .eq("stripePiId", piId)
+      .eq("kind", "Ticket")
+      .maybeSingle();
     if (!payment) return;
-    // Promote the buyer's reserved tickets for this floor's events to paid.
-    await prisma.ticket.updateMany({
-      where: { userId: payment.userId, state: "reserved" },
-      data: { state: "paid" },
-    });
+    // Promote the buyer's reserved tickets to paid.
+    await sb.from("Ticket").update({ state: "paid" }).eq("userId", payment.userId).eq("state", "reserved");
   }
 
   /**
@@ -166,9 +182,10 @@ export class WebhooksController {
    * platform fee is held back (here a flat 20%); the rest goes to the floor.
    */
   private async payoutPartnerFloor(piId: string): Promise<void> {
-    const payment = await prisma.payment.findFirst({ where: { stripePiId: piId } });
+    const sb = this.supa.service();
+    const { data: payment } = await sb.from("Payment").select("*").eq("stripePiId", piId).maybeSingle();
     if (!payment) return;
-    const floor = await prisma.floor.findUnique({ where: { id: payment.floorId } });
+    const { data: floor } = await sb.from("Floor").select("*").eq("id", payment.floorId).maybeSingle();
     if (!floor?.stripeAccountId) return; // first-party floor — no transfer needed.
     const PLATFORM_FEE_BPS = 2000; // 20%
     const floorShare = Math.round(payment.amountCents * (1 - PLATFORM_FEE_BPS / 10_000));
@@ -186,8 +203,13 @@ export class WebhooksController {
 
   private async setMembershipBySub(subId: string | null, status: string): Promise<void> {
     if (!subId) return;
-    const res = await prisma.membership.updateMany({ where: { stripeSubId: subId }, data: { status } });
-    if (res.count === 0) this.log.debug(`No Membership for sub ${subId}.`);
+    const { data } = await this.supa
+      .service()
+      .from("Membership")
+      .update({ status: status as Enums<"MembershipStatus"> })
+      .eq("stripeSubId", subId)
+      .select("id");
+    if (!data || data.length === 0) this.log.debug(`No Membership for sub ${subId}.`);
   }
 
   private subId(sub: string | Stripe.Subscription | null | undefined): string | null {

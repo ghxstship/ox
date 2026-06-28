@@ -1,71 +1,94 @@
 // Commerce (Alo parity). Products are public but gated drops are filtered by the
-// viewer's level. Cart/Order rows are owner-scoped via ScopeRunner (RLS).
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { prisma, Prisma } from "@ox/db";
+// viewer's level. Cart/Order rows are owner-scoped via supa.forUser(token) (RLS).
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import type { OxSupabase } from "@ox/supabase";
 import type { Session } from "@ox/rbac";
 import { BillingService } from "../billing/billing.service";
-import { ScopeRunner } from "../common/scope.runner";
+import { SupaService } from "../common/supa.service";
 import { StoreService } from "../consumer/store.service";
 import type { AddCartItemDto } from "./commerce.dto";
 
 @Injectable()
 export class CommerceService {
   constructor(
-    private readonly scope: ScopeRunner,
+    private readonly supa: SupaService,
     private readonly billing: BillingService,
   ) {}
 
   /** List products visible to the viewer: gateLevel must be <= the viewer's level. */
-  async products(session: Session | undefined, collection?: string) {
-    // The JWT carries no level, so resolve it from the DB when signed in.
+  async products(session: Session | undefined, token: string | undefined, collection?: string) {
+    const sb = this.supa.forUser(token);
+    // The session carries no guaranteed level, so resolve it from the DB when signed in.
     let level = session?.level ?? 0;
     if (session && level === 0) {
-      const user = await prisma.user.findUnique({ where: { id: session.userId }, select: { level: true } });
+      const { data: user } = await sb.from("User").select("level").eq("id", session.userId).maybeSingle();
       level = user?.level ?? 0;
     }
-    const all = await prisma.product.findMany({
-      where: collection ? { collection } : undefined,
-      orderBy: { priceCents: "asc" },
-    });
-    return all.filter((p) => p.gateLevel <= level);
+    let q = sb.from("Product").select("*").order("priceCents", { ascending: true });
+    if (collection) q = q.eq("collection", collection);
+    const { data: all, error } = await q;
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return (all ?? []).filter((p) => p.gateLevel <= level);
   }
 
   /** The caller's open cart (Order in `cart` state), created lazily. */
-  cart(session: Session) {
-    return this.scope.run(session, async (tx) => {
-      const cart = await tx.order.findFirst({
-        where: { userId: session.userId, state: "cart" },
-        include: { items: true },
-      });
-      return cart ?? { id: null, userId: session.userId, state: "cart", totalCents: 0, items: [] };
-    });
+  async cart(session: Session, token: string | undefined) {
+    const sb = this.supa.forUser(token);
+    const { data: cart } = await sb
+      .from("Order")
+      .select("*")
+      .eq("userId", session.userId)
+      .eq("state", "cart")
+      .maybeSingle();
+    if (!cart) return { id: null, userId: session.userId, state: "cart", totalCents: 0, items: [] };
+    const { data: items } = await sb.from("OrderItem").select("*").eq("orderId", cart.id);
+    return { ...cart, items: items ?? [] };
   }
 
-  addItem(session: Session, dto: AddCartItemDto) {
-    return this.scope.run(session, async (tx) => {
-      const product = await tx.product.findUnique({ where: { id: dto.productId } });
-      if (!product) throw new NotFoundException({ code: "not_found", message: "No product." });
+  async addItem(session: Session, token: string | undefined, dto: AddCartItemDto) {
+    const sb = this.supa.forUser(token);
+    const { data: product } = await sb.from("Product").select("*").eq("id", dto.productId).maybeSingle();
+    if (!product) throw new NotFoundException({ code: "not_found", message: "No product." });
 
-      let cart = await tx.order.findFirst({ where: { userId: session.userId, state: "cart" } });
-      cart ??= await tx.order.create({ data: { userId: session.userId, state: "cart", totalCents: 0 } });
+    let { data: cart } = await sb
+      .from("Order")
+      .select("*")
+      .eq("userId", session.userId)
+      .eq("state", "cart")
+      .maybeSingle();
+    if (!cart) {
+      const { data: created, error } = await sb
+        .from("Order")
+        .insert({ userId: session.userId, state: "cart", totalCents: 0 })
+        .select()
+        .single();
+      if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+      cart = created;
+    }
 
-      const qty = dto.qty ?? 1;
-      await tx.orderItem.create({
-        data: { orderId: cart.id, productId: product.id, size: dto.size, qty, priceCents: product.priceCents },
-      });
-      return this.recount(tx, cart.id);
+    const qty = dto.qty ?? 1;
+    const { error: itemErr } = await sb.from("OrderItem").insert({
+      orderId: cart.id,
+      productId: product.id,
+      size: dto.size,
+      qty,
+      priceCents: product.priceCents,
     });
+    if (itemErr) throw new InternalServerErrorException({ code: "internal", message: itemErr.message });
+    return this.recount(sb, cart.id);
   }
 
-  removeItem(session: Session, itemId: string) {
-    return this.scope.run(session, async (tx) => {
-      const item = await tx.orderItem.findUnique({ where: { id: itemId }, include: { order: true } });
-      if (!item || item.order.userId !== session.userId) {
-        throw new NotFoundException({ code: "not_found", message: "No cart item." });
-      }
-      await tx.orderItem.delete({ where: { id: itemId } });
-      return this.recount(tx, item.orderId);
-    });
+  async removeItem(session: Session, token: string | undefined, itemId: string) {
+    const sb = this.supa.forUser(token);
+    const { data: item } = await sb.from("OrderItem").select("*").eq("id", itemId).maybeSingle();
+    if (!item) throw new NotFoundException({ code: "not_found", message: "No cart item." });
+    const { data: order } = await sb.from("Order").select("userId").eq("id", item.orderId).maybeSingle();
+    if (!order || order.userId !== session.userId) {
+      throw new NotFoundException({ code: "not_found", message: "No cart item." });
+    }
+    const { error } = await sb.from("OrderItem").delete().eq("id", itemId);
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return this.recount(sb, item.orderId);
   }
 
   /**
@@ -73,54 +96,75 @@ export class CommerceService {
    * move to `placed`, write Payment(pending). A valid promo increments its
    * timesRedeemed only on this successful checkout.
    */
-  checkout(session: Session, promoCode?: string) {
-    return this.scope.run(session, async (tx) => {
-      const cart = await tx.order.findFirst({
-        where: { userId: session.userId, state: "cart" },
-        include: { items: true },
-      });
-      if (!cart || cart.items.length === 0) {
-        throw new NotFoundException({ code: "not_found", message: "Cart is empty." });
-      }
-      const subtotal = cart.items.reduce((s, i) => s + i.priceCents * i.qty, 0);
-      let total = subtotal;
-      let discountCents = 0;
-      if (promoCode) {
-        const promo = await StoreService.validatePromo(tx, promoCode);
-        discountCents = StoreService.computeDiscount(promo, subtotal);
-        total = Math.max(0, subtotal - discountCents);
-        await tx.promoCode.update({ where: { id: promo.id }, data: { timesRedeemed: { increment: 1 } } });
-      }
-      const pi = await this.billing.createPaymentIntent(total, "Shop");
+  async checkout(session: Session, token: string | undefined, promoCode?: string) {
+    const sb = this.supa.forUser(token);
+    const { data: cart } = await sb
+      .from("Order")
+      .select("*")
+      .eq("userId", session.userId)
+      .eq("state", "cart")
+      .maybeSingle();
+    const { data: items } = cart
+      ? await sb.from("OrderItem").select("*").eq("orderId", cart.id)
+      : { data: [] as { priceCents: number; qty: number }[] };
+    if (!cart || !items || items.length === 0) {
+      throw new NotFoundException({ code: "not_found", message: "Cart is empty." });
+    }
+    const subtotal = items.reduce((s, i) => s + i.priceCents * i.qty, 0);
+    let total = subtotal;
+    let discountCents = 0;
+    if (promoCode) {
+      const promo = await StoreService.validatePromo(sb, promoCode);
+      discountCents = StoreService.computeDiscount(promo, subtotal);
+      total = Math.max(0, subtotal - discountCents);
+      await sb.from("PromoCode").update({ timesRedeemed: promo.timesRedeemed + 1 }).eq("id", promo.id);
+    }
+    const pi = await this.billing.createPaymentIntent(total, "Shop");
 
-      const order = await tx.order.update({
-        where: { id: cart.id },
-        data: { state: "placed", totalCents: total, placedAt: new Date() },
-        include: { items: true },
-      });
-      const payment = await tx.payment.create({
-        data: {
-          userId: session.userId,
-          floorId: session.floorId ?? "",
-          kind: "Shop",
-          amountCents: total,
-          state: "pending",
-          stripePiId: pi.id,
-        },
-      });
-      return {
-        order,
-        subtotalCents: subtotal,
-        discountCents,
-        totalCents: total,
-        payment: { id: payment.id, clientSecret: pi.clientSecret, mock: pi.mock },
-      };
-    });
+    const { data: order, error: ordErr } = await sb
+      .from("Order")
+      .update({ state: "placed", totalCents: total, placedAt: new Date().toISOString() })
+      .eq("id", cart.id)
+      .select()
+      .single();
+    if (ordErr) throw new InternalServerErrorException({ code: "internal", message: ordErr.message });
+    const { data: orderItems } = await sb.from("OrderItem").select("*").eq("orderId", cart.id);
+
+    // Minting a Payment is privileged → service() client, scoped explicitly.
+    const { data: payment, error: payErr } = await this.supa
+      .service()
+      .from("Payment")
+      .insert({
+        userId: session.userId,
+        floorId: session.floorId ?? "",
+        kind: "Shop",
+        amountCents: total,
+        state: "pending",
+        stripePiId: pi.id,
+      })
+      .select()
+      .single();
+    if (payErr) throw new InternalServerErrorException({ code: "internal", message: payErr.message });
+
+    return {
+      order: { ...order, items: orderItems ?? [] },
+      subtotalCents: subtotal,
+      discountCents,
+      totalCents: total,
+      payment: { id: payment.id, clientSecret: pi.clientSecret, mock: pi.mock },
+    };
   }
 
-  private async recount(tx: Prisma.TransactionClient, orderId: string) {
-    const items = await tx.orderItem.findMany({ where: { orderId } });
-    const total = items.reduce((s, i) => s + i.priceCents * i.qty, 0);
-    return tx.order.update({ where: { id: orderId }, data: { totalCents: total }, include: { items: true } });
+  private async recount(sb: OxSupabase, orderId: string) {
+    const { data: items } = await sb.from("OrderItem").select("*").eq("orderId", orderId);
+    const total = (items ?? []).reduce((s, i) => s + i.priceCents * i.qty, 0);
+    const { data: order, error } = await sb
+      .from("Order")
+      .update({ totalCents: total })
+      .eq("id", orderId)
+      .select()
+      .single();
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return { ...order, items: items ?? [] };
   }
 }

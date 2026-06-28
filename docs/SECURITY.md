@@ -7,16 +7,18 @@ issues within 7 days. We support coordinated disclosure.
 
 ## Architecture controls
 
-- **AuthN:** OTP / passkey → JWT carrying `{ userId, role, floorId }`. The token
-  is the source of truth for authorization — never client state.
+- **AuthN:** Supabase Auth (email OTP / passwordless) → a Supabase access token
+  (JWT). The token is the source of truth for authorization — never client state.
 - **AuthZ — two boundaries:**
-  1. **Row-Level Security (RLS) in Postgres** is the *data* boundary. The API
-     decodes the JWT and sets session GUCs (`ox.user_id/ox.role/ox.floor_id`);
-     policies filter every row in SQL (`db/prisma/migrations/rls/policies.sql`).
-     The app must connect as a **non-superuser, non-`BYPASSRLS`** role or
-     policies are skipped.
+  1. **Row-Level Security (RLS) in Postgres (Supabase)** is the *data* boundary.
+     Policies resolve the caller via `auth.uid() ↔ "User"."authUserId"` and the
+     `app_uid()/app_role()/app_floor()/is_admin()/is_operator()` helpers
+     (`db/migrations/0001_rls_helpers.sql`); every read/write is scoped in SQL.
+     Browser and server both go through supabase-js as the signed-in user.
   2. **Capabilities** are the *verb* boundary. Every privileged write checks
-     `can(session, cap)` (`@ox/rbac`) server-side, not just in the UI.
+     `can(session, cap)` (`@ox/rbac`) server-side, not just in the UI. The API
+     uses the service role only for trusted writes (webhooks, automations) with
+     explicit `userId`/`floorId` scoping.
 - **Defense in depth:** client `scope()`/`can()` only hide what the server would
   refuse; they are never trusted as enforcement.
 - **Payments:** PCI SAQ-A — card data is tokenized by Stripe client-side; OX

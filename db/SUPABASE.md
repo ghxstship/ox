@@ -41,36 +41,37 @@ events, exercises, products, floors) is readable when `auth.uid() IS NULL`.
 - **Server code** that must bypass RLS (Stripe webhooks, admin jobs) uses
   `createServiceClient()` (service-role key, server-only, never shipped).
 - **The NestJS API (`apps/api`)** adds the *capability* layer (`can()`), Stripe,
-  and server logic. When it connects with an elevated role it bypasses RLS, so it
-  enforces capabilities explicitly; alternatively it forwards the user's access
-  token to act as the user. Its `withScope()` GUC helper + `policies.sql` are the
-  **portable / self-hosted** equivalent of the Supabase helpers above, for
-  running OX on a non-Supabase Postgres.
+  and server logic. It reads **as the caller** (forwards the user's Supabase
+  access token → `createServerClient(token)` → RLS applies) and uses the
+  **service role** (`createServiceClient()`) only for trusted server writes
+  (webhooks, automation runs, XP awards) with explicit `userId`/`floorId`
+  scoping. **No ORM** — there is no Prisma and no GUC layer.
 
-## Connecting Prisma to Supabase
+## Data access (no ORM)
 
-Set both URLs (get the password from Supabase → Project Settings → Database):
+The apps talk to Postgres through **supabase-js** (`@ox/supabase`):
 
-```bash
-# Pooled (app runtime, pgBouncer)
-DATABASE_URL="postgresql://postgres.xaepcwnqjwphuwvuekfb:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-# Direct (migrations / db pull)
-DIRECT_URL="postgresql://postgres.xaepcwnqjwphuwvuekfb:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+```ts
+import { createBrowserClient } from "@ox/supabase";          // browser / RLS
+import { createServerClient, createServiceClient } from "@ox/supabase/server"; // server
 ```
 
-Sync the Prisma schema to the live DB and generate the client:
+RLS scopes every read to the signed-in identity, so the anon/publishable key is
+safe in the browser. The four demo identities sign in with a real Supabase
+session (password `oxdemo1234`).
+
+## Apply SQL migrations
+
+The OX additive layer lives in `db/migrations/*.sql` (helper functions + the
+parity tables + RLS). Apply with the Supabase CLI or the dashboard SQL editor:
 
 ```bash
-pnpm --filter @ox/db pull        # prisma db pull && prisma generate
-pnpm --filter @ox/db verify      # read-only row snapshot
+supabase login && supabase link --project-ref xaepcwnqjwphuwvuekfb
+pnpm --filter @ox/db push        # supabase db push
 ```
-
-> `db:migrate` and `db:seed` intentionally **refuse** to run against this project
-> (they'd clobber data). Use them only on a fresh local Postgres via
-> `seed:fresh` / `prisma migrate dev`.
 
 ## Regenerate the typed client
 
 ```bash
-pnpm --filter @ox/supabase gen:types   # Supabase CLI → src/database.types.ts
+pnpm --filter @ox/db types       # Supabase CLI → packages/supabase/src/database.types.ts
 ```

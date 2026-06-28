@@ -7,7 +7,7 @@
 // lands, persist the computed rows; the surface stays the same.
 import { Injectable } from "@nestjs/common";
 import type { Session } from "@ox/rbac";
-import { ScopeRunner } from "../common/scope.runner";
+import { SupaService } from "../common/supa.service";
 
 export interface CommissionRow {
   staffId: string;
@@ -21,44 +21,51 @@ export interface CommissionRow {
 
 @Injectable()
 export class PayrollService {
-  constructor(private readonly scope: ScopeRunner) {}
+  constructor(private readonly supa: SupaService) {}
 
   /** Compute per-staff commission for a period (YYYY-MM). Admin scope = global. */
-  commissions(session: Session, period?: string): Promise<CommissionRow[]> {
-    return this.scope.run(session, async (tx) => {
-      const { gte, lt } = monthRange(period);
-      const staff = await tx.user.findMany({
-        where: { role: { in: ["coach", "host"] } },
-        select: { id: true, name: true, floorId: true },
-      });
-      const paid = await tx.payment.findMany({ where: { state: "paid", at: { gte, lt } } });
+  async commissions(session: Session, token: string | undefined, period?: string): Promise<CommissionRow[]> {
+    const sb = this.supa.forUser(token);
+    const { gte, lt } = monthRange(period);
+    const staff = this.supa.unwrap(
+      await sb.from("User").select("id, name, floorId").in("role", ["coach", "host"]),
+      "No staff.",
+    );
+    const paid = this.supa.unwrap(
+      await sb
+        .from("Payment")
+        .select("*")
+        .eq("state", "paid")
+        .gte("at", gte.toISOString())
+        .lt("at", lt.toISOString()),
+      "No payment.",
+    );
 
-      const rows: CommissionRow[] = [];
-      for (const s of staff) {
-        // Class/PT revenue attributed to the coach's floor's class/coaching kinds.
-        const floorPayments = paid.filter((p) => p.floorId === s.floorId);
-        const classesCents = sum(floorPayments.filter((p) => /class|workshop/i.test(p.kind)));
-        const ptCents = sum(floorPayments.filter((p) => /private|coaching|pt/i.test(p.kind)));
-        const retailCents = sum(floorPayments.filter((p) => /shop|pos/i.test(p.kind)));
-        const totalCents = classesCents + ptCents + retailCents;
-        if (totalCents === 0) continue;
-        rows.push({
-          staffId: s.id,
-          staffName: s.name,
-          period: period ?? currentPeriod(),
-          classesCents,
-          ptCents,
-          retailCents,
-          totalCents,
-        });
-      }
-      return rows;
-    });
+    const rows: CommissionRow[] = [];
+    for (const s of staff) {
+      // Class/PT revenue attributed to the coach's floor's class/coaching kinds.
+      const floorPayments = paid.filter((p) => p.floorId === s.floorId);
+      const classesCents = sum(floorPayments.filter((p) => /class|workshop/i.test(p.kind)));
+      const ptCents = sum(floorPayments.filter((p) => /private|coaching|pt/i.test(p.kind)));
+      const retailCents = sum(floorPayments.filter((p) => /shop|pos/i.test(p.kind)));
+      const totalCents = classesCents + ptCents + retailCents;
+      if (totalCents === 0) continue;
+      rows.push({
+        staffId: s.id,
+        staffName: s.name,
+        period: period ?? currentPeriod(),
+        classesCents,
+        ptCents,
+        retailCents,
+        totalCents,
+      });
+    }
+    return rows;
   }
 
   /** CSV export of the commission rows (Payroll surface ▸ export). */
-  async csv(session: Session, period?: string): Promise<string> {
-    const rows = await this.commissions(session, period);
+  async csv(session: Session, token: string | undefined, period?: string): Promise<string> {
+    const rows = await this.commissions(session, token, period);
     const header = "staffId,staffName,period,classesCents,ptCents,retailCents,totalCents";
     const lines = rows.map(
       (r) => `${r.staffId},"${r.staffName}",${r.period},${r.classesCents},${r.ptCents},${r.retailCents},${r.totalCents}`,

@@ -36,6 +36,15 @@ export const DEMO_IDENTITIES: { id: string; name: string; role: Role; line: stri
   { id: "u_hq", name: "OX HQ", role: "admin", line: "Admin · all floors" },
 ];
 
+/** Demo identities → their real Supabase email; shared dev password. */
+export const DEMO_EMAILS: Record<string, string> = {
+  m_mara: "mara@ox.fit",
+  u_dom: "dom@ox.fit",
+  u_iris: "iris@ox.fit",
+  u_hq: "hq@ox.fit",
+};
+export const DEMO_PASSWORD = "oxdemo1234";
+
 interface SessionCtx {
   session: Session | null;
   jwt: string | null;
@@ -92,22 +101,36 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }
 
   async function signInDemo(id: string) {
-    // The OTP shim accepts the seeded code "000000" for demo identities and
-    // returns a real OX JWT + the rbac session.
-    const res = await api.auth.otpVerify({ id, code: "000000" });
-    const s = res.session;
+    // Supabase-only: sign in the identity's real Supabase user (shared dev
+    // password) → real access token (drives both RLS and the api-client bearer)
+    // → resolve the OX User row to build the rbac session.
+    const email = DEMO_EMAILS[id] ?? id;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: DEMO_PASSWORD });
+    if (error) throw error;
+    const token = data.session?.access_token;
+    const uid = data.user?.id;
+    if (!token || !uid) throw new Error("No Supabase session returned for demo identity.");
+
+    const { data: u, error: uerr } = await supabase
+      .from("User")
+      .select("id,name,initial,role,floorId,homeFloorId,level,xp")
+      .eq("authUserId", uid)
+      .maybeSingle();
+    if (uerr) throw uerr;
+    if (!u) throw new Error("No OX profile linked to this identity.");
+
     const sess: Session = {
-      userId: s.userId,
-      name: s.name,
-      initial: s.initial,
-      role: s.role as Role,
-      floorId: s.floorId ?? null,
-      floors: s.floors ?? [],
-      level: s.level,
-      xp: s.xp,
-      homeFloor: s.homeFloor,
+      userId: u.id,
+      name: u.name,
+      initial: u.initial,
+      role: u.role as Role,
+      floorId: u.floorId ?? null,
+      floors: u.floorId ? [u.floorId] : [],
+      level: u.level ?? undefined,
+      xp: u.xp ?? undefined,
+      homeFloor: u.homeFloorId ?? undefined,
     };
-    commit(res.jwt, sess);
+    commit(token, sess);
   }
 
   async function startEmailOtp(email: string) {

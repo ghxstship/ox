@@ -19,7 +19,7 @@ and accessibility. It is the index; the linked docs hold the detail.
 - **Data-subject requests:** access, rectification, erasure, portability, and
   restriction flows route to a DSAR queue. See `PRIVACY.md`.
 - **Data minimization & retention:** PII is minimized; retention windows are
-  per data class; deletion cascades through the Prisma relations.
+  per data class; deletion cascades through the Postgres foreign keys.
 - **Residency:** tenant data is floor-scoped (RLS); regional hosting is a
   deploy-time choice.
 

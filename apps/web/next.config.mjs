@@ -1,10 +1,15 @@
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n.ts");
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Self-contained server bundle for Docker (traces the monorepo packages too).
+  output: "standalone",
   // The DS / rbac / api-client / types packages ship TypeScript + JSX source
   // (no build step), so Next must transpile them.
   transpilePackages: ["@ox/ds", "@ox/rbac", "@ox/api-client", "@ox/types", "@ox/supabase"],
@@ -12,6 +17,8 @@ const nextConfig = {
     // Allow importing package source that lives outside apps/web (the monorepo
     // packages/* directories) without symlinked node_modules realpath issues.
     externalDir: true,
+    // Trace from the repo root so standalone bundles the workspace packages.
+    outputFileTracingRoot: repoRoot,
   },
   webpack(config) {
     // The @ox/* packages are TS source that uses NodeNext-style ".js" import

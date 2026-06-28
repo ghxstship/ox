@@ -18,10 +18,11 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "gen:types": "pnpm --filter @ox/types generate",
-    "db:generate": "pnpm --filter @ox/db prisma:generate",
-    "db:migrate": "pnpm --filter @ox/db prisma:migrate",
-    "db:rls": "pnpm --filter @ox/db rls:apply",
-    "db:seed": "pnpm --filter @ox/db seed"
+    "db:push": "pnpm --filter @ox/db push",
+    "db:types": "pnpm --filter @ox/db types",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up",
+    "docker:down": "docker compose down"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

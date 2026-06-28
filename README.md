@@ -34,7 +34,7 @@ ox/
 │   ├── api-client/ # @ox/api-client — typed fetch client over the API
 │   ├── supabase/   # @ox/supabase — typed Supabase clients over the live DB (RLS-scoped)
 │   └── config/     # @ox/config — shared tsconfig presets
-├── db/             # @ox/db — Prisma schema (introspected from Supabase) · RLS · verify
+├── db/             # @ox/db — Supabase SQL migrations + RLS (no ORM)
 ├── openapi/        # ox-platform.yaml (OpenAPI 3.1) + component bindings
 ├── whitelabel/     # brand.schema.json · apply-brand.js · brands/*.json
 ├── docs/           # ACCESSIBILITY · VPAT · COMPLIANCE · PRIVACY · SECURITY · WHITE-LABEL
@@ -54,20 +54,27 @@ pnpm install
 # 2. Configure — point at Supabase (set [PASSWORD] from the dashboard)
 cp .env.example .env                 # NEXT_PUBLIC_SUPABASE_* are pre-filled
 
-# 3. Generate the OpenAPI types + sync Prisma to the live schema
+# 3. Generate the OpenAPI types (the Supabase Database types are committed)
 pnpm gen:types                       # @ox/types from openapi/ox-platform.yaml
-pnpm --filter @ox/supabase gen:types # typed Database from the live DB (optional; committed)
-pnpm db:pull                         # prisma db pull + generate (introspect Supabase)
-pnpm --filter @ox/db verify          # read-only row snapshot
 
 # 4. Run everything
 pnpm dev                             # web :3000 · api :4000 (Swagger at /api/v1/docs)
 ```
 
-> The web app reads through `@ox/supabase` (RLS-scoped) and falls back to seed
-> mock data if offline, so you can explore the UI immediately.
-> `docker compose up -d` is only for a fully **local, offline** Postgres — the
-> default path uses Supabase.
+There is **no ORM and no local database** — the apps read/write the hosted
+Supabase project directly through `@ox/supabase` (supabase-js), with RLS as the
+boundary. The web app falls back to seed data if offline, so the UI renders
+immediately.
+
+### Docker (full stack, deployment-ready)
+
+```bash
+cp .env.example .env                 # set SUPABASE_SERVICE_ROLE_KEY + Stripe (optional)
+docker compose up --build            # web :3000 + api :4000 against hosted Supabase
+```
+
+`apps/web` builds to a standalone Next server; `apps/api` runs the NestJS app.
+No database container — Supabase is the database.
 
 ## The four demo identities (your acceptance test)
 
@@ -102,8 +109,9 @@ app code. (`packages/rbac/src/scope.test.ts` mirrors this; the DB proves it.)
 - **RLS as the boundary.** Enforced natively in Supabase: `auth.uid()` ↔
   `User.authUserId`, with `app_role()`/`app_floor()` helpers scoping every row.
   The same query returns 1/5/3/7 members by identity — in SQL. Capabilities
-  (`can()`) gate every write. Clients never supply scope. (`@ox/db`'s `withScope`
-  GUC helper + `policies.sql` are the portable equivalent for self-hosted Postgres.)
+  (`can()`) gate every write. Clients never supply scope. The API reads as the
+  caller (forwarded Supabase token → RLS) and uses the service role only for
+  trusted server writes (webhooks, automations) with explicit scoping.
 - **White-label.** `GET /tenant/brand` → `OXBrand.apply()` re-skins every
   component at runtime, no redeploy. See `docs/WHITE-LABEL.md`.
 - **i18n / a11y.** Locale-segment routing, RTL via logical properties, and a

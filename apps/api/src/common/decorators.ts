@@ -22,3 +22,13 @@ export const CurrentSession = createParamDecorator((_data: unknown, ctx: Executi
   if (!req.session) throw new UnauthorizedException({ code: "unauthorized", message: "No session." });
   return req.session;
 });
+
+/**
+ * Inject the raw Supabase access token from the request so services can call
+ * `supa.forUser(token)` and have RLS scope rows to the caller. Undefined on
+ * @Public() routes with no bearer.
+ */
+export const CurrentToken = createParamDecorator((_data: unknown, ctx: ExecutionContext): string | undefined => {
+  const req = ctx.switchToHttp().getRequest<OxRequest>();
+  return req.accessToken;
+});

@@ -31,9 +31,6 @@ jobs:
       - name: Generate API types from OpenAPI
         run: pnpm gen:types
 
-      - name: Prisma generate
-        run: pnpm db:generate
-
       - name: Typecheck
         run: pnpm typecheck
 

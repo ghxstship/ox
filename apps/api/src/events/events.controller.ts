@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { Capability, CurrentSession, Public } from "../common/decorators";
+import { Capability, CurrentSession, CurrentToken, Public } from "../common/decorators";
 import type { Session } from "../common/session";
 import { CreateEventDto, RsvpDto } from "./events.dto";
 import { EventsService } from "./events.service";
@@ -22,19 +22,24 @@ export class EventsController {
 
   @Post("events")
   @Capability("class.manage")
-  create(@CurrentSession() session: Session, @Body() dto: CreateEventDto) {
-    return this.events.create(session, dto);
+  create(@CurrentSession() session: Session, @CurrentToken() token: string | undefined, @Body() dto: CreateEventDto) {
+    return this.events.create(session, token, dto);
   }
 
   @Post("events/:id/rsvp")
   @Capability("raid.join")
-  rsvp(@CurrentSession() session: Session, @Param("id") id: string, @Body() dto: RsvpDto) {
-    return this.events.rsvp(session, id, dto);
+  rsvp(
+    @CurrentSession() session: Session,
+    @CurrentToken() token: string | undefined,
+    @Param("id") id: string,
+    @Body() dto: RsvpDto,
+  ) {
+    return this.events.rsvp(session, token, id, dto);
   }
 
   @Post("tickets/:id/checkin")
   @Capability("checkin.scan")
-  checkin(@CurrentSession() session: Session, @Param("id") id: string) {
-    return this.events.checkin(session, id);
+  checkin(@CurrentSession() session: Session, @CurrentToken() token: string | undefined, @Param("id") id: string) {
+    return this.events.checkin(session, token, id);
   }
 }

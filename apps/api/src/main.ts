@@ -1,7 +1,8 @@
 // OX API bootstrap. Plug in. Level up.
-// JWT → Postgres GUC → RLS: the guard decodes the token into req.session, and
-// every scoped handler runs its DB work through withScope so the RLS policies
-// filter rows. Capabilities are the verb boundary; RLS is the row boundary.
+// Supabase access token → RLS: the guard resolves the token into req.session and
+// attaches req.accessToken, and every scoped handler runs its DB work through a
+// per-request Supabase client (supa.forUser(token)) so the RLS policies filter
+// rows. Capabilities are the verb boundary; RLS is the row boundary.
 import "reflect-metadata";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";

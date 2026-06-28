@@ -6,26 +6,24 @@ Base prefix: `/api/v1`. Default port `4000` (`PORT`). Helmet + CORS + a global
 `ValidationPipe`. Every error leaves as the single OpenAPI envelope
 `{ code, message, details? }`.
 
-## The JWT → GUC → RLS flow
+## The token → RLS flow (Supabase-only, no ORM)
 
-1. `POST /auth/otp/verify` mints a JWT signed with `{ userId, role, floorId }`.
-2. `JwtAuthGuard` decodes the bearer token into `req.session` (the `@ox/rbac`
-   `Session`). `@Public()` routes skip the requirement (they still personalize
-   when a token is present). The guard accepts **two token kinds** (see below)
-   and rejects **denylisted** tokens (server-side signout).
+1. The bearer is a **Supabase access token** (the apps sign in via Supabase Auth;
+   the four demo identities use a real password session).
+2. `JwtAuthGuard` verifies the token (`SUPABASE_JWT_SECRET` HS256 → JWKS → dev
+   decode) and resolves the OX `User` (`authUserId = sub`) into `req.session`
+   (the `@ox/rbac` `Session`) + `req.accessToken`. `@Public()` routes skip the
+   requirement; signout denylists the token server-side.
 3. `@Capability('cap')` + `CapabilityGuard` enforce the **verb boundary** via
    `can(session, cap)` — a 403 envelope otherwise.
-4. Scoped handlers run their Prisma work through `ScopeRunner.run(session, tx => …)`,
-   which calls `@ox/db` `withScope`. That opens a transaction and sets the
-   Postgres GUCs `ox.user_id / ox.role / ox.floor_id`. The **RLS policies are the
-   row boundary** — they filter every row. We never hand-filter scoped rows. The
-   operator- and consumer-parity tables (leads, automations, shifts, agreements,
-   notifications, wishlist, credits, packs, …) are Prisma-backed and run through
-   the same `ScopeRunner`, with explicit floor/user `where` clauses as defense in
-   depth so cross-tenant rows never leak.
+4. Handlers read/write through **supabase-js** (`SupaService`): scoped reads use
+   `forUser(token)` so **RLS** (`auth.uid() ↔ "User"."authUserId"`) filters every
+   row — we never hand-filter. Trusted server writes (webhooks, automation runs,
+   XP awards, payment minting) use `service()` (service role) with explicit
+   `floorId`/`userId` guards so cross-tenant rows never leak.
 
-> Connect Postgres as a **non-superuser, non-BYPASSRLS** role in prod or the
-> policies in `db/prisma/migrations/rls/policies.sql` will not apply.
+> RLS is enforced by the Supabase policies (`db/migrations/*.sql`). There is no
+> Prisma and no GUC layer.
 
 ## Two token kinds + the Supabase bridge
 
@@ -40,7 +38,7 @@ Base prefix: `/api/v1`. Default port `4000` (`PORT`). Helmet + CORS + a global
 
 For privileged server writes (webhooks, admin jobs) `SupabaseBridge.service()`
 returns a `createServiceClient()` (service-role key, bypasses RLS) when
-`SUPABASE_SERVICE_ROLE_KEY` is set; otherwise callers fall back to scoped Prisma
+`SUPABASE_SERVICE_ROLE_KEY` is set; otherwise callers fall back to scoped supabase-js
 so rows are still filtered.
 
 ## Auth — OTP + signout
@@ -117,7 +115,7 @@ signup + booking), POS desk sales (real `Payment` rows; cash settles paid, card
 mints a PaymentIntent), staff scheduling, commission/payroll (computed from the
 live `Payment` ledger, CSV export), recurring class builder (`occurrences`), and
 contracts/e-sign. All of these now persist for real: Lead/LeadActivity,
-Automation/AutomationRun, Shift, and Agreement/Signature are Prisma-backed and
+Automation/AutomationRun, Shift, and Agreement/Signature are Supabase-backed and
 RLS-scoped via `ScopeRunner` (host=floor, coach=own, admin=all), with explicit
 floor/user `where` clauses so tenants never leak. The automation `fire(floor,
 trigger)` runner records an `AutomationRun` per matched rule. Consumer-parity
@@ -146,7 +144,7 @@ secret is set (missing/invalid signature → rejected); with no secret it parses
 body (dev). It is **idempotent by event id** (in-memory Set — *prod needs a durable
 store*) and branches on `payment_intent.succeeded/payment_failed`,
 `invoice.paid/payment_failed`, `customer.subscription.updated/deleted` to update
-`Payment.state` / `Order.state` / `Ticket.state` / `Membership.status` via Prisma.
+`Payment.state` / `Order.state` / `Ticket.state` / `Membership.status` via supabase-js.
 The DB mutations are real; enqueue-style side effects (dunning, notifications) are
 logged TODO seams.
 
@@ -155,7 +153,8 @@ logged TODO seams.
 | Var | Purpose |
 |---|---|
 | `PORT` | API port (default 4000) |
-| `DATABASE_URL` / `DIRECT_URL` | Prisma → Supabase Postgres |
+| `SUPABASE_SERVICE_ROLE_KEY` | trusted server writes (bypasses RLS) |
+| `SUPABASE_JWT_SECRET` | verify Supabase access tokens |
 | `JWT_SECRET` | signs/verifies OX-minted JWTs |
 | `STRIPE_SECRET_KEY` | enables live Stripe; unset → mock mode |
 | `STRIPE_WEBHOOK_SECRET` | webhook signature verification |

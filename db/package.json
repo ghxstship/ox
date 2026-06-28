@@ -2,30 +2,13 @@
   "name": "@ox/db",
   "version": "1.0.0",
   "private": true,
-  "description": "OX database — Prisma schema (02-data-model), Postgres RLS policies (06), and the seed that reproduces the four demo identities.",
-  "main": "index.ts",
-  "exports": {
-    ".": "./index.ts"
-  },
+  "description": "OX database — Supabase (project xaepcwnqjwphuwvuekfb). SQL migrations + RLS. No ORM: the app talks to Postgres through supabase-js (@ox/supabase) with RLS as the boundary.",
   "scripts": {
-    "prisma:generate": "prisma generate",
-    "pull": "prisma db pull && prisma generate",
-    "setup": "prisma db pull && prisma generate",
-    "verify": "tsx prisma/verify.ts",
-    "prisma:migrate": "echo 'Refusing: the Supabase DB is the source of truth. Use db:pull to introspect. To migrate a FRESH local DB instead, run: prisma migrate dev' && exit 1",
-    "seed": "echo 'Refusing: the Supabase project xaepcwnqjwphuwvuekfb is already seeded. To seed a FRESH/empty DB, run: tsx prisma/seed.ts directly.' && exit 1",
-    "seed:fresh": "tsx prisma/seed.ts",
-    "rls:apply": "psql \"$DIRECT_URL\" -f prisma/migrations/rls/policies.sql",
-    "studio": "prisma studio",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .turbo *.tsbuildinfo node_modules/.prisma"
-  },
-  "dependencies": {
-    "@prisma/client": "^5.20.0"
-  },
-  "devDependencies": {
-    "prisma": "^5.20.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.5.4"
+    "push": "supabase db push",
+    "diff": "supabase db diff",
+    "types": "supabase gen types typescript --project-id xaepcwnqjwphuwvuekfb > ../packages/supabase/src/database.types.ts",
+    "link": "supabase link --project-ref xaepcwnqjwphuwvuekfb",
+    "lint": "echo \"@ox/db: SQL migrations — no lint\" && exit 0",
+    "typecheck": "echo \"@ox/db: no TypeScript\" && exit 0"
   }
 }

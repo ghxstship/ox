@@ -1,9 +1,0 @@
-{
-  "extends": "../packages/config/tsconfig.node.json",
-  "compilerOptions": {
-    "noEmit": true,
-    "moduleResolution": "Bundler",
-    "module": "ESNext"
-  },
-  "include": ["index.ts", "prisma/**/*.ts"]
-}

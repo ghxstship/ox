@@ -21,7 +21,6 @@
     "noUncheckedIndexedAccess": false,
     "types": ["node"],
     "paths": {
-      "@ox/db": ["../../db/index.ts"],
       "@ox/rbac": ["../../packages/rbac/src/index.ts"],
       "@ox/types": ["../../packages/types/src/index.ts"],
       "@ox/api-client": ["../../packages/api-client/src/index.ts"],
@@ -35,10 +34,15 @@
   "ts-node": {
     "transpileOnly": true,
     "preferTsExts": true,
+    "experimentalResolver": true,
     "require": ["tsconfig-paths/register"],
     "compilerOptions": {
       "module": "commonjs",
       "moduleResolution": "node"
+    },
+    "moduleTypes": {
+      "../../packages/supabase/src/**/*.ts": "cjs",
+      "../../packages/rbac/src/**/*.ts": "cjs"
     }
   }
 }

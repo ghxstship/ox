@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
-import { Capability, CurrentSession, Public } from "../common/decorators";
+import { Capability, CurrentSession, CurrentToken, Public } from "../common/decorators";
 import type { Session } from "../common/session";
 import { GenerateWorkoutDto, LogSetDto, StartWorkoutDto } from "./training.dto";
 import { TrainingService } from "./training.service";
@@ -26,19 +26,24 @@ export class TrainingController {
 
   @Post("workouts")
   @Capability("workout.log")
-  start(@CurrentSession() session: Session, @Body() dto: StartWorkoutDto) {
-    return this.training.start(session, dto);
+  start(@CurrentSession() session: Session, @CurrentToken() token: string | undefined, @Body() dto: StartWorkoutDto) {
+    return this.training.start(session, token, dto);
   }
 
   @Post("workouts/:id/sets")
   @Capability("workout.log")
-  logSet(@CurrentSession() session: Session, @Param("id") id: string, @Body() dto: LogSetDto) {
-    return this.training.logSet(session, id, dto);
+  logSet(
+    @CurrentSession() session: Session,
+    @CurrentToken() token: string | undefined,
+    @Param("id") id: string,
+    @Body() dto: LogSetDto,
+  ) {
+    return this.training.logSet(session, token, id, dto);
   }
 
   @Post("workouts/:id/finish")
   @Capability("workout.log")
-  finish(@CurrentSession() session: Session, @Param("id") id: string) {
-    return this.training.finish(session, id);
+  finish(@CurrentSession() session: Session, @CurrentToken() token: string | undefined, @Param("id") id: string) {
+    return this.training.finish(session, token, id);
   }
 }

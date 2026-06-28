@@ -1,31 +1,41 @@
-# OX — OPTIONAL local infrastructure for fully-offline dev only.
-# The default backend is Supabase (xaepcwnqjwphuwvuekfb); you do NOT need this to run OX.
-# Use only to run OX against a local Postgres (then point DATABASE_URL here and run db:seed:fresh).
+# OX — full-stack app (web + api) against the hosted Supabase project
+# xaepcwnqjwphuwvuekfb. No local database: Supabase IS the database.
+#   cp .env.example .env   # fill the Supabase service key + Stripe secrets
+#   docker compose up --build
 services:
-  postgres:
-    image: postgres:16-alpine
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
     environment:
-      POSTGRES_USER: ox
-      POSTGRES_PASSWORD: ox
-      POSTGRES_DB: ox
-    ports: ["5432:5432"]
-    volumes: ["ox_pg:/var/lib/postgresql/data"]
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ox"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-  redis:
-    image: redis:7-alpine
-    ports: ["6379:6379"]
-  minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
+      PORT: "4000"
+      WEB_ORIGIN: "http://localhost:3000"
+      NEXT_PUBLIC_SUPABASE_URL: "${NEXT_PUBLIC_SUPABASE_URL:-https://xaepcwnqjwphuwvuekfb.supabase.co}"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-sb_publishable_ZzRzJgf-NQ3g5sR6i48m8g_HbMD_DMM}"
+      SUPABASE_SERVICE_ROLE_KEY: "${SUPABASE_SERVICE_ROLE_KEY:-}"
+      SUPABASE_JWT_SECRET: "${SUPABASE_JWT_SECRET:-}"
+      JWT_SECRET: "${JWT_SECRET:-dev-secret-change-me}"
+      STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY:-}"
+      STRIPE_WEBHOOK_SECRET: "${STRIPE_WEBHOOK_SECRET:-}"
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: "${NEXT_PUBLIC_SUPABASE_URL:-https://xaepcwnqjwphuwvuekfb.supabase.co}"
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-sb_publishable_ZzRzJgf-NQ3g5sR6i48m8g_HbMD_DMM}"
+        NEXT_PUBLIC_OX_API_URL: "${NEXT_PUBLIC_OX_API_URL:-http://localhost:4000/api/v1}"
     environment:
-      MINIO_ROOT_USER: ox
-      MINIO_ROOT_PASSWORD: oxoxoxox
-    ports: ["9000:9000", "9001:9001"]
-    volumes: ["ox_minio:/data"]
-volumes:
-  ox_pg:
-  ox_minio:
+      PORT: "3000"
+      NEXT_PUBLIC_SUPABASE_URL: "${NEXT_PUBLIC_SUPABASE_URL:-https://xaepcwnqjwphuwvuekfb.supabase.co}"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-sb_publishable_ZzRzJgf-NQ3g5sR6i48m8g_HbMD_DMM}"
+      NEXT_PUBLIC_OX_API_URL: "${NEXT_PUBLIC_OX_API_URL:-http://localhost:4000/api/v1}"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    restart: unless-stopped

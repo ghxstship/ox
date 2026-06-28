@@ -1,49 +1,54 @@
 // Floor management writes (03 · operator/CRM). Reads are public; updates require
-// floor.manage and equipment changes require equipment.manage. All writes run
-// through ScopeRunner so RLS keeps a host to their own floor.
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { Prisma } from "@ox/db";
+// floor.manage and equipment changes require equipment.manage. All writes run AS
+// the caller (RLS) via supa.forUser(token) so a host stays on their own floor.
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import type { Enums, TablesUpdate } from "@ox/supabase/types";
 import type { Session } from "@ox/rbac";
-import { ScopeRunner } from "../common/scope.runner";
+import { SupaService } from "../common/supa.service";
 import type { UpdateFloorDto, SetEquipmentDto } from "./floors.dto";
 
 @Injectable()
 export class FloorsService {
-  constructor(private readonly scope: ScopeRunner) {}
+  constructor(private readonly supa: SupaService) {}
 
-  update(session: Session, id: string, dto: UpdateFloorDto) {
-    return this.scope.run(session, async (tx) => {
-      const floor = await tx.floor.findUnique({ where: { id } });
-      if (!floor) throw new NotFoundException({ code: "not_found", message: "No floor (or out of scope)." });
-      return tx.floor.update({
-        where: { id },
-        data: {
-          name: dto.name,
-          address: dto.address,
-          scenery: dto.scenery as Prisma.FloorUpdateInput["scenery"],
-          stripeAccountId: dto.stripeAccountId,
-          geo: dto.geo as Prisma.InputJsonValue | undefined,
-        },
-      });
-    });
+  async update(session: Session, token: string | undefined, id: string, dto: UpdateFloorDto) {
+    const sb = this.supa.forUser(token);
+    const { data: floor } = await sb.from("Floor").select("id").eq("id", id).maybeSingle();
+    if (!floor) throw new NotFoundException({ code: "not_found", message: "No floor (or out of scope)." });
+
+    const patch: TablesUpdate<"Floor"> = {};
+    if (dto.name !== undefined) patch.name = dto.name;
+    if (dto.address !== undefined) patch.address = dto.address;
+    if (dto.scenery !== undefined) patch.scenery = dto.scenery as Enums<"Scenery">;
+    if (dto.stripeAccountId !== undefined) patch.stripeAccountId = dto.stripeAccountId;
+    if (dto.geo !== undefined) patch.geo = dto.geo as TablesUpdate<"Floor">["geo"];
+
+    const { data, error } = await sb.from("Floor").update(patch).eq("id", id).select().single();
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return data;
   }
 
   /** Replace the floor's equipment roster with the supplied set. */
-  setEquipment(session: Session, id: string, dto: SetEquipmentDto) {
-    return this.scope.run(session, async (tx) => {
-      const floor = await tx.floor.findUnique({ where: { id } });
-      if (!floor) throw new NotFoundException({ code: "not_found", message: "No floor (or out of scope)." });
-      await tx.floorEquipment.deleteMany({ where: { floorId: id } });
-      for (const item of dto.equipment) {
-        await tx.floorEquipment.create({
-          data: {
-            floorId: id,
-            equipment: item.equipment as Prisma.FloorEquipmentCreateInput["equipment"],
-            count: item.count ?? 1,
-          },
-        });
-      }
-      return tx.floorEquipment.findMany({ where: { floorId: id } });
-    });
+  async setEquipment(session: Session, token: string | undefined, id: string, dto: SetEquipmentDto) {
+    const sb = this.supa.forUser(token);
+    const { data: floor } = await sb.from("Floor").select("id").eq("id", id).maybeSingle();
+    if (!floor) throw new NotFoundException({ code: "not_found", message: "No floor (or out of scope)." });
+
+    const { error: delErr } = await sb.from("FloorEquipment").delete().eq("floorId", id);
+    if (delErr) throw new InternalServerErrorException({ code: "internal", message: delErr.message });
+
+    if (dto.equipment.length) {
+      const rows = dto.equipment.map((item) => ({
+        floorId: id,
+        equipment: item.equipment as Enums<"Equipment">,
+        count: item.count ?? 1,
+      }));
+      const { error: insErr } = await sb.from("FloorEquipment").insert(rows);
+      if (insErr) throw new InternalServerErrorException({ code: "internal", message: insErr.message });
+    }
+
+    const { data, error } = await sb.from("FloorEquipment").select("*").eq("floorId", id);
+    if (error) throw new InternalServerErrorException({ code: "internal", message: error.message });
+    return data;
   }
 }

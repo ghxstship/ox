@@ -1,28 +1,26 @@
-// Supabase token bridge.
+// Supabase token bridge (Supabase-only).
 //
-// A request may carry EITHER an OX-minted JWT (signed by this API, claims
-// { userId, role, floorId }) OR a Supabase access token (issued by Supabase Auth,
-// `sub` = auth.users.id). This service:
-//   1. verifies/decodes a Supabase access token and resolves it to an OX User via
-//      User.authUserId, building the same Session shape;
-//   2. hands out scoped server clients (`@ox/supabase/server`) so RLS-filtered
-//      reads run AS the user when a Supabase token is present;
-//   3. exposes a privileged service client (service-role key) for webhooks/admin
-//      writes that must bypass RLS.
+// Every request carries a Supabase access token (issued by Supabase Auth,
+// `sub` = auth.users.id) — both real users and the four demo identities now sign
+// in via Supabase, so `auth.uid()` resolves. This service:
+//   1. verifies/decodes the access token and resolves it to an OX User via
+//      User.authUserId, building the Session shape the guards + RLS expect;
+//   2. relies on SupaService for the per-request scoped client (RLS as the user)
+//      and the service-role client (RLS bypass for trusted lookups).
 //
 // Verification: if SUPABASE_JWT_SECRET is set we verify the HS256 signature; if a
 // JWKS endpoint is configured we verify against it (RS256 / asymmetric keys);
-// otherwise we DECODE-AND-TRUST the `sub` (acceptable only in trusted/dev setups —
-// the resolved row is still RLS-scoped because we forward the original token to
-// the per-request Supabase client). Production should always set a secret/JWKS.
+// otherwise we DECODE-AND-TRUST the `sub` with a warning (acceptable only in
+// trusted/dev setups — the resolved row is still RLS-scoped because every
+// user-facing read forwards the original token to a per-request Supabase client).
+// Production should always set SUPABASE_JWT_SECRET or SUPABASE_JWKS_URL.
 import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { prisma, type Role } from "@ox/db";
+import type { Enums } from "@ox/supabase";
 import type { Session } from "@ox/rbac";
-import { createServerClient, createServiceClient } from "@ox/supabase/server";
-import type { OxSupabase } from "@ox/supabase";
 import * as jwt from "jsonwebtoken";
 import { JwksClient } from "jwks-rsa";
+import { SupaService } from "./supa.service";
 
 interface SupabaseClaims {
   sub?: string;
@@ -38,9 +36,11 @@ export class SupabaseBridge {
   private readonly log = new Logger("SupabaseBridge");
   private readonly jwtSecret?: string;
   private readonly jwks?: JwksClient;
-  private serviceClient?: OxSupabase;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    private readonly config: ConfigService,
+    private readonly supa: SupaService,
+  ) {
     this.jwtSecret = config.get<string>("SUPABASE_JWT_SECRET") || undefined;
     const jwksUri = config.get<string>("SUPABASE_JWKS_URL") || this.defaultJwksUri();
     if (jwksUri) {
@@ -48,27 +48,24 @@ export class SupabaseBridge {
     }
   }
 
-  /**
-   * True when the token looks like a Supabase access token rather than an
-   * OX-minted JWT. OX tokens carry `userId`; Supabase tokens carry `sub` + the
-   * Supabase issuer. We decode (no verify) just to route — verification happens
-   * in `sessionFromSupabaseToken`.
-   */
-  isSupabaseToken(token: string): boolean {
-    const decoded = jwt.decode(token) as SupabaseClaims | null;
-    if (!decoded) return false;
-    if (typeof (decoded as Record<string, unknown>).userId === "string") return false; // OX token
-    const iss = decoded.iss ?? "";
-    return Boolean(decoded.sub) && (iss.includes("supabase") || iss.includes("/auth/v1"));
-  }
-
   /** Verify a Supabase access token and resolve it to an OX Session. */
-  async sessionFromSupabaseToken(token: string): Promise<Session> {
+  async sessionFromToken(token: string): Promise<Session> {
     const claims = await this.verify(token);
     const authUserId = claims.sub;
     if (!authUserId) throw new UnauthorizedException({ code: "unauthorized", message: "Token missing subject." });
 
-    const user = await prisma.user.findUnique({ where: { authUserId } });
+    // Resolve the OX identity with the service client (RLS bypass) so login works
+    // before the per-request scoped client is established.
+    const { data: user, error } = await this.supa
+      .service()
+      .from("User")
+      .select("id, name, initial, role, floorId, level, xp, homeFloorId")
+      .eq("authUserId", authUserId)
+      .maybeSingle();
+
+    if (error) {
+      throw new UnauthorizedException({ code: "unauthorized", message: `Could not resolve identity: ${error.message}` });
+    }
     if (!user) {
       throw new UnauthorizedException({ code: "unauthorized", message: "No OX identity for this account." });
     }
@@ -77,33 +74,13 @@ export class SupabaseBridge {
       userId: user.id,
       name: user.name,
       initial: user.initial,
-      role: user.role as Role,
+      role: user.role as Enums<"Role">,
       floorId,
       floors: floorId ? [floorId] : [],
       level: user.level,
       xp: user.xp,
       homeFloor: user.homeFloorId ?? undefined,
     };
-  }
-
-  /** Per-request Supabase client that acts AS the user (RLS applies). */
-  serverClientFor(accessToken: string): OxSupabase {
-    return createServerClient(accessToken);
-  }
-
-  /**
-   * Privileged service client (service-role key, BYPASSES RLS). Returns null when
-   * SUPABASE_SERVICE_ROLE_KEY is unset so callers can fall back to scoped Prisma.
-   */
-  service(): OxSupabase | null {
-    if (!this.config.get<string>("SUPABASE_SERVICE_ROLE_KEY")) return null;
-    try {
-      this.serviceClient ??= createServiceClient();
-      return this.serviceClient;
-    } catch (e) {
-      this.log.warn(`Service client unavailable: ${(e as Error).message}`);
-      return null;
-    }
   }
 
   private async verify(token: string): Promise<SupabaseClaims> {
@@ -129,9 +106,9 @@ export class SupabaseBridge {
       }
     }
     // 3) No verification material configured — decode and trust the subject.
-    // Safe-ish because every read we run with this session still passes the
-    // user's token to a per-request Supabase client, so RLS re-checks. Production
-    // MUST set SUPABASE_JWT_SECRET or SUPABASE_JWKS_URL.
+    // Safe-ish because every user-facing read still passes the user's token to a
+    // per-request Supabase client, so RLS re-checks. Production MUST set
+    // SUPABASE_JWT_SECRET or SUPABASE_JWKS_URL.
     this.log.warn("Supabase token accepted without signature verification — set SUPABASE_JWT_SECRET / SUPABASE_JWKS_URL in production.");
     const claims = jwt.decode(token) as SupabaseClaims | null;
     if (!claims) throw new UnauthorizedException({ code: "unauthorized", message: "Unparseable token." });
