@@ -8,6 +8,10 @@ export type { Session };
 export interface OxRequest extends Request {
   session?: Session;
   rawBody?: Buffer;
+  /** The raw bearer token (OX JWT or Supabase access token), if present. */
+  accessToken?: string;
+  /** True when the bearer was a Supabase access token (RLS-via-token path). */
+  isSupabaseToken?: boolean;
 }
 
 /** The minimal claims we sign into the JWT. */

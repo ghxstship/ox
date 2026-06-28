@@ -13,6 +13,8 @@ import {
   OXSetting,
   OXSelect,
   OXAvatar,
+  OXListRow,
+  OXIcon,
   OXEmpty,
 } from "@ox/ds";
 import { moneyFromCents } from "@ox/rbac";
@@ -20,6 +22,7 @@ import { useSession } from "../providers/SessionProvider";
 import { usePrefs } from "../providers/PrefsProvider";
 import { prs, recovery } from "../../lib/seed";
 import { currencyOptions, unitOptions } from "../../lib/prefs";
+import { withLocale } from "../../lib/links";
 import { locales, localeLabel, intlLocale, type AppLocale } from "../../i18n/config";
 
 const seedOrders = [
@@ -29,6 +32,15 @@ const seedOrders = [
 
 export function YouView() {
   const t = useTranslations("you");
+  const tplan = useTranslations("plan");
+  const tcredits = useTranslations("credits");
+  const twallet = useTranslations("wallet");
+  const tnotif = useTranslations("notifications");
+  const tbody = useTranslations("body");
+  const tsched = useTranslations("schedule");
+  const thealth = useTranslations("health");
+  const tanalytics = useTranslations("analytics");
+  const tgift = useTranslations("gift");
   const router = useRouter();
   const pathname = usePathname();
   const routeLocale = useLocale();
@@ -66,6 +78,29 @@ export function YouView() {
           ]}
           strip="ox.fit/verify/014 · ON-CHAIN"
         />
+      </section>
+
+      <section className="ox-stack" style={{ gap: 6 }}>
+        <div className="ox-section-label">Account</div>
+        {[
+          { href: "/app/you/plan", icon: "ticket" as const, label: tplan("title") },
+          { href: "/app/you/credits", icon: "wallet" as const, label: tcredits("title") },
+          { href: "/app/you/wallet", icon: "qr" as const, label: twallet("title") },
+          { href: "/app/you/notifications", icon: "bell" as const, label: tnotif("title") },
+          { href: "/app/you/body", icon: "fitness" as const, label: tbody("title") },
+          { href: "/app/you/schedule", icon: "calendar" as const, label: tsched("title") },
+          { href: "/app/you/connections", icon: "globe" as const, label: thealth("title") },
+          { href: "/app/you/analytics", icon: "grid" as const, label: tanalytics("title") },
+          { href: "/app/shop/gift", icon: "events" as const, label: tgift("title") },
+        ].map((row) => (
+          <OXListRow
+            key={row.href}
+            icon={<OXIcon name={row.icon} size="sm" />}
+            title={row.label}
+            chevron
+            onClick={() => router.push(withLocale(routeLocale, row.href))}
+          />
+        ))}
       </section>
 
       <section className="ox-stack" style={{ gap: 10 }}>
@@ -112,18 +147,14 @@ export function YouView() {
           <OXEmpty title={t("noOrders")} />
         ) : (
           seedOrders.map((o) => (
-            <div
+            <OXListRow
               key={o.id}
-              className="ox-row-wrap"
-              style={{ justifyContent: "space-between", borderBottom: "1px solid var(--ox-line)", paddingBlock: 10 }}
-            >
-              <span style={{ fontFamily: "var(--ox-font-sans)" }}>
-                {o.name} <span className="ox-demo-note">· {o.at}</span>
-              </span>
-              <span style={{ fontFamily: "var(--ox-font-mono)", color: "var(--ox-oxide)" }}>
-                {moneyFromCents(o.totalCents, { locale: prefs.locale, currency: prefs.currency })}
-              </span>
-            </div>
+              title={o.name}
+              sub={o.at}
+              trail={moneyFromCents(o.totalCents, { locale: prefs.locale, currency: prefs.currency })}
+              chevron
+              onClick={() => router.push(withLocale(routeLocale, `/app/you/orders/${o.id}`))}
+            />
           ))
         )}
       </section>

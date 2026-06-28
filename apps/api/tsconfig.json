@@ -24,7 +24,10 @@
       "@ox/db": ["../../db/index.ts"],
       "@ox/rbac": ["../../packages/rbac/src/index.ts"],
       "@ox/types": ["../../packages/types/src/index.ts"],
-      "@ox/api-client": ["../../packages/api-client/src/index.ts"]
+      "@ox/api-client": ["../../packages/api-client/src/index.ts"],
+      "@ox/supabase": ["../../packages/supabase/src/index.ts"],
+      "@ox/supabase/server": ["../../packages/supabase/src/server.ts"],
+      "@ox/supabase/types": ["../../packages/supabase/src/database.types.ts"]
     }
   },
   "include": ["src/**/*.ts"],

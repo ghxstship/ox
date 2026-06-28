@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, Req } from "@nestjs/common";
 import { Public } from "../common/decorators";
+import type { OxRequest } from "../common/session";
 import { OtpStartDto, OtpVerifyDto } from "./auth.dto";
 import { AuthService } from "./auth.service";
 
@@ -21,10 +22,12 @@ export class AuthController {
     return this.auth.verify(body.id, body.code);
   }
 
+  // Public route, but it reads the bearer to revoke it. The guard attaches
+  // req.accessToken even on @Public() routes when a token is present.
   @Public()
   @Post("signout")
   @HttpCode(204)
-  signout(): void {
-    // Stateless JWT — client drops the token. Revocation list is out of scope.
+  signout(@Req() req: OxRequest): void {
+    this.auth.signout(req.accessToken);
   }
 }

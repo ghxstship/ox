@@ -3,14 +3,18 @@
 // OX web — Cart / checkout. Line items + total + checkout CTA. Empty state via
 // OXEmpty. All money through moneyFromCents() (i18n gate). Demo line items.
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { OXButton, OXEmpty, OXToast } from "@ox/ds";
 import { moneyFromCents } from "@ox/rbac";
 import { usePrefs } from "../providers/PrefsProvider";
 import { products } from "../../lib/seed";
+import { withLocale } from "../../lib/links";
 
 export function CartView() {
   const t = useTranslations("shop");
+  const router = useRouter();
+  const locale = useLocale();
   const { prefs } = usePrefs();
   const [items, setItems] = useState(() => [
     { ...products[0]!, size: "M", qty: 1 },
@@ -68,7 +72,7 @@ export function CartView() {
         </span>
       </div>
 
-      <OXButton variant="oxide" arrow block onClick={() => setPlaced(true)}>
+      <OXButton variant="oxide" arrow block onClick={() => router.push(withLocale(locale, "/app/cart/checkout"))}>
         {t("checkout")}
       </OXButton>
 

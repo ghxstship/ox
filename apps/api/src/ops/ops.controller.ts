@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post } from "@nestjs/common";
 import { Capability, CurrentSession } from "../common/decorators";
 import type { Session } from "../common/session";
+import { SubscribeDto, UpdateMembershipDto } from "./ops.dto";
 import { OpsService } from "./ops.service";
 
 @Controller()
@@ -41,6 +42,18 @@ export class OpsController {
   @Capability("revenue.view")
   memberships(@CurrentSession() session: Session) {
     return this.ops.memberships(session);
+  }
+
+  @Post("memberships")
+  @Capability("revenue.view")
+  subscribe(@CurrentSession() session: Session, @Body() dto: SubscribeDto) {
+    return this.ops.subscribe(session, dto);
+  }
+
+  @Patch("memberships/:id")
+  @Capability("revenue.view")
+  updateMembership(@CurrentSession() session: Session, @Param("id") id: string, @Body() dto: UpdateMembershipDto) {
+    return this.ops.updateMembership(session, id, dto.action);
   }
 
   @Get("reports/:name")

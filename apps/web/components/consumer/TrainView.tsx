@@ -1,9 +1,9 @@
 "use client";
 
-// OX web — Train. Exercise library (OXFilterBar + OXExerciseCard), a session
-// generator, recovery map (OXRecoveryMap), and PRs (OXPRChip). Exercises load
-// from the API with a seed fallback (demo note when offline).
-import { useEffect, useMemo, useState } from "react";
+// OX web — Train. Exercise library (OXFilterBar + OXExerciseCard) read LIVE from
+// Supabase (public discovery; seed only as offline fallback), entry points to the
+// Generator / Programs / Analytics, recovery map (OXRecoveryMap), and PRs.
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -15,12 +15,19 @@ import {
   OXEmpty,
   OXSkeleton,
 } from "@ox/ds";
-import { withFallback } from "../../lib/api";
-import { useApi } from "../../lib/useApi";
-import { exercises as seedExercises, recovery, prs, sessionPlan } from "../../lib/seed";
+import { useLive } from "../../lib/useLive";
+import { fetchExercises } from "../../lib/supabase";
+import { exercises as seedExercises, recovery, prs } from "../../lib/seed";
 import { withLocale } from "../../lib/links";
+import { ExerciseDemoSheet } from "../parity/ExerciseDemoSheet";
 
-type ExRow = (typeof seedExercises)[number];
+interface ExRow {
+  id: string;
+  name: string;
+  muscles: string;
+  equipment: string;
+  floors: number;
+}
 
 const filterGroups = [
   { key: "muscle", label: "Muscle", options: ["push", "pull", "legs", "core", "full body"] },
@@ -29,38 +36,27 @@ const filterGroups = [
 
 export function TrainView() {
   const t = useTranslations("train");
-  const tc = useTranslations("common");
+  const tprog = useTranslations("programs");
+  const tanalytics = useTranslations("analytics");
   const router = useRouter();
   const locale = useLocale();
-  const api = useApi();
 
-  const [rows, setRows] = useState<ExRow[] | null>(null);
-  const [live, setLive] = useState(true);
+  const lib = useLive(fetchExercises, []);
   const [filters, setFilters] = useState<Record<string, string | null>>({});
+  const [demo, setDemo] = useState<{ id: string; name: string; cue?: string } | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    void withFallback<ExRow[]>(
-      async () => {
-        const page = await api.training.exercises();
-        return page.data.map((e) => ({
-          id: e.id,
-          name: e.name,
-          muscles: e.muscles.join(" · "),
-          equipment: e.equipment.join(", "),
-          floors: 0,
-        }));
-      },
-      seedExercises
-    ).then((res) => {
-      if (!active) return;
-      setRows(res.data);
-      setLive(res.live);
-    });
-    return () => {
-      active = false;
-    };
-  }, [api]);
+  const rows: ExRow[] | null = useMemo(() => {
+    if (lib.loading) return null;
+    const live = (lib.data ?? []).map((e) => ({
+      id: e.id,
+      name: e.name,
+      muscles: e.muscles.join(" · "),
+      equipment: e.equipment.join(", "),
+      floors: 0,
+    }));
+    if (live.length) return live;
+    return seedExercises.map((e) => ({ id: e.id, name: e.name, muscles: e.muscles, equipment: e.equipment, floors: e.floors }));
+  }, [lib.loading, lib.data]);
 
   const filtered = useMemo(() => {
     if (!rows) return [];
@@ -75,18 +71,19 @@ export function TrainView() {
 
   return (
     <div className="ox-page ox-stack">
-      <div className="ox-row-wrap" style={{ justifyContent: "space-between" }}>
-        <h1 style={{ fontFamily: "var(--ox-font-serif)", fontSize: 32, margin: 0 }}>{t("title")}</h1>
-        {!live && <span className="ox-demo-note">{tc("demoData")}</span>}
-      </div>
+      <h1 style={{ fontFamily: "var(--ox-font-serif)", fontSize: 32, margin: 0 }}>{t("title")}</h1>
 
-      <OXButton
-        variant="oxide"
-        arrow
-        onClick={() => router.push(withLocale(locale, `/app/train/session/${sessionPlan.id}`))}
-      >
-        {t("generate")}
-      </OXButton>
+      <div className="ox-row-wrap">
+        <OXButton variant="oxide" arrow onClick={() => router.push(withLocale(locale, "/app/train/generate"))}>
+          {t("generate")}
+        </OXButton>
+        <OXButton variant="default" onClick={() => router.push(withLocale(locale, "/app/train/programs"))}>
+          {tprog("title")}
+        </OXButton>
+        <OXButton variant="default" onClick={() => router.push(withLocale(locale, "/app/you/analytics"))}>
+          {tanalytics("title")}
+        </OXButton>
+      </div>
 
       <section className="ox-stack" style={{ gap: 10 }}>
         <div className="ox-section-label">{t("library")}</div>
@@ -106,15 +103,21 @@ export function TrainView() {
         ) : (
           <div className="ox-stack" style={{ gap: 8 }}>
             {filtered.map((x, i) => (
-              <OXExerciseCard
+              <button
                 key={x.id}
-                index={String(i + 1).padStart(2, "0")}
-                name={x.name}
-                muscles={x.muscles}
-                equipment={x.equipment}
-                floors={x.floors}
-                onFind={() => router.push(withLocale(locale, "/app/map"))}
-              />
+                type="button"
+                onClick={() => setDemo({ id: x.id, name: x.name, cue: undefined })}
+                style={{ border: "none", background: "none", padding: 0, inlineSize: "100%", textAlign: "start", cursor: "pointer" }}
+              >
+                <OXExerciseCard
+                  index={String(i + 1).padStart(2, "0")}
+                  name={x.name}
+                  muscles={x.muscles}
+                  equipment={x.equipment}
+                  floors={x.floors}
+                  onFind={() => router.push(withLocale(locale, "/app/map"))}
+                />
+              </button>
             ))}
           </div>
         )}
@@ -133,6 +136,16 @@ export function TrainView() {
           ))}
         </div>
       </section>
+
+      {demo && (
+        <ExerciseDemoSheet
+          open
+          onClose={() => setDemo(null)}
+          exerciseId={demo.id}
+          fallbackName={demo.name}
+          fallbackCue={demo.cue}
+        />
+      )}
     </div>
   );
 }

@@ -16,14 +16,14 @@ export function RoleSwitcher() {
   const t = useTranslations("nav");
   const router = useRouter();
   const locale = useLocale();
-  const { session, signIn, signOut } = useSession();
+  const { session, signInDemo, signOut } = useSession();
   const [open, setOpen] = useState(false);
   const ref = useDismissable(open, () => setOpen(false));
 
   if (!session) return null;
 
-  function choose(userId: string) {
-    signIn(userId);
+  async function choose(userId: string) {
+    await signInDemo(userId);
     setOpen(false);
     const role = accounts.find((a) => a.id === userId)?.role;
     if (role) {
@@ -45,7 +45,7 @@ export function RoleSwitcher() {
               ...accounts.map((a) => ({
                 key: a.id,
                 label: `${a.label} · ${a.role}`,
-                onSelect: () => choose(a.id),
+                onSelect: () => void choose(a.id),
               })),
               { key: "out", label: t("signOut"), danger: true, separatorAfter: false, onSelect: () => { signOut(); router.replace(withLocale(locale, "/signin")); } },
             ]}

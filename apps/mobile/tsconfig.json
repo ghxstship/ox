@@ -4,11 +4,13 @@
     "jsx": "react-native",
     "moduleResolution": "Bundler",
     "noEmit": true,
-    "types": ["react"],
+    "types": ["react", "node"],
     "paths": {
       "@ox/types": ["../../packages/types/src/index.ts"],
       "@ox/rbac": ["../../packages/rbac/src/index.ts"],
-      "@ox/api-client": ["../../packages/api-client/src/index.ts"]
+      "@ox/api-client": ["../../packages/api-client/src/index.ts"],
+      "@ox/supabase": ["../../packages/supabase/src/index.ts"],
+      "@ox/supabase/types": ["../../packages/supabase/src/database.types.ts"]
     }
   },
   "include": ["app/**/*", "src/**/*", "index.ts"]

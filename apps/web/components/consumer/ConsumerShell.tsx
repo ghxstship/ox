@@ -47,6 +47,9 @@ export function ConsumerShell({ children }: { children: React.ReactNode }) {
               {scopeLabel(session, floorName)}
             </OXChip>
           )}
+          <Link href={withLocale(locale, "/app/search")} aria-label="Search" className="ox-hit" style={{ display: "inline-grid", placeItems: "center" }}>
+            <OXIcon name="search" />
+          </Link>
           <Link href={withLocale(locale, "/app/cart")} aria-label={t("shop")} className="ox-hit" style={{ display: "inline-grid", placeItems: "center" }}>
             <OXIcon name="wallet" />
           </Link>

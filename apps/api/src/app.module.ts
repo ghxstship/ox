@@ -14,6 +14,8 @@ import { EventsModule } from "./events/events.module";
 import { FloorsModule } from "./floors/floors.module";
 import { MeModule } from "./me/me.module";
 import { OpsModule } from "./ops/ops.module";
+import { ParityModule } from "./parity/parity.module";
+import { RealtimeModule } from "./realtime/realtime.module";
 import { TenantModule } from "./tenant/tenant.module";
 import { TrainingModule } from "./training/training.module";
 import { WebhooksModule } from "./webhooks/webhooks.module";
@@ -22,6 +24,8 @@ import { WebhooksModule } from "./webhooks/webhooks.module";
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     CommonModule,
+    RealtimeModule,
+    ParityModule,
     BillingModule,
     AuthModule,
     MeModule,

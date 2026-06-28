@@ -28,6 +28,22 @@ export class ClassesController {
     return this.classes.create(session, dto);
   }
 
+  // Recurring class builder (11 §B #30): expand a series' recurRule into
+  // occurrences. `?persist=1` materializes them as concrete Class rows.
+  @Post("classes/:id/occurrences")
+  @Capability("class.manage")
+  occurrences(
+    @CurrentSession() session: Session,
+    @Param("id") id: string,
+    @Query("count") count?: string,
+    @Query("persist") persist?: string,
+  ) {
+    return this.classes.occurrences(session, id, {
+      count: count ? Number(count) : undefined,
+      persist: persist === "1" || persist === "true",
+    });
+  }
+
   @Patch("classes/:id")
   @Capability("class.manage")
   update(@CurrentSession() session: Session, @Param("id") id: string, @Body() dto: UpdateClassDto) {

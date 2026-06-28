@@ -7,10 +7,14 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "backgroundColor": "#ECE7DA",
-    "plugins": ["expo-router"],
-    "experiments": { "typedRoutes": true },
+    "plugins": ["expo-router", "expo-font"],
+    "experiments": { "typedRoutes": false },
     "ios": { "supportsTablet": true, "bundleIdentifier": "fit.ox.app" },
     "android": { "package": "fit.ox.app" },
-    "extra": { "apiUrl": "http://localhost:4000/api/v1" }
+    "extra": {
+      "apiUrl": "http://localhost:4000/api/v1",
+      "supabaseUrl": "https://xaepcwnqjwphuwvuekfb.supabase.co",
+      "supabaseAnonKey": "sb_publishable_ZzRzJgf-NQ3g5sR6i48m8g_HbMD_DMM"
+    }
   }
 }
